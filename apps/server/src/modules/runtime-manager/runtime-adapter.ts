@@ -6,7 +6,9 @@
  */
 import {
   ERROR_STATUS,
+  type ExecutionMode,
   type RiskClass,
+  type RuntimeEnvironment,
   type RuntimeCapabilityProfile,
   type RuntimeKind,
   type Usage,
@@ -139,6 +141,46 @@ export interface RuntimeAdapter {
   detect(): Promise<RuntimeDetection>;
   capabilities(): RuntimeCapabilityProfile;
   start(input: StartSessionInput, deps: RuntimeDeps): Promise<SessionHandle>;
+}
+
+/**
+ * What the orchestrator uses (implemented by RuntimeManager). It hides adapters, sinks, the
+ * scope guard, liveness monitoring and the managed-session/agent projection, so the
+ * orchestration workstream only decides WHAT to run and WHEN.
+ */
+export interface ManagedRuntime {
+  environment(): Promise<RuntimeEnvironment>;
+  /**
+   * Start a Nexora-managed session in `input.cwd` (a worktree). Events are persisted with
+   * source agent_sdk/stream_json; the session row gets runtime, executionMode, currentTaskId,
+   * observeOnly=false and the adapter's capabilities.
+   */
+  startManagedSession(
+    input: StartSessionInput & {
+      executionMode: ExecutionMode;
+      runtime?: RuntimeKind;
+      idleTimeoutMs: number;
+      turnTimeoutMs: number;
+    },
+    deps: {
+      approvals: ApprovalGate;
+      /** turn exceeded turnTimeoutMs — the runtime already interrupted/stopped it */
+      onTurnTimeout?: (info: { sessionId: string; taskId: string | null }) => void;
+    },
+  ): Promise<SessionHandle>;
+  /**
+   * Read-only, single-turn model query for analysis/planning (permissionMode "plan", tools limited
+   * to Read/Glob/Grep, cwd inside the project). Callers MUST have model-usage consent (FR-008).
+   */
+  readOnlyQuery(input: {
+    cwd: string;
+    prompt: string;
+    model?: string;
+    maxTurns?: number;
+  }): Promise<{ text: string; usage: Usage | null }>;
+  getHandle(sessionId: string): SessionHandle | undefined;
+  /** stop every managed session (graceful server shutdown) */
+  stopAll(): Promise<void>;
 }
 
 /** Tools that execute arbitrary shell commands — always routed through the ApprovalGate. */
