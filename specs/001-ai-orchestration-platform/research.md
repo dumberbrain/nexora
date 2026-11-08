@@ -1,0 +1,190 @@
+# Phase 0 Research: AI Development Orchestration Platform
+
+Sources: official Claude Code docs (code.claude.com/docs/en/{hooks, headless, cli-reference,
+agent-sdk/typescript, agent-teams, sub-agents}), local `claude --help` (v2.1.319), team frontend
+standards (`team-front-skill` v2.1.1, profile `shadcn-tailwind-tanstack-router`). Every runtime
+integration below uses **documented** features only; anything undocumented is listed as a limitation.
+
+Environment detected (2026-11-08): Windows 10, Node 22.21.1, npm 11.7.0, Claude Code 2.1.319,
+uv 0.11.1, git 2.35.1; **gh CLI not installed**; `~/.claude/teams` absent (Agent Teams never used).
+
+---
+
+## R1. Managed session runtime (Multi-Session, Subagents, Workflow nodes)
+
+- **Decision**: Primary adapter = **Claude Agent SDK for TypeScript** (`@anthropic-ai/claude-agent-sdk`)
+  using `query()` in **streaming-input mode** (AsyncIterable prompt). Secondary adapter = **headless
+  CLI** (`claude -p --input-format stream-json --output-format stream-json --verbose`) for users who
+  prefer the installed CLI binary; same capability profile minus SDK-only controls.
+- **Rationale**: Streaming-input mode is documented as required for `interrupt()`,
+  `setPermissionMode()`, `setModel()`, `streamInput()` (send message), `close()`. `canUseTool`
+  gives a native approval path (no timeout ⇒ matches "no auto-approve"). `agents` option defines
+  subagents programmatically. `resume: sessionId` continues a session later.
+- **Capability profile (SDK)**: start ✔, stop ✔ (`close`), interrupt ✔, sendMessage ✔
+  (`streamInput`), setPermissionMode ✔, resume ✔ (new query with `resume`), restart ✔ (close +
+  resume), **pause ✘** (not documented). UI shows "Interrupt" and "Resume", never a fake "Pause".
+  Execution-level "pause" = interrupt all + mark `paused`; only offered when every runtime has
+  interrupt+resume, and labelled "Interrupt & hold".
+- **Alternatives**: PTY-driving interactive `claude` for all modes — rejected (screen-scraping,
+  fragile, no structured events); raw Anthropic Messages API — rejected (would re-implement Claude
+  Code tools, violates "use Claude Code").
+
+## R2. Event capture
+
+- **Decision**: Three sources, normalised by Event Manager:
+  1. **Claude Code `http` hooks** → `POST http://127.0.0.1:3022/api/v1/hooks/ingest` for sessions
+     *not* started by Nexora (observed sessions, Agent Teams). Events used: SessionStart, SessionEnd,
+     UserPromptSubmit, PreToolUse, PostToolUse, PostToolUseFailure, PermissionRequest,
+     PermissionDenied, Notification, SubagentStart, SubagentStop, TaskCreated, TaskCompleted,
+     TeammateIdle, Stop, StopFailure, FileChanged, WorktreeCreate, WorktreeRemove, CwdChanged.
+  2. **SDK / stream-json messages** for Nexora-managed sessions (`system:init`, `assistant`, `user`
+     with `parent_tool_use_id` ⇒ subagent tree, `result` with `usage`, `modelUsage`,
+     `total_cost_usd`). SDK `hooks` option + `includeHookEvents` for tool/subagent events
+     in-process.
+  3. **Agent Teams files** (read-only polling of `~/.claude/teams/<team>/config.json`,
+     `inboxes/*.json`, `~/.claude/tasks/<team>/`) — reliability `best_effort`; docs say "do not
+     edit" ⇒ Nexora never writes them.
+- **Rationale**: hooks are the only documented way to see sessions Nexora did not spawn; `http`
+  type avoids shipping a helper script. Common fields `session_id, cwd, hook_event_name,
+  transcript_path, agent_id, agent_type, tool_use_id` give the joins we need.
+- **Hook install**: written to the project's `.claude/settings.local.json` (git-ignored) only after
+  the user previews the diff and confirms (FR-041). Per-project secret sent as a request header;
+  if `http` hook header support turns out insufficient, fall back to a token in the URL query
+  (loopback only). → verified by spike task in Phase 3.
+- **Reliability tagging**: `authoritative` (SDK messages, hooks), `derived` (git-diff file changes,
+  board column), `best_effort` (team file polling). Shown in Live Logs and Agent Details.
+- **Cost**: `total_cost_usd` is documented as a client-side estimate ⇒ UI label "≈ estimated";
+  `modelUsage` used for token totals; absent ⇒ "not available" (FR-029).
+
+## R3. Agent Teams mode
+
+- **Decision**: Supported only when `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is set (env or
+  settings `env`) — detected by Runtime Manager. Because teams are **not available in `-p` or SDK
+  sessions**, Nexora launches the team lead as an **interactive `claude` process inside a
+  pseudo-terminal** (`node-pty`), sends the initial prompt as typed input, and observes via hooks
+  (TaskCreated, TaskCompleted, TeammateIdle, SubagentStart/Stop with `agent_id`) + team files.
+  A terminal panel (xterm.js) in Agent Details lets the user interact directly.
+- **Capability profile**: start ✔, stop ✔ (SIGTERM / Ctrl-C), sendMessage ✔ to **lead only**
+  (PTY input, `best_effort`), message individual teammates ✘ (no documented external API),
+  pause ✘, resume ✘ (in-process teammates not restored on resume — documented limitation).
+- **Never** emulated with subagents (spec FR-011). If the flag is absent the mode is disabled with
+  "Set CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 — Nexora can add it to project settings after you
+  confirm".
+- **Alternatives**: observe-only (user starts lead in own terminal) — kept as fallback when
+  `node-pty` prebuilt binary is unavailable on the platform.
+- **Risk**: experimental feature, schemas may change ⇒ adapter isolated, contract-tested against
+  recorded fixtures, version-gated.
+
+## R4. Subagents mode
+
+- **Decision**: One SDK session; Nexora writes role definitions (Architect, Frontend Developer,
+  Backend Developer, Database Engineer, QA Engineer, Security Reviewer, Code Reviewer, DevOps
+  Engineer) as SDK `agents` (description, prompt, tools, model, permissionMode) — not files, unless
+  the user chooses "save to `.claude/agents/`". Existing project/user agent files are discovered
+  and reused. Tree built from `parent_tool_use_id` + SubagentStart/Stop `agent_id/agent_type`.
+  Completion report = subagent's final user-visible text.
+
+## R5. Multi-Session isolation & conflicts
+
+- **Decision**: Planner assigns each task `ownedPaths` globs. Parallel tasks with overlapping
+  globs ⇒ either serialised or each gets its own **git worktree** (`git worktree add
+  <repo>/.nexora/worktrees/<execution>/<task> -b nexora/<execution>/<task>`), created by Nexora's
+  Git service (not `claude -w`, so Nexora controls names/cleanup). SDK session `cwd` = worktree.
+  Merge back via a review task (Code Reviewer) + user approval; Nexora never force-pushes.
+- **Coordinator / message bus**: in-process Communication Manager; messages to managed sessions
+  delivered with `streamInput`; every message is an `Event` + `Message` row.
+- **Concurrency**: default max 4 parallel sessions (configurable ≤ 8); `maxBudgetUsd` /
+  `maxTurns` passed per session where user set budgets.
+
+## R6. Workflow engine
+
+- **Decision**: Own engine in server (`modules/workflow-engine`): versioned JSON graph (data-model),
+  executor = topological scheduler with fork/join, condition nodes (expressions over previous node
+  outputs, evaluated by a safe sandboxed evaluator such as `jsonata`/`filtrex`, no `eval`), approval
+  nodes (create ApprovalRequest, wait), retry with backoff, error edges. Node executors: `agent` →
+  SDK session; `skill` → SDK session prompted with the skill slash command, **only** for skills the
+  Skill Registry marks `executable` (user-invocable skills/commands); `mcp_tool` → call via the
+  SDK session with that MCP server enabled (Nexora does not call third-party MCP servers directly
+  in v1). Existing `.specify/workflows/*.yml` etc. are listed but not executed unless an adapter
+  exists (shown as "not executable").
+- **Alternatives**: Temporal / BullMQ — rejected (extra infra, constitution YAGNI).
+
+## R7. Backend framework: Hono + Socket.IO
+
+- **Decision**: Hono on `@hono/node-server`; Socket.IO server attached to the same Node
+  `http.Server` (`new Server(httpServer, { path: '/socket.io' })`). Validation with
+  `@hono/zod-validator`; schemas from `@nexora/contracts`. MCP via `@modelcontextprotocol/sdk`
+  Streamable HTTP transport mounted at `/mcp`.
+- **Process model**: single Node process = API + realtime + MCP + orchestrator ⇒ no duplicated
+  logic (FR-043). Child processes only for Claude runtimes, git, gh.
+- **Rationale**: user choice; Hono is small, typed, Web-standard handlers, testable via
+  `app.request()` without network.
+
+## R8. Persistence: SQLite + Drizzle
+
+- **Decision**: `better-sqlite3` driver (sync, fastest, prebuilt for Node 22 on Windows) +
+  `drizzle-orm` + `drizzle-kit` migrations; WAL mode; FTS5 table for event search; DB at
+  `~/.nexora/nexora.db` (override `NEXORA_DATA_DIR`). Event writes batched in a transaction every
+  100 ms. Alternative `node:sqlite` built-in — rejected for now (still experimental flag in Node 22).
+
+## R9. Frontend: React + Rsbuild + team standards
+
+- **Decision**: Profile `shadcn-tailwind-tanstack-router` (FSD layers: app, routes (thin), views,
+  widgets, features, entities, shared) with **Rsbuild** instead of Vite (user request). Mapping:
+  - `@rsbuild/plugin-react`; TanStack Router file routes via `@tanstack/router-plugin/rspack`
+    (`TanStackRouterRspack({ target: 'react', autoCodeSplitting: true })` in `tools.rspack.plugins`);
+  - Tailwind CSS v4 via PostCSS (`@tailwindcss/postcss`) — Rsbuild has built-in PostCSS;
+  - env prefix `PUBLIC_` (Rsbuild) instead of `VITE_`; only non-secret values;
+  - React Compiler via `babel-plugin-react-compiler` through `@rsbuild/plugin-babel` (optional,
+    measured first);
+  - dev server port **3022** with `server.proxy` for `/api`, `/socket.io` (ws), `/mcp` → backend
+    dev port 3023; production: backend serves `apps/web/dist` on 3022 (single port).
+  - CSP via `html.tags` meta + backend `secureHeaders` (Hono) for production.
+- **Libraries**: shadcn/ui (Radix) in `shared/ui`, `@xyflow/react` (React Flow) for Agent Canvas and
+  Workflow editor, `@dnd-kit` for Kanban, TanStack Query (key factories, `setQueryData` from socket
+  `entity.changed`), Zustand (`createResettableStore`) for UI-only state (selected agent, panels,
+  theme), `socket.io-client`, axios via `shared/api/http.ts`, `react-hook-form` + zod for forms,
+  `sonner` toasts, `@xterm/xterm` terminal for Agent Teams lead.
+- **Rules applied**: ≤150 lines per `.tsx`, minimal `useEffect` (allowed: socket subscription =
+  external system), no `console.log` (shared logger), a11y, dark default + light theme.
+- **Deviation report** (team standard expects Vite): build tool only; folder structure, router,
+  UI kit, state, testing unchanged. CI bundle check uses `size-limit` against Rsbuild output.
+
+## R10. Monorepo layout & tooling
+
+- **Decision**: npm workspaces (npm detected; no other lockfile): `apps/web`, `apps/server`,
+  `packages/contracts` (zod schemas + inferred types shared by web, server, MCP). TypeScript 5
+  strict, ESLint flat config + Prettier, husky + lint-staged + commitlint (Conventional Commits per
+  constitution), Vitest workspaces (server unit/integration, web component tests with
+  Testing Library + MSW), Playwright E2E + `@axe-core/playwright` against production build on 3022.
+- **Test doubles**: a **FakeRuntimeAdapter** implementing the runtime interface for tests only
+  (never reachable in production views — FR-061); recorded hook/stream-json fixtures for contract
+  tests.
+
+## R11. Security
+
+- Bind `127.0.0.1` by default; `NEXORA_HOST` other than loopback refused unless
+  `NEXORA_REMOTE=1` **and** an auth token is configured (FR-050).
+- Loopback web auth: per-install random secret ⇒ `HttpOnly SameSite=Strict` cookie issued on first
+  load from loopback + CSRF header; Host/Origin header check (DNS-rebinding protection).
+- Command allowlist: Nexora spawns only `claude`, `git`, `gh` with argument arrays (`execFile`, no
+  shell). Paths normalised + verified inside registered project roots (FR-051).
+- Redaction: pattern + entropy-based redactor (API keys, tokens, `Authorization`, `.env` values,
+  private keys) applied before persistence, socket emit, export and MCP output (FR-052).
+- Permission mode default `default`; `bypassPermissions` / `--dangerously-skip-permissions`
+  never default, requires per-execution typed confirmation + audit (FR-053).
+- Approvals: SDK `canUseTool` + `PreToolUse`/`PermissionRequest` hook responses for managed
+  sessions; risky plan tasks gated before start (FR-033).
+
+## R12. GitHub
+
+- **Decision**: GitHub adapter shells `gh api` (read-only GETs) and `gh auth status`. Since `gh` is
+  not installed, view shows setup guidance (`winget install GitHub.cli`, `gh auth login`). Local
+  git data (branches, commits, diff) comes from `git` directly and works without gh.
+
+## Resolved unknowns
+
+All Technical Context items resolved; no NEEDS CLARIFICATION remains. Open verification spikes
+(not blockers, scheduled as first tasks of their phase): S1 http-hook header support & payload
+fixtures; S2 node-pty prebuilt on Windows + Agent Teams lead under PTY; S3 SDK streaming-input
+`interrupt`/`resume` round-trip on installed version.
