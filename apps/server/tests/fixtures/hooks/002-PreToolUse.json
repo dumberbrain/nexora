@@ -1,0 +1,19 @@
+{
+  "session_id": "7448f0f2-4201-4d73-a3bc-92657df6269f",
+  "transcript_path": "C:\\Users\\dev\\.claude\\projects\\C--work-demo-repo\\7448f0f2-4201-4d73-a3bc-92657df6269f.jsonl",
+  "cwd": "C:\\work\\demo-repo",
+  "prompt_id": "6547ba9c-2353-49d3-935f-e74fddc93ed7",
+  "permission_mode": "acceptEdits",
+  "effort": {
+    "level": "medium"
+  },
+  "hook_event_name": "PreToolUse",
+  "tool_name": "Agent",
+  "tool_input": {
+    "description": "Create hello.txt file",
+    "prompt": "Create a file named hello.txt in the working directory C:\\work\\demo-repo containing the single word hi (no other content). Verify the file contents after writing, then report back the file path and its contents.",
+    "subagent_type": "general-purpose",
+    "run_in_background": false
+  },
+  "tool_use_id": "toolu_01BwbkLFgJ3PnnQDd6i2NBgH"
+}

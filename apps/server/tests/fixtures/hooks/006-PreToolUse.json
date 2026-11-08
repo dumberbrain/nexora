@@ -1,0 +1,18 @@
+{
+  "session_id": "7448f0f2-4201-4d73-a3bc-92657df6269f",
+  "transcript_path": "C:\\Users\\dev\\.claude\\projects\\C--work-demo-repo\\7448f0f2-4201-4d73-a3bc-92657df6269f.jsonl",
+  "cwd": "C:\\work\\demo-repo",
+  "prompt_id": "6547ba9c-2353-49d3-935f-e74fddc93ed7",
+  "permission_mode": "acceptEdits",
+  "agent_id": "ae0883f726e201b87",
+  "agent_type": "general-purpose",
+  "effort": {
+    "level": "medium"
+  },
+  "hook_event_name": "PreToolUse",
+  "tool_name": "Read",
+  "tool_input": {
+    "file_path": "C:\\work\\demo-repo\\hello.txt"
+  },
+  "tool_use_id": "toolu_01PiWY9gNJKTTphXWgWe7bZA"
+}

@@ -71,9 +71,11 @@ interface EventSink { emit(e: RawRuntimeEvent): void } // → Event Manager norm
 
 | hook_event_name | NexoraEvent.type | Joins |
 |---|---|---|
-| SessionStart | session.started | session_id, cwd |
+| SessionStart | session.started | session_id, cwd — **not delivered to `http` hooks (S1)**; a session is created from the first event of any type for an unknown `session_id` |
+| UserPromptSubmit | message.sent (user → main agent) | session_id, prompt_id |
 | SessionEnd | session.stopped | session_id |
-| SubagentStart / SubagentStop | agent.spawned / agent.completed | agent_id, agent_type |
+| SubagentStart / SubagentStop | agent.spawned / agent.completed | agent_id, agent_type; parent = caller of the latest unmatched `PreToolUse(Agent)` (derived); Stop summary = `last_assistant_message` |
+| Stop | agent.waiting (main agent idle) | session_id |
 | PreToolUse / PostToolUse | tool.invoked / tool.completed | tool_use_id, agent_id? |
 | PostToolUse (Write/Edit) | + file.modified (derived) | tool_input.file_path |
 | PermissionRequest | permission.requested | tool_name |

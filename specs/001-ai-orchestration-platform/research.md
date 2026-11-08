@@ -159,6 +159,29 @@ uv 0.11.1, git 2.35.1; **gh CLI not installed**; `~/.claude/teams` absent (Agent
   `prefers-reduced-motion`, never behind data tables. Light theme keeps structure with green
   primary. Status colours stay distinct and always paired with a text label (FR-032).
 
+## S1 result — http hooks (2026-11-08, Claude Code 2.1.319)
+
+Run: `claude -p … --settings <file> --model haiku`, http hooks for every R2 event → local echo
+server; main agent delegated a Write to a general-purpose subagent. Fixtures (paths scrubbed):
+`apps/server/tests/fixtures/hooks/*.json`, stream: `apps/server/tests/fixtures/stream-json/`.
+
+- **Custom headers work**: `headers: { "X-Nexora-Hook-Token": "…" }` arrived on every POST →
+  the installer uses the header (no query token). Requests come from Claude Code with UA `axios`.
+- **SessionStart is not delivered to `http` hooks** (only command hooks ran for it). ⇒ the session
+  projection creates a session on the *first event of any type* for an unknown `session_id`.
+- Received: UserPromptSubmit, PreToolUse, PostToolUse, SubagentStart, SubagentStop, Stop,
+  SessionEnd (+ `reason`). Not exercised in this run: PermissionRequest, Notification, failures,
+  TaskCreated/Completed, TeammateIdle, FileChanged, worktree events.
+- Common fields: `session_id, transcript_path, cwd, prompt_id, hook_event_name`; tool events add
+  `permission_mode, effort, tool_name, tool_input, tool_use_id` (+ `tool_response, duration_ms` on
+  PostToolUse). Events from inside a subagent carry `agent_id` + `agent_type`.
+- **SubagentStart has no tool_use_id** — only `agent_id, agent_type`. Parent linkage is derived:
+  the subagent's parent is the caller (`agent_id` or main) of the most recent unmatched
+  `PreToolUse` with `tool_name: "Agent"` in that session (reliability `derived`).
+- SubagentStop carries `last_assistant_message` (completion summary) and `agent_transcript_path`.
+- The main agent's spawn call is tool `Agent` (input has `description`, `prompt`,
+  `subagent_type`).
+
 ## R13. Toolchain versions (Phase 1, 2026-11-08)
 
 - **TypeScript 6.0.3**, not 7.0: `typescript-eslint` 8.72 peer range is `<6.1.0` (TS 7 is the

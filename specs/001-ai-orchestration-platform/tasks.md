@@ -119,7 +119,7 @@ testable increment.
 
 ### Tests for User Story 1 ⚠️ (write first, must fail)
 
-- [ ] T049 [US1] Spike S1: in a scratch repo configure an `http` hook to a local echo server for every event in research R2, run a session with a subagent and a Write, save raw payloads to `apps/server/tests/fixtures/hooks/*.json` (redact secrets), and record whether `http` hooks support custom headers in `specs/001-ai-orchestration-platform/research.md` (S1 result)
+- [X] T049 [US1] Spike S1: in a scratch repo configure an `http` hook to a local echo server for every event in research R2, run a session with a subagent and a Write, save raw payloads to `apps/server/tests/fixtures/hooks/*.json` (redact secrets), and record whether `http` hooks support custom headers in `specs/001-ai-orchestration-platform/research.md` (S1 result)
 - [ ] T050 [P] [US1] Contract test `apps/server/tests/contract/hook-ingest.test.ts`: each fixture maps per the table in `contracts/runtime-adapter.md` (SessionStart→session.started … StopFailure→error), PostToolUse Write/Edit adds derived `file.modified`, missing/invalid `X-Nexora-Hook-Token` → 401, response `{}` for observed sessions
 - [ ] T051 [P] [US1] Unit test `apps/server/tests/unit/session-manager/session-projection.test.ts`: session status transitions from events, `lastActivityAt`, unknown project resolved by `cwd` under registered root
 - [ ] T052 [P] [US1] Unit test `apps/server/tests/unit/agent-registry/agent-tree.test.ts`: SubagentStart/Stop `agent_id`/`agent_type` build parent/child tree under session main agent
