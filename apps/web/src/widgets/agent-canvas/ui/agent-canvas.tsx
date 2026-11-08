@@ -61,6 +61,8 @@ export function AgentCanvas({ sessionId }: AgentCanvasProps) {
         nodesDraggable={false}
         nodesConnectable={false}
         fitView
+        // a small tree must not be blown up to fill the viewport
+        fitViewOptions={{ maxZoom: 1, padding: 0.3 }}
         minZoom={0.2}
         proOptions={{ hideAttribution: true }}
         onNodeClick={(_, node) =>

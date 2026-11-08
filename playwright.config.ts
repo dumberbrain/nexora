@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 3022;
+/** Defaults to 3022; override (NEXORA_E2E_PORT) when a dev server already owns that port. */
+const PORT = Number(process.env.NEXORA_E2E_PORT ?? 3022);
 
 export default defineConfig({
   testDir: "./e2e",
@@ -18,6 +19,7 @@ export default defineConfig({
   webServer: {
     command: "npm run build && npm run start:e2e",
     url: `http://localhost:${PORT}/api/v1/health`,
+    env: { NEXORA_PORT: String(PORT), NEXORA_PUBLIC_URL: `http://127.0.0.1:${PORT}` },
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
   },

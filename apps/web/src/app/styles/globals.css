@@ -27,7 +27,7 @@
   --card-foreground: #0b0b0b;
   --popover: #ffffff;
   --popover-foreground: #0b0b0b;
-  --primary: #15803d;
+  --primary: #166534;
   --primary-foreground: #f8f8f8;
   --secondary: #e4e4e4;
   --secondary-foreground: #0b0b0b;
@@ -39,9 +39,9 @@
   --destructive-foreground: #f8f8f8;
   --border: #d4d4d8;
   --input: #d4d4d8;
-  --ring: #15803d;
+  --ring: #166534;
 
-  --phosphor: #15803d;
+  --phosphor: #166534;
   --phosphor-bright: #16a34a;
   --phosphor-dim: rgb(21 128 61 / 0.35);
   --terminal: #ffffff;
@@ -49,14 +49,14 @@
   --glow: 0 0 0 transparent;
 
   /* execution status (FR-032): distinct hue AND a text label — never color alone */
-  --status-running: #15803d;
-  --status-idle: #71717a;
-  --status-paused: #b45309;
+  --status-running: #166534;
+  --status-idle: #5b5b64;
+  --status-paused: #92400e;
   --status-waiting: #7c3aed;
-  --status-stopped: #52525b;
+  --status-stopped: #3f3f46;
   --status-failed: #c8001a;
   --status-completed: #1d4ed8;
-  --status-unknown: #a1a1aa;
+  --status-unknown: #66666f;
 }
 
 .dark {
@@ -91,10 +91,10 @@
   --status-idle: #a1a1aa;
   --status-paused: #fbbf24;
   --status-waiting: #c084fc;
-  --status-stopped: #71717a;
+  --status-stopped: #94949d;
   --status-failed: #f43f5e;
   --status-completed: #60a5fa;
-  --status-unknown: #52525b;
+  --status-unknown: #8a8a94;
 }
 
 @theme inline {
