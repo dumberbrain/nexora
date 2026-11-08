@@ -9,7 +9,7 @@ import {
   type Reliability,
   type Severity,
 } from "@nexora/contracts";
-import { and, asc, desc, eq, gt, gte, inArray, lt, lte, sql, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, gt, gte, inArray, isNull, lt, lte, sql, type SQL } from "drizzle-orm";
 
 import { type EventBus } from "./event-bus";
 import { type Db } from "../../db/client";
@@ -172,6 +172,33 @@ export class EventStore {
       .limit(limit)
       .all()
       .map(toEvent);
+  }
+
+  /**
+   * Distinct paths from file.modified events of one agent, oldest first. `agentId` null = the
+   * session's main agent (its events carry no agent id).
+   */
+  filesModified(sessionId: string, agentId: string | null, limit = 1000): string[] {
+    this.flush();
+    const rows = this.db
+      .select({ payload: events.payload })
+      .from(events)
+      .where(
+        and(
+          eq(events.type, "file.modified"),
+          eq(events.sessionId, sessionId),
+          agentId === null ? isNull(events.agentId) : eq(events.agentId, agentId),
+        ),
+      )
+      .orderBy(asc(events.id))
+      .limit(limit)
+      .all();
+    const paths = new Set<string>();
+    for (const { payload } of rows) {
+      const p = (payload as { path?: unknown } | null)?.path;
+      if (typeof p === "string") paths.add(p);
+    }
+    return [...paths];
   }
 
   close(): void {

@@ -24,6 +24,11 @@ export interface AppDeps {
   keys?: SessionKeys;
   /** registers authenticated module routes under /api/v1 (added per user story) */
   registerRoutes?: (api: Hono<AppBindings>) => void;
+  /**
+   * registers PUBLIC routes under /api/v1, mounted before session/CSRF auth — only for callers
+   * that bring their own credential check (e.g. hook ingest with X-Nexora-Hook-Token)
+   */
+  registerPublicRoutes?: (api: Hono<AppBindings>) => void;
   /** built SPA directory served on non-API paths (production / e2e) */
   webDistDir?: string;
 }
@@ -88,6 +93,8 @@ export function createApp(deps: AppDeps): Hono<AppBindings> {
     issueSession(c, keys, deps.env.remote);
     return c.json({ ok: true });
   });
+
+  deps.registerPublicRoutes?.(api);
 
   // ---- authenticated ----
   api.use(

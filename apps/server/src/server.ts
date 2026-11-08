@@ -10,10 +10,12 @@ import { type NexoraEnv } from "./config/env";
 import { closeDb, type Db, openDb } from "./db/client";
 import { createApp } from "./http/app";
 import { SessionKeys } from "./http/middleware/session-cookie";
+import { registerApiRoutes, registerPublicApiRoutes } from "./http/routes";
 import { logger as defaultLogger, type Logger } from "./lib/logger";
 import { EventBus, EventStore } from "./modules/event-manager";
 import { AuditService } from "./modules/permission-manager/audit.service";
 import { createGateway, type Gateway } from "./realtime/gateway";
+import { createServices, type Services } from "./services";
 
 const WEB_PORT = 3022;
 
@@ -32,6 +34,7 @@ export interface NexoraServer {
   store: EventStore;
   audit: AuditService;
   gateway: Gateway;
+  services: Services;
   /** graceful stop: runtimes → realtime → HTTP → flush events → DB */
   close(): Promise<void>;
 }
@@ -54,6 +57,17 @@ export async function createNexoraServer(opts: CreateServerOptions): Promise<Nex
   const store = new EventStore(db, bus);
   const audit = new AuditService(db);
   const keys = new SessionKeys();
+  // the gateway needs the HTTP server, which needs the app — stats reach it late-bound
+  const live: { gateway?: Gateway } = {};
+  const services = createServices({
+    db,
+    env,
+    bus,
+    store,
+    audit,
+    logger: log,
+    publishStats: (stats) => live.gateway?.publishStats(stats),
+  });
   const ports = [...new Set([env.port, WEB_PORT])];
 
   const serveSpa = env.nodeEnv !== "development" && opts.webDistDir !== null;
@@ -68,6 +82,8 @@ export async function createNexoraServer(opts: CreateServerOptions): Promise<Nex
     startedAt,
     logger: log,
     keys,
+    registerPublicRoutes: (api) => registerPublicApiRoutes(api, services),
+    registerRoutes: (api) => registerApiRoutes(api, services),
     ...(serveSpa ? { webDistDir } : {}),
   });
 
@@ -80,6 +96,7 @@ export async function createNexoraServer(opts: CreateServerOptions): Promise<Nex
     policy: { remote: env.remote, ports },
     envToken: env.token,
   });
+  live.gateway = gateway;
 
   await new Promise<void>((resolveListen, reject) => {
     http.once("error", reject);
@@ -103,12 +120,15 @@ export async function createNexoraServer(opts: CreateServerOptions): Promise<Nex
     store,
     audit,
     gateway,
+    services,
     close: async () => {
       if (closed) return;
       closed = true;
       // runtime adapters are stopped here once they exist (Phase 4)
+      services.close();
       await gateway.close();
       await new Promise<void>((r) => http.close(() => r()));
+      await services.sessionProjection.settled();
       store.close();
       closeDb(db);
       log.info("nexora stopped");
