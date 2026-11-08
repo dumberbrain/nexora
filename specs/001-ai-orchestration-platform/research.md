@@ -188,6 +188,32 @@ server; main agent delegated a Write to a general-purpose subagent. Fixtures (pa
 - Parent-link bookkeeping (pending `Agent` calls) is in memory; after a server restart an orphaned
   subagent is attached to the main agent.
 
+## S3 result — Agent SDK streaming / interrupt / resume (2026-11-08, SDK 0.3.319)
+
+Script `apps/server/scripts/spike-sdk.ts` (model haiku, `settingSources: []`); fixtures in
+`apps/server/tests/fixtures/sdk/{phase1,phase2-resume,permissions,hooks}.jsonl`.
+
+- **Streaming input works**: a push-based `AsyncIterable<SDKUserMessage>` (`{type:"user",
+  message:{role:"user",content}, parent_tool_use_id:null}`) drives the session; a second message
+  pushed after a `result` starts a new turn in the same session (a new `system/init` is emitted).
+- **`canUseTool` fired for the `PowerShell` tool** (the model wrote the file with a shell command on
+  Windows, not `Write`). Options passed: `suggestions, blockedPath, decisionReasonType, displayName,
+  description, toolUseID, requestId, signal`. ⇒ the scope guard must treat **Bash and PowerShell** as
+  shell tools (route to ApprovalGate), not only file tools.
+- **SDK `hooks.PreToolUse` callback fired** with `(input, toolUseID)`; main-agent input has no
+  `agent_id`. `includeHookEvents: true` produced no extra system messages for SDK callbacks.
+- **`interrupt()` resolves `{ still_queued: [] }`; the turn then ends with
+  `result.subtype = "error_during_execution"`, `is_error: true`.** Nexora maps a result that
+  follows its own interrupt to status *interrupted*, not failed.
+- **Resume works**: a new `query({ resume: sessionId })` reports the same `session_id` and kept the
+  context (answered "a.txt").
+- `result` carries `total_cost_usd` (**cumulative per session** — identical on the interrupted turn),
+  `usage` (main loop only) and `modelUsage` keyed by model id ⇒ usage = sum over `modelUsage`,
+  cost labelled "estimate".
+- `system/init` reports `model` (e.g. `claude-haiku-5-5`), `permissionMode`, `cwd`, `tools`.
+- Also emitted: `rate_limit_event`, `system/commands_changed` (ignored by the mapper).
+- No pause primitive exists (confirms R1): "Interrupt & hold" = `interrupt()` then `resume`.
+
 ## R13. Toolchain versions (Phase 1, 2026-11-08)
 
 - **TypeScript 6.0.3**, not 7.0: `typescript-eslint` 8.72 peer range is `<6.1.0` (TS 7 is the

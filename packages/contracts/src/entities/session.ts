@@ -1,8 +1,9 @@
 import { z } from "zod";
 
-import { RuntimeKindSchema, SessionStatusSchema } from "../enums";
+import { ExecutionModeSchema, RuntimeKindSchema, SessionStatusSchema } from "../enums";
 import { EpochMsSchema, UlidSchema } from "../primitives";
 import { RuntimeCapabilityProfileSchema } from "./capability";
+import { TaskIdSchema } from "./task";
 
 /** Token usage — present ONLY when the runtime reported it; never estimated by Nexora (FR-029). */
 export const UsageSchema = z.object({
@@ -18,6 +19,10 @@ export const SessionSchema = z.object({
   /** Claude Code session UUID */
   id: z.string().min(1).max(128),
   executionId: UlidSchema.nullable(),
+  /** mode of the owning execution; null for observed sessions */
+  executionMode: ExecutionModeSchema.nullable(),
+  /** task this session is working on (Nexora-managed sessions only) */
+  currentTaskId: TaskIdSchema.nullable(),
   projectId: UlidSchema.nullable(),
   runtime: RuntimeKindSchema,
   /** true for external_observed — UI labels "observe-only" */

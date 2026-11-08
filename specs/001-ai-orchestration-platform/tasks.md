@@ -157,7 +157,7 @@ testable increment.
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T071 [US2] Spike S3: script `apps/server/scripts/spike-sdk.ts` running SDK `query()` in streaming-input mode against a scratch repo: send message via `streamInput`, `interrupt()`, then new query with `resume: sessionId`; record message fixtures to `apps/server/tests/fixtures/sdk/*.jsonl` and results in research.md (S3)
+- [X] T071 [US2] Spike S3: script `apps/server/scripts/spike-sdk.ts` running SDK `query()` in streaming-input mode against a scratch repo: send message via `streamInput`, `interrupt()`, then new query with `resume: sessionId`; record message fixtures to `apps/server/tests/fixtures/sdk/*.jsonl` and results in research.md (S3)
 - [ ] T072 [P] [US2] Unit test `apps/server/tests/unit/execution-orchestrator/execution-state.test.ts`: all allowed transitions `draft → analyzing → awaiting_mode → configuring → plan_ready → awaiting_approval → running ⇄ paused → verifying → completed|failed|cancelled`; invalid ones throw CONFLICT
 - [ ] T073 [P] [US2] Unit test `apps/server/tests/unit/task-manager/task-state.test.ts`: transitions per data-model "Task transitions"; dependency graph must be a DAG (cycle ⇒ validation error)
 - [ ] T074 [P] [US2] Unit test `apps/server/tests/unit/execution-orchestrator/conflict-detector.test.ts`: overlapping `ownedPaths` globs between parallel tasks flagged (picomatch), non-overlapping not flagged

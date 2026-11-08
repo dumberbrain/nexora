@@ -29,6 +29,8 @@ export const observedCapabilities: RuntimeCapabilityProfile = {
 
 const base: Omit<Session, "id" | "status" | "lastActivityAt" | "startedAt"> = {
   executionId: null,
+  executionMode: null,
+  currentTaskId: null,
   projectId: "01JCXK0000000000000000P001",
   runtime: "external_observed",
   observeOnly: true,

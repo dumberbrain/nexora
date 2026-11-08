@@ -19,4 +19,5 @@ export * from "./entities/audit";
 
 export * from "./api/common";
 export * from "./api/monitoring";
+export * from "./api/executions";
 export * from "./socket";

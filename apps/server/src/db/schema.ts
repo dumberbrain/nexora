@@ -131,6 +131,8 @@ export const sessions = sqliteTable(
   {
     id: text("id").primaryKey(),
     executionId: text("execution_id").references(() => executions.id),
+    executionMode: text("execution_mode").$type<ExecutionMode>(),
+    currentTaskId: text("current_task_id"),
     projectId: text("project_id").references(() => projects.id),
     runtime: text("runtime").$type<RuntimeKind>().notNull(),
     observeOnly: bool("observe_only").notNull(),

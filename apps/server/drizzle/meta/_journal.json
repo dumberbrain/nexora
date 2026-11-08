@@ -15,6 +15,13 @@
       "when": 1794133175640,
       "tag": "0001_events_fts",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794149874520,
+      "tag": "0002_session_mode_task",
+      "breakpoints": true
     }
   ]
 }

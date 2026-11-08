@@ -86,6 +86,8 @@ export class SessionProjection {
     const session: Session = {
       id: o.sessionId,
       executionId: null,
+      executionMode: null,
+      currentTaskId: null,
       projectId: project?.id ?? null,
       runtime: "external_observed",
       observeOnly: true,
