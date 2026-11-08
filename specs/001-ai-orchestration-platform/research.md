@@ -181,6 +181,12 @@ server; main agent delegated a Write to a general-purpose subagent. Fixtures (pa
 - SubagentStop carries `last_assistant_message` (completion summary) and `agent_transcript_path`.
 - The main agent's spawn call is tool `Agent` (input has `description`, `prompt`,
   `subagent_type`).
+- **Installer deliberately skips `WorktreeCreate` / `WorktreeRemove`**: per the hooks docs a hook
+  on these events *replaces* Claude Code's own git-worktree handling, so an `{}` answer could break
+  worktrees (not exercised in S1). Worktree activity of observed sessions is therefore not
+  captured in US1; Nexora-managed worktrees are tracked by the git-workspace module (US2).
+- Parent-link bookkeeping (pending `Agent` calls) is in memory; after a server restart an orphaned
+  subagent is attached to the main agent.
 
 ## R13. Toolchain versions (Phase 1, 2026-11-08)
 

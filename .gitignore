@@ -1,4 +1,6 @@
 .claude/settings.local.json
+# agent git worktrees (parallel workstreams)
+.claude/worktrees/
 
 # dependencies
 node_modules/
