@@ -13,13 +13,13 @@ description: "Task list for AI Development Orchestration Platform (Nexora)"
 (state machines, scheduler, permission checks, event handling, redaction) and integration/contract
 tests on every adapter boundary. Test tasks MUST be written and fail before their implementation.
 
-**Organization**: Grouped by user story (US1–US8 from spec.md) so each story is an independently
+**Organization**: Grouped by user story (US1Ã¢â‚¬â€œUS8 from spec.md) so each story is an independently
 testable increment.
 
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: parallelizable (different files, no dependency on incomplete tasks)
-- **[Story]**: US1…US8 (user-story phases only)
+- **[Story]**: US1Ã¢â‚¬Â¦US8 (user-story phases only)
 
 ## Path Conventions
 
@@ -27,10 +27,13 @@ testable increment.
 - Web (FSD, team-front profile `shadcn-tailwind-tanstack-router`, Rsbuild): `apps/web/src/{app,routes,views,widgets,features,entities,shared}/`
 - Shared schemas: `packages/contracts/src/`
 - E2E: `e2e/`
-- Web rules for every web task: ≤150 lines per `.tsx`, sub-components in a sibling `components/`
+- Web rules for every web task: Ã¢â€°Â¤150 lines per `.tsx`, sub-components in a sibling `components/`
   folder, no `useEffect` except syncing an external system (comment which), no `console.log`
   (use `shared/lib/logger`), imports only via slice `index.ts`, a11y labels on all controls,
   loading/empty/error states, real backend data only.
+- Visual language for every web task: reactivite.vercel.app terminal/phosphor style Ã¢â‚¬â€ use the
+  tokens and utilities in `apps/web/src/app/styles/globals.css` (`text-display`, `text-index`,
+  `corner-brackets`, `bg-terminal-grid`, `shadow-glow`, `font-mono` body); see research.md R9.
 
 ---
 
@@ -38,20 +41,21 @@ testable increment.
 
 **Purpose**: Tooling, workspaces, prerequisites
 
-- [ ] T001 Install and authenticate GitHub CLI on the dev machine: run `winget install --id GitHub.cli -e`, restart the shell, run `gh auth login` (interactive — user runs it via `! gh auth login`), verify with `gh --version` and `gh auth status`; document the steps (incl. macOS `brew install gh`, Linux package) in `docs/setup/prerequisites.md`
-- [ ] T002 Create root `package.json` with npm workspaces `["apps/*","packages/*"]`, `"engines": {"node": ">=22"}`, scripts `dev`, `build`, `start`, `lint`, `typecheck`, `test`, `test:e2e`, `db:generate`, `db:migrate`; add `.nvmrc` (`22`) and `.npmrc` (`save-exact=true`)
-- [ ] T003 Create `tsconfig.base.json` (strict, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, ES2023, bundler resolution) and per-package `tsconfig.json` references
-- [ ] T004 [P] Scaffold `packages/contracts` (`package.json` name `@nexora/contracts`, deps `zod`, `src/index.ts` barrel, build via `tsc`)
-- [ ] T005 [P] Scaffold `apps/server` (`package.json` deps: `hono`, `@hono/node-server`, `@hono/zod-validator`, `socket.io`, `drizzle-orm`, `better-sqlite3`, `ulid`, `pino`, `picomatch`, `@anthropic-ai/claude-agent-sdk`, `@modelcontextprotocol/sdk`; dev: `drizzle-kit`, `tsx`, `vitest`, `@types/better-sqlite3`), `apps/server/drizzle.config.ts`
-- [ ] T006 [P] Scaffold `apps/web` with Rsbuild: `apps/web/rsbuild.config.ts` (`@rsbuild/plugin-react`, `TanStackRouterRspack({ target: 'react', autoCodeSplitting: true })` from `@tanstack/router-plugin/rspack` in `tools.rspack.plugins`, `server.port: 3022`, `server.proxy` for `/api` and `/mcp` → `http://127.0.0.1:3023` and `/socket.io` with `ws: true`, alias `@` → `src`, `source.define` only for `PUBLIC_*`), `apps/web/postcss.config.mjs` (`@tailwindcss/postcss`), `apps/web/index.html`, `apps/web/src/app/main.tsx`
-- [ ] T007 [P] Add web deps to `apps/web/package.json`: `react@19`, `react-dom@19`, `@tanstack/react-router`, `@tanstack/react-query`, `zustand`, `axios`, `socket.io-client`, `@xyflow/react`, `@dnd-kit/core`, `@dnd-kit/sortable`, `react-hook-form`, `@hookform/resolvers`, `zod`, `sonner`, `@xterm/xterm`, `class-variance-authority`, `tailwind-merge`, `lucide-react`; dev: `@tanstack/router-devtools`, `@testing-library/react`, `@testing-library/user-event`, `msw`, `jsdom`
-- [ ] T008 [P] Configure ESLint flat config `eslint.config.js` (typescript-eslint strict, react-hooks, `@tanstack/eslint-plugin-query`, `@tanstack/eslint-plugin-router`, `max-lines: 150` for `apps/web/**/*.tsx` skipping blank/comments, `no-console: error`, FSD import-boundary rule) and Prettier `.prettierrc.json` + `.prettierignore`
-- [ ] T009 [P] Configure husky + lint-staged + commitlint (Conventional Commits): `.husky/pre-commit` (lint-staged), `.husky/commit-msg`, `commitlint.config.js`, `lint-staged` block in root `package.json`
-- [ ] T010 [P] Configure Vitest workspace `vitest.workspace.ts` (projects: `packages/contracts` node, `apps/server` node, `apps/web` jsdom with setup `apps/web/tests/setup.ts` starting MSW server from `apps/web/tests/msw/server.ts`); exclude `e2e/**`
-- [ ] T011 [P] Configure Playwright `playwright.config.ts` (`webServer`: `npm run build && npm start`, `baseURL: http://localhost:3022`, chromium+firefox+webkit) and `e2e/fixtures/axe.ts` using `@axe-core/playwright`
-- [ ] T012 [P] Initialise shadcn/ui: `apps/web/components.json`, primitives in `apps/web/src/shared/ui/` (button, card, badge, dialog, sheet, tabs, table, tooltip, dropdown-menu, input, textarea, select, checkbox, scroll-area, separator, skeleton, sonner), `cn` helper `apps/web/src/shared/lib/cn.ts`, design tokens (dark default + light) in `apps/web/src/app/styles/globals.css`
-- [ ] T013 [P] Add CI workflow `.github/workflows/ci.yml` (node 22, `npm ci`, lint, typecheck, test, build, Playwright E2E, upload report)
-- [ ] T014 [P] Extend `.gitignore` with `node_modules/`, `dist/`, `.nexora/`, `*.db`, `*.db-wal`, `*.db-shm`, `playwright-report/`, `test-results/`, `apps/web/src/routeTree.gen.ts`
+- [X] T001 Install and authenticate GitHub CLI on the dev machine: run `winget install --id GitHub.cli -e`, restart the shell, run `gh auth login` (interactive Ã¢â‚¬â€ user runs it via `! gh auth login`), verify with `gh --version` and `gh auth status`; document the steps (incl. macOS `brew install gh`, Linux package) in `docs/setup/prerequisites.md`
+- [X] T002 Create root `package.json` with npm workspaces `["apps/*","packages/*"]`, `"engines": {"node": ">=22"}`, scripts `dev`, `build`, `start`, `start:e2e` (production build with `NODE_ENV=test`, `NEXORA_TEST_FAKE_RUNTIME=1`, temporary `NEXORA_DATA_DIR`), `lint`, `typecheck`, `test`, `test:e2e`, `db:generate`, `db:migrate`; add `.nvmrc` (`22`) and `.npmrc` (`save-exact=true`)
+- [X] T003 Create `tsconfig.base.json` (strict, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, ES2023, bundler resolution) and per-package `tsconfig.json` references
+- [X] T004 [P] Scaffold `packages/contracts` (`package.json` name `@nexora/contracts`, deps `zod`, `src/index.ts` barrel, build via `tsc`)
+- [X] T005 [P] Scaffold `apps/server` (`package.json` deps: `hono`, `@hono/node-server`, `@hono/zod-validator`, `socket.io`, `drizzle-orm`, `better-sqlite3`, `ulid`, `pino`, `picomatch`, `@anthropic-ai/claude-agent-sdk`, `@modelcontextprotocol/sdk`; dev: `drizzle-kit`, `tsx`, `vitest`, `@types/better-sqlite3`), `apps/server/drizzle.config.ts`
+- [X] T006 [P] Scaffold `apps/web` with Rsbuild: `apps/web/rsbuild.config.ts` (`@rsbuild/plugin-react`, `TanStackRouterRspack({ target: 'react', autoCodeSplitting: true })` from `@tanstack/router-plugin/rspack` in `tools.rspack.plugins`, `server.port: 3022`, `server.proxy` for `/api` and `/mcp` Ã¢â€ â€™ `http://127.0.0.1:3023` and `/socket.io` with `ws: true`, alias `@` Ã¢â€ â€™ `src`, `source.define` only for `PUBLIC_*`), `apps/web/postcss.config.mjs` (`@tailwindcss/postcss`), `apps/web/index.html`, `apps/web/src/app/main.tsx`
+- [X] T007 [P] Add web deps to `apps/web/package.json`: `react@19`, `react-dom@19`, `@tanstack/react-router`, `@tanstack/react-query`, `zustand`, `axios`, `socket.io-client`, `@xyflow/react`, `@dnd-kit/core`, `@dnd-kit/sortable`, `react-hook-form`, `@hookform/resolvers`, `zod`, `sonner`, `@xterm/xterm`, `class-variance-authority`, `tailwind-merge`, `lucide-react`; dev: `@tanstack/router-devtools`, `@testing-library/react`, `@testing-library/user-event`, `msw`, `jsdom`
+- [X] T008 [P] Configure ESLint flat config `eslint.config.js` (typescript-eslint strict, react-hooks, `@tanstack/eslint-plugin-query`, `@tanstack/eslint-plugin-router`, `max-lines: 150` for `apps/web/**/*.tsx` skipping blank/comments, `no-console: error`, FSD import-boundary rule) and Prettier `.prettierrc.json` + `.prettierignore`
+- [X] T009 [P] Configure git hooks with the user's `husky-set` layout (user decision, replaces lint-staged + commitlint): `.husky/lib.sh`, `.husky/pre-commit` (branch gate incl. spec-kit `NNN-name`, staged lint + prettier --check), `.husky/commit-msg` (Conventional Commits prefixes incl. build/style), `.husky/pre-push` (lint, typecheck); `check` / `check:staged` scripts
+- [X] T010 [P] Configure Vitest 5 projects in root `vitest.config.ts` (projects: `packages/contracts` node, `apps/server` node, `apps/web` jsdom with setup `apps/web/tests/setup.ts` starting MSW server from `apps/web/tests/msw/server.ts`); exclude `e2e/**`
+- [X] T011 [P] Configure Playwright `playwright.config.ts` (`webServer`: `npm run build && npm run start:e2e`, `baseURL: http://localhost:3022`, chromium+firefox+webkit) and `e2e/fixtures/axe.ts` using `@axe-core/playwright`
+- [X] T012 [P] Initialise shadcn/ui: `apps/web/components.json`, primitives in `apps/web/src/shared/ui/` (button, card, badge, dialog, sheet, tabs, table, tooltip, dropdown-menu, input, textarea, select, checkbox, scroll-area, separator, skeleton, sonner), `cn` helper `apps/web/src/shared/lib/cn.ts`, design tokens (dark default + light) in `apps/web/src/app/styles/globals.css`
+- [X] T013 [P] Add CI workflow `.github/workflows/ci.yml` (node 22, `npm ci`, lint, typecheck, test, build, Playwright E2E, upload report)
+- [X] T014 [P] Add PR template `.github/pull_request_template.md` with a checklist stating compliance with constitution Principles IÃ¢â‚¬â€œV, security constraints, tests run, and documented limitations
+- [X] T015 [P] Extend `.gitignore` with `node_modules/`, `dist/`, `.nexora/`, `*.db`, `*.db-wal`, `*.db-shm`, `playwright-report/`, `test-results/`, `apps/web/src/routeTree.gen.ts`
 
 ---
 
@@ -59,160 +63,167 @@ testable increment.
 
 **Purpose**: Contracts, persistence, server/web skeleton, security baseline, event core
 
-**⚠️ CRITICAL**: No user story work can begin until this phase is complete
+**Ã¢Å¡Â Ã¯Â¸Â CRITICAL**: No user story work can begin until this phase is complete
 
 ### Contracts (single source of truth)
 
-- [ ] T015 [P] Define enums in `packages/contracts/src/enums.ts`: ExecutionMode (`multi_session|agent_teams|subagents|workflow|hybrid`), Strategy (`spec_driven|plan_first|tdd|direct|research_first`), ExecutionStatus (`draft, analyzing, awaiting_mode, configuring, plan_ready, awaiting_approval, running, paused, verifying, completed, failed, cancelled`), TaskStatus (`pending, queued, planning, running, waiting_for_input, blocked, reviewing, completed, failed, cancelled`), SessionStatus (`starting, running, idle, waiting_for_approval, paused, stopped, failed, unknown`), AgentKind (`main, subagent, team_lead, teammate, workflow_node`), AgentStatus, EventType (20 types from data-model Event), EventSource (`hook, stream_json, agent_sdk, team_files, coordinator, orchestrator, git`), Reliability (`authoritative|derived|best_effort`), Severity, RiskClass (`normal|destructive|expensive|deploy|architecture`), ApprovalStatus (`pending|approved|rejected|expired_session`), RuntimeKind
-- [ ] T016 [P] Define entity schemas in `packages/contracts/src/entities/` (one file each: project, execution, task, session, agent, event, message, approval, workflow, integration, audit, capability) with verbatim constraints: Project.name "1–120 chars", rootPath "absolute, normalised"; Execution.prompt "1–20 000 chars", config.maxParallelSessions "≤ 8", permissionBypass "default false"; Task.title "1–200", priority `p1|p2|p3`, id `T-<n>`; Event.summary "≤ 500 chars", payload "size-capped 32 KB (truncated flag)"; Message summary redacted; Workflow node retry "maxAttempts ≤ 5, backoffMs", onError `fail|continue|goto(nodeId)`; RuntimeCapabilityProfile per `contracts/runtime-adapter.md`
-- [ ] T017 [P] Define API error shape and codes (`VALIDATION_FAILED 400, UNAUTHENTICATED 401, FORBIDDEN 403, NOT_FOUND 404, CONFLICT 409, CAPABILITY_UNSUPPORTED 422, APPROVAL_REQUIRED 428, INTERNAL 500`) and cursor pagination schema (`limit 1..200`) in `packages/contracts/src/api/common.ts`
-- [ ] T018 [P] Define Socket.IO schemas (`subscribe`, `unsubscribe`, `event`, `entity.changed`, `stats`, `replay.done`) in `packages/contracts/src/socket.ts` per `contracts/socket-events.md`
-- [ ] T019 Write schema tests in `packages/contracts/tests/schemas.test.ts` (boundary values for every quoted constraint)
+- [ ] T016 [P] Define enums in `packages/contracts/src/enums.ts`: ExecutionMode (`multi_session|agent_teams|subagents|workflow|hybrid`), Strategy (`spec_driven|plan_first|tdd|direct|research_first`), ExecutionStatus (`draft, analyzing, awaiting_mode, configuring, plan_ready, awaiting_approval, running, paused, verifying, completed, failed, cancelled`), TaskStatus (`pending, queued, planning, running, waiting_for_input, blocked, reviewing, completed, failed, cancelled`), SessionStatus (`starting, running, idle, waiting_for_approval, paused, unresponsive, stopped, failed, unknown`), AgentKind (`main, subagent, team_lead, teammate, workflow_node`), AgentStatus, EventType (20 types from data-model Event), EventSource (`hook, stream_json, agent_sdk, team_files, coordinator, orchestrator, git`), Reliability (`authoritative|derived|best_effort`), Severity, RiskClass (`normal|destructive|expensive|deploy|architecture`), ApprovalStatus (`pending|approved|rejected|expired_session`), RuntimeKind (`agent_sdk|cli_headless|agent_team_pty|external_observed`)
+- [ ] T017 [P] Define entity schemas in `packages/contracts/src/entities/` (one file each: project, execution, task, session, agent, event, message, approval, workflow, integration, audit, capability) with verbatim constraints: Project.name "1Ã¢â‚¬â€œ120 chars", rootPath "absolute, normalised"; Execution.prompt "1Ã¢â‚¬â€œ20 000 chars", config.maxParallelSessions "Ã¢â€°Â¤ 8 (default 4)", config.idleTimeoutMs "default 600 000", config.turnTimeoutMs "default 1 800 000", config.modelAnalysisConsent boolean, worktreePath, permissionBypass "default false"; Session.observeOnly boolean; Task.title "1Ã¢â‚¬â€œ200", priority `p1|p2|p3`, id `T-<n>`; Event.summary "Ã¢â€°Â¤ 500 chars", payload "size-capped 32 KB (truncated flag)"; Message summary redacted; Workflow node retry "maxAttempts Ã¢â€°Â¤ 5, backoffMs", onError `fail|continue|goto(nodeId)`; RuntimeCapabilityProfile per `contracts/runtime-adapter.md`
+- [ ] T018 [P] Define API error shape and codes (`VALIDATION_FAILED 400, UNAUTHENTICATED 401, FORBIDDEN 403, NOT_FOUND 404, CONFLICT 409, CAPABILITY_UNSUPPORTED 422, APPROVAL_REQUIRED 428, INTERNAL 500`) and cursor pagination schema (`limit 1..200`) in `packages/contracts/src/api/common.ts`
+- [ ] T019 [P] Define Socket.IO schemas (`subscribe`, `unsubscribe`, `event`, `entity.changed`, `stats`, `replay.done`) in `packages/contracts/src/socket.ts` per `contracts/socket-events.md`
+- [ ] T020 Write schema tests in `packages/contracts/tests/schemas.test.ts` (boundary values for every quoted constraint)
 
 ### Server core (tests first)
 
-- [ ] T020 [P] Write failing tests `apps/server/tests/unit/config/env.test.ts`: defaults host `127.0.0.1`, port 3022 (prod) / 3023 (dev); non-loopback host rejected unless `NEXORA_REMOTE=1` AND `NEXORA_TOKEN` (≥32 chars) set
-- [ ] T021 Implement env config in `apps/server/src/config/env.ts` (zod) to pass T020
-- [ ] T022 [P] Write failing tests `apps/server/tests/unit/lib/redactor.test.ts` (Anthropic/OpenAI/GitHub/AWS keys, bearer headers, `password=`, PEM private keys, high-entropy strings in `.env` lines; nested JSON; idempotent)
-- [ ] T023 Implement redactor in `apps/server/src/lib/redactor.ts` to pass T022
-- [ ] T024 [P] Write failing tests `apps/server/tests/unit/lib/path-guard.test.ts` (traversal `..`, symlink escape, Windows drive/UNC paths, case-insensitive roots on win32)
-- [ ] T025 Implement path guard in `apps/server/src/lib/path-guard.ts` to pass T024
-- [ ] T026 [P] Write failing tests `apps/server/tests/unit/lib/process.test.ts`: only `claude`, `git`, `gh` allowed; args passed as array; no shell; timeout + kill tree
-- [ ] T027 Implement allowlisted process runner in `apps/server/src/lib/process.ts` (`execFile`/`spawn` with `shell:false`) to pass T026
-- [ ] T028 [P] Implement `apps/server/src/lib/ulid.ts` (monotonic) and `apps/server/src/lib/logger.ts` (pino, redactor applied to all log objects)
-- [ ] T029 Implement Drizzle schema for all tables in `apps/server/src/db/schema.ts` (projects, executions, tasks, task_dependencies, sessions, agents, events, messages, approval_requests, workflow_definitions, workflow_versions, workflow_runs, workflow_node_runs, integrations, audit_entries, api_tokens) with indexes `(session_id,id)`, `(execution_id,id)`, `(type,ts)`; generate migration in `apps/server/drizzle/`; add raw-SQL migration for FTS5 virtual table `events_fts(summary)`
-- [ ] T030 Implement DB client `apps/server/src/db/client.ts` (data dir `NEXORA_DATA_DIR` default `~/.nexora`, WAL, foreign keys on, migrate on start) and `db:migrate` script `apps/server/src/db/migrate.ts`
-- [ ] T031 [P] Write failing tests `apps/server/tests/integration/http/security.test.ts` via `app.request()`: rejects foreign `Origin`/`Host` (DNS rebinding), mutating request without CSRF header → 403, bearer token required in remote mode, secure headers present
-- [ ] T032 Implement Hono app `apps/server/src/http/app.ts` with middleware `apps/server/src/http/middleware/{origin-guard,session-cookie,csrf,bearer-auth,error-mapper}.ts` (cookie `HttpOnly; SameSite=Strict`, header `X-Nexora-CSRF`) and `GET /api/v1/health` → `{status, version, db, uptimeMs}` to pass T031
-- [ ] T033 [P] Implement audit service (append-only, no update/delete) in `apps/server/src/modules/permission-manager/audit.service.ts` + test `apps/server/tests/unit/permission-manager/audit.test.ts`
-- [ ] T034 [P] Write failing tests `apps/server/tests/unit/event-manager/event-store.test.ts`: 100 ms batched inserts, redaction before insert, payload > 32 KB truncated with flag, summary ≤ 500, cursor query by ULID ordered, filters (session, agent, execution, type[], severity[], from/to, FTS `q`)
-- [ ] T035 Implement event store + bus in `apps/server/src/modules/event-manager/{event-store.ts,event-bus.ts,index.ts}` to pass T034
-- [ ] T036 [P] Write failing tests `apps/server/tests/integration/realtime/replay.test.ts`: subscribe with `sinceEventId` replays in order, max 5 000 then `gap: true`, then `replay.done`, then live; per-room 100 ms batching
-- [ ] T037 Implement Socket.IO gateway `apps/server/src/realtime/gateway.ts` (namespace `/live`, cookie/token handshake auth, rooms `global|execution:<id>|session:<id>|agent:<id>`, replay, batching, `entity.changed` emitter) to pass T036
-- [ ] T038 Implement bootstrap `apps/server/src/main.ts` (config → db → modules → Hono via `@hono/node-server` + Socket.IO on same `http.Server`; in production serve `apps/web/dist` with SPA fallback on port 3022; graceful shutdown stops runtimes)
+- [ ] T021 [P] Write failing tests `apps/server/tests/unit/config/env.test.ts`: defaults host `127.0.0.1`, port 3022 (prod) / 3023 (dev); non-loopback host rejected unless `NEXORA_REMOTE=1` AND `NEXORA_TOKEN` (Ã¢â€°Â¥32 chars) set
+- [ ] T022 Implement env config in `apps/server/src/config/env.ts` (zod) to pass T021
+- [ ] T023 [P] Write failing tests `apps/server/tests/unit/lib/redactor.test.ts` (Anthropic/OpenAI/GitHub/AWS keys, bearer headers, `password=`, PEM private keys, high-entropy strings in `.env` lines; nested JSON; idempotent)
+- [ ] T024 Implement redactor in `apps/server/src/lib/redactor.ts` to pass T023
+- [ ] T025 [P] Write failing tests `apps/server/tests/unit/lib/path-guard.test.ts` (traversal `..`, symlink escape, Windows drive/UNC paths, case-insensitive roots on win32)
+- [ ] T026 Implement path guard in `apps/server/src/lib/path-guard.ts` to pass T025
+- [ ] T027 [P] Write failing tests `apps/server/tests/unit/lib/process.test.ts`: only `claude`, `git`, `gh` allowed; args passed as array; no shell; timeout + kill tree
+- [ ] T028 Implement allowlisted process runner in `apps/server/src/lib/process.ts` (`execFile`/`spawn` with `shell:false`) to pass T027
+- [ ] T029 [P] Implement `apps/server/src/lib/ulid.ts` (monotonic) and `apps/server/src/lib/logger.ts` (pino, redactor applied to all log objects)
+- [ ] T030 Implement Drizzle schema for all tables in `apps/server/src/db/schema.ts` (projects, executions, tasks, task_dependencies, sessions, agents, events, messages, approval_requests, workflow_definitions, workflow_versions, workflow_runs, workflow_node_runs, integrations, audit_entries, api_tokens) with indexes `(session_id,id)`, `(execution_id,id)`, `(type,ts)`; generate migration in `apps/server/drizzle/`; add raw-SQL migration for FTS5 virtual table `events_fts(summary)`
+- [ ] T031 Implement DB client `apps/server/src/db/client.ts` (data dir `NEXORA_DATA_DIR` default `~/.nexora`, WAL, foreign keys on, migrate on start) and `db:migrate` script `apps/server/src/db/migrate.ts`
+- [ ] T032 [P] Write failing tests `apps/server/tests/integration/http/security.test.ts` via `app.request()`: rejects foreign `Origin`/`Host` (DNS rebinding), mutating request without CSRF header Ã¢â€ â€™ 403, bearer token required in remote mode, secure headers present
+- [ ] T033 Implement Hono app `apps/server/src/http/app.ts` with middleware `apps/server/src/http/middleware/{origin-guard,session-cookie,csrf,bearer-auth,error-mapper}.ts` (cookie `HttpOnly; SameSite=Strict`, header `X-Nexora-CSRF`) and `GET /api/v1/health` Ã¢â€ â€™ `{status, version, db, uptimeMs}` to pass T032
+- [ ] T034 [P] Implement audit service (append-only, no update/delete) in `apps/server/src/modules/permission-manager/audit.service.ts` + test `apps/server/tests/unit/permission-manager/audit.test.ts`
+- [ ] T035 [P] Write failing tests `apps/server/tests/unit/event-manager/event-store.test.ts`: 100 ms batched inserts, redaction before insert, payload > 32 KB truncated with flag, summary Ã¢â€°Â¤ 500, cursor query by ULID ordered, filters (session, agent, execution, type[], severity[], from/to, FTS `q`)
+- [ ] T036 Implement event store + bus in `apps/server/src/modules/event-manager/{event-store.ts,event-bus.ts,index.ts}` to pass T035
+- [ ] T037 [P] Write failing tests `apps/server/tests/integration/realtime/replay.test.ts`: subscribe with `sinceEventId` replays in order, max 5 000 then `gap: true`, then `replay.done`, then live; per-room 100 ms batching
+- [ ] T038 Implement Socket.IO gateway `apps/server/src/realtime/gateway.ts` (namespace `/live`, cookie/token handshake auth, rooms `global|execution:<id>|session:<id>|agent:<id>`, replay, batching, `entity.changed` emitter) to pass T037
+- [ ] T039 Implement bootstrap `apps/server/src/main.ts` (config Ã¢â€ â€™ db Ã¢â€ â€™ modules Ã¢â€ â€™ Hono via `@hono/node-server` + Socket.IO on same `http.Server`; in production serve `apps/web/dist` with SPA fallback on port 3022; graceful shutdown stops runtimes)
 
 ### Web core
 
-- [ ] T039 [P] Implement `apps/web/src/shared/api/http.ts` (axios instance, base `/api/v1`, `withCredentials`, `X-Nexora-CSRF` header from cookie/meta, maps error shape to typed `ApiError`) + test `apps/web/src/shared/api/http.test.ts`
-- [ ] T040 [P] Implement `apps/web/src/shared/api/query-client.ts` (staleTime defaults per team standard, retry off for 4xx)
-- [ ] T041 [P] Implement `apps/web/src/shared/lib/{logger.ts,create-resettable-store.ts}` and `apps/web/src/shared/config/env.ts` (`PUBLIC_*` only)
-- [ ] T042 Implement socket client `apps/web/src/shared/socket/{client.ts,use-live-subscription.ts}` (singleton `socket.io-client`, stores `lastEventId` per subscription, re-subscribes with `sinceEventId` on reconnect, dedupes by id; `useEffect` allowed — external system: socket) + test `apps/web/src/shared/socket/use-live-subscription.test.ts`
-- [ ] T043 Implement `apps/web/src/app/socket-bridge.ts` applying `entity.changed` to TanStack Query cache via `setQueryData`/exact-key invalidation
-- [ ] T044 Implement app shell: `apps/web/src/app/{providers.tsx,router.tsx}`, `apps/web/src/routes/__root.tsx`, widget `apps/web/src/widgets/app-shell/` (sidebar nav: Overview, Agent Canvas, Sessions, Tasks, Workflows, Communication, Live Logs, Skills & MCP, GitHub; header with connection status indicator + theme toggle; responsive collapse)
-- [ ] T045 [P] Implement feature `apps/web/src/features/toggle-theme/` (dark default, light, system; persisted in localStorage with try/catch)
-- [ ] T046 [P] Implement shared state components `apps/web/src/shared/ui/state/{loading-state,empty-state,error-state,unavailable-badge}.tsx` (`unavailable-badge` shows "not available" + reason tooltip, used for FR-029/FR-031)
-- [ ] T047 [P] Implement `apps/web/src/entities/status/` status badge with visually distinct, labelled variants (cva) for Paused, Waiting for approval, Idle, Running, Stopped, Failed, Completed, Unknown (FR-032)
+- [ ] T040 [P] Implement `apps/web/src/shared/api/http.ts` (axios instance, base `/api/v1`, `withCredentials`, `X-Nexora-CSRF` header from cookie/meta, maps error shape to typed `ApiError`) + test `apps/web/src/shared/api/http.test.ts`
+- [ ] T041 [P] Implement `apps/web/src/shared/api/query-client.ts` (staleTime defaults per team standard, retry off for 4xx)
+- [ ] T042 [P] Implement `apps/web/src/shared/lib/{logger.ts,create-resettable-store.ts}` and `apps/web/src/shared/config/env.ts` (`PUBLIC_*` only)
+- [ ] T043 Implement socket client `apps/web/src/shared/socket/{client.ts,use-live-subscription.ts}` (singleton `socket.io-client`, stores `lastEventId` per subscription, re-subscribes with `sinceEventId` on reconnect, dedupes by id; `useEffect` allowed Ã¢â‚¬â€ external system: socket) + test `apps/web/src/shared/socket/use-live-subscription.test.ts`
+- [ ] T044 Implement `apps/web/src/app/socket-bridge.ts` applying `entity.changed` to TanStack Query cache via `setQueryData`/exact-key invalidation
+- [ ] T045 Implement app shell: `apps/web/src/app/{providers.tsx,router.tsx}`, `apps/web/src/routes/__root.tsx`, widget `apps/web/src/widgets/app-shell/` (sidebar nav: Overview, Agent Canvas, Sessions, Tasks, Workflows, Communication, Live Logs, Skills & MCP, GitHub; header with connection status indicator + theme toggle; responsive collapse)
+- [ ] T046 [P] Implement feature `apps/web/src/features/toggle-theme/` (dark default, light, system; persisted in localStorage with try/catch)
+- [ ] T047 [P] Implement shared state components `apps/web/src/shared/ui/state/{loading-state,empty-state,error-state,unavailable-badge}.tsx` (`unavailable-badge` shows "not available" + reason tooltip, used for FR-029/FR-031)
+- [ ] T048 [P] Implement `apps/web/src/entities/status/` status badge with visually distinct, labelled variants (cva) for Paused, Waiting for approval, Idle, Running, Stopped, Failed, Completed, Unknown (FR-032)
 
 **Checkpoint**: `npm run dev` serves shell on http://localhost:3022, `/api/v1/health` ok, sockets connect
 
 ---
 
-## Phase 3: User Story 1 - Watch real agent activity live (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - Watch real agent activity live (Priority: P1) Ã°Å¸Å½Â¯ MVP
 
 **Goal**: Observe real Claude Code sessions, agents, tools, files and errors live via hooks
 
-**Independent Test**: quickstart V1 + V2 — register sample repo, install hooks, run `claude` with a subagent writing a file; dashboard shows session ≤ 2 s, main→subagent edge, file change; 60 s disconnect replays without loss/duplication
+**Independent Test**: quickstart V1 + V2 Ã¢â‚¬â€ register sample repo, install hooks, run `claude` with a subagent writing a file; dashboard shows session Ã¢â€°Â¤ 2 s, mainÃ¢â€ â€™subagent edge, file change; 60 s disconnect replays without loss/duplication
 
-### Tests for User Story 1 ⚠️ (write first, must fail)
+### Tests for User Story 1 Ã¢Å¡Â Ã¯Â¸Â (write first, must fail)
 
-- [ ] T048 [US1] Spike S1: in a scratch repo configure an `http` hook to a local echo server for every event in research R2, run a session with a subagent and a Write, save raw payloads to `apps/server/tests/fixtures/hooks/*.json` (redact secrets), and record whether `http` hooks support custom headers in `specs/001-ai-orchestration-platform/research.md` (S1 result)
-- [ ] T049 [P] [US1] Contract test `apps/server/tests/contract/hook-ingest.test.ts`: each fixture maps per the table in `contracts/runtime-adapter.md` (SessionStart→session.started … StopFailure→error), PostToolUse Write/Edit adds derived `file.modified`, missing/invalid `X-Nexora-Hook-Token` → 401, response `{}` for observed sessions
-- [ ] T050 [P] [US1] Unit test `apps/server/tests/unit/session-manager/session-projection.test.ts`: session status transitions from events, `lastActivityAt`, unknown project resolved by `cwd` under registered root
-- [ ] T051 [P] [US1] Unit test `apps/server/tests/unit/agent-registry/agent-tree.test.ts`: SubagentStart/Stop `agent_id`/`agent_type` build parent/child tree under session main agent
-- [ ] T052 [P] [US1] Unit test `apps/server/tests/unit/project-registry/hook-installer.test.ts`: preview produces diff of `.claude/settings.local.json` merging (never removing) existing hooks; install requires `confirm: true`; uninstall removes only Nexora entries
-- [ ] T053 [P] [US1] E2E `e2e/us1-live-monitoring.spec.ts`: POST recorded fixtures to ingest endpoint, assert Overview counters, Sessions row, canvas nodes/edge, agent details timeline/files, logs filter + export, axe clean
+- [ ] T049 [US1] Spike S1: in a scratch repo configure an `http` hook to a local echo server for every event in research R2, run a session with a subagent and a Write, save raw payloads to `apps/server/tests/fixtures/hooks/*.json` (redact secrets), and record whether `http` hooks support custom headers in `specs/001-ai-orchestration-platform/research.md` (S1 result)
+- [ ] T050 [P] [US1] Contract test `apps/server/tests/contract/hook-ingest.test.ts`: each fixture maps per the table in `contracts/runtime-adapter.md` (SessionStartÃ¢â€ â€™session.started Ã¢â‚¬Â¦ StopFailureÃ¢â€ â€™error), PostToolUse Write/Edit adds derived `file.modified`, missing/invalid `X-Nexora-Hook-Token` Ã¢â€ â€™ 401, response `{}` for observed sessions
+- [ ] T051 [P] [US1] Unit test `apps/server/tests/unit/session-manager/session-projection.test.ts`: session status transitions from events, `lastActivityAt`, unknown project resolved by `cwd` under registered root
+- [ ] T052 [P] [US1] Unit test `apps/server/tests/unit/agent-registry/agent-tree.test.ts`: SubagentStart/Stop `agent_id`/`agent_type` build parent/child tree under session main agent
+- [ ] T053 [P] [US1] Unit test `apps/server/tests/unit/project-registry/hook-installer.test.ts`: preview produces diff of `.claude/settings.local.json` merging (never removing) existing hooks; install requires `confirm: true`; uninstall removes only Nexora entries
+- [ ] T054 [P] [US1] E2E `e2e/us1-live-monitoring.spec.ts`: POST recorded fixtures to ingest endpoint, assert Overview counters, Sessions row, canvas nodes/edge, agent details timeline/files, logs filter + export, axe clean
 
 ### Implementation for User Story 1
 
-- [ ] T054 [P] [US1] Implement project registry `apps/server/src/modules/project-registry/{project.repository.ts,project.service.ts}` (register `rootPath` must exist, normalised, unique; name 1–120) and routes `apps/server/src/http/routes/projects.ts` (`GET/POST /projects`)
-- [ ] T055 [US1] Implement hook installer `apps/server/src/modules/project-registry/hook-installer.ts` (per-project secret, `http` hook entries for R2 events to `http://127.0.0.1:3022/api/v1/hooks/ingest`, header or query-token per S1 result) and routes `GET /projects/:id/hooks/preview`, `POST /projects/:id/hooks/install`, `DELETE /projects/:id/hooks` with audit entries
-- [ ] T056 [US1] Implement hook normaliser `apps/server/src/modules/event-manager/normalizers/hook-normalizer.ts` (source `hook`, reliability `authoritative`; derived `file.modified` reliability `derived`) and ingest route `apps/server/src/http/routes/hooks.ts` (loopback only, token check)
-- [ ] T057 [US1] Implement session manager projection `apps/server/src/modules/session-manager/{session.repository.ts,session-projection.ts,index.ts}` incl. git branch lookup via `git rev-parse --abbrev-ref HEAD` (process runner) and `entity.changed` emits
-- [ ] T058 [US1] Implement agent registry `apps/server/src/modules/agent-registry/{agent.repository.ts,agent-tree.ts,index.ts}`
-- [ ] T059 [US1] Implement stats service `apps/server/src/modules/event-manager/stats.service.ts` (active sessions, active/idle agents, completed/failed tasks, pending approvals, running workflows, current mode; socket `stats` throttled ≤ 2/s)
-- [ ] T060 [US1] Implement read routes `apps/server/src/http/routes/{sessions.ts,agents.ts,events.ts}`: `GET /sessions`, `GET /sessions/:id` (with capabilities), `GET /agents`, `GET /agents/:id`, `GET /events` (filters + cursor), `GET /events/export?format=jsonl|csv` (streamed, redacted)
-- [ ] T061 [P] [US1] Implement entities `apps/web/src/entities/{project,session,agent,event}/` (api functions via `shared/api/http`, query key factories, query options, `model/types.ts` re-exporting contracts, small UI atoms)
-- [ ] T062 [P] [US1] Implement feature `apps/web/src/features/register-project/` (RHF + zod form for `rootPath`)
-- [ ] T063 [P] [US1] Implement feature `apps/web/src/features/install-hooks/` (dialog showing settings diff, explicit confirm button, uninstall)
-- [ ] T064 [P] [US1] Implement widget `apps/web/src/widgets/overview-stats/` (8 stat cards from `stats` socket + initial REST) and view `apps/web/src/views/overview/`, route `apps/web/src/routes/index.tsx` (loader `ensureQueryData`)
-- [ ] T065 [P] [US1] Implement widget `apps/web/src/widgets/session-table/` (Session ID, working directory, mode, model or "not available", current task, status badge, last activity relative time, git branch; staleness indicator) and routes `apps/web/src/routes/sessions/index.tsx`, `apps/web/src/routes/sessions/$sessionId.tsx` with view `apps/web/src/views/session/`
-- [ ] T066 [US1] Implement widget `apps/web/src/widgets/agent-canvas/` using `@xyflow/react` (custom `AgentNode` in `components/agent-node.tsx` showing name, type, current task, status; parent/child + communication + dependency edge types; edges animate for 1.5 s on related events; auto-layout; click opens details) and route `apps/web/src/routes/canvas.tsx`
-- [ ] T067 [US1] Implement widget `apps/web/src/widgets/agent-details-panel/` (Sheet: identity/role, assignment, status, activity timeline with event source + reliability tags, tool events, files changed, task history, output summaries, errors, token usage/cost only when reported else `unavailable-badge`) and route `apps/web/src/routes/agents/$agentId.tsx`
-- [ ] T068 [US1] Implement widget `apps/web/src/widgets/log-viewer/` (virtualised list, live append, filters session/agent/type/mode/time/severity bound to URL via `validateSearch` zod, text search) + feature `apps/web/src/features/export-events/`; route `apps/web/src/routes/logs.tsx`
-- [ ] T069 [US1] Add MSW handlers `apps/web/tests/msw/handlers/{sessions,agents,events,projects}.ts` and component tests next to widgets (`*.test.tsx`) for overview-stats, session-table, agent-canvas node render, agent-details unavailable usage, log-viewer filters
+- [ ] T055 [P] [US1] Implement project registry `apps/server/src/modules/project-registry/{project.repository.ts,project.service.ts}` (register `rootPath` must exist, normalised, unique; name 1Ã¢â‚¬â€œ120) and routes `apps/server/src/http/routes/projects.ts` (`GET/POST /projects`)
+- [ ] T056 [US1] Implement hook installer `apps/server/src/modules/project-registry/hook-installer.ts` (per-project secret, `http` hook entries for R2 events to `${NEXORA_PUBLIC_URL}/api/v1/hooks/ingest` Ã¢â‚¬â€ `NEXORA_PUBLIC_URL` from env config, default `http://127.0.0.1:3022`, header or query-token per S1 result) and routes `GET /projects/:id/hooks/preview`, `POST /projects/:id/hooks/install`, `DELETE /projects/:id/hooks` with audit entries
+- [ ] T057 [US1] Implement hook normaliser `apps/server/src/modules/event-manager/normalizers/hook-normalizer.ts` (source `hook`, reliability `authoritative`; derived `file.modified` reliability `derived`) and ingest route `apps/server/src/http/routes/hooks.ts` (loopback only, token check)
+- [ ] T058 [US1] Implement session manager projection `apps/server/src/modules/session-manager/{session.repository.ts,session-projection.ts,index.ts}` incl. git branch lookup via `git rev-parse --abbrev-ref HEAD` (process runner) and `entity.changed` emits
+- [ ] T059 [US1] Implement agent registry `apps/server/src/modules/agent-registry/{agent.repository.ts,agent-tree.ts,index.ts}`
+- [ ] T060 [US1] Implement stats service `apps/server/src/modules/event-manager/stats.service.ts` (active sessions, active/idle agents, completed/failed tasks, pending approvals, running workflows, current mode; socket `stats` throttled Ã¢â€°Â¤ 2/s)
+- [ ] T061 [US1] Implement read routes `apps/server/src/http/routes/{sessions.ts,agents.ts,events.ts}`: `GET /sessions`, `GET /sessions/:id` (with capabilities), `GET /agents`, `GET /agents/:id`, `GET /events` (filters + cursor), `GET /events/export?format=jsonl|csv` (streamed, redacted)
+- [ ] T062 [P] [US1] Implement entities `apps/web/src/entities/{project,session,agent,event}/` (api functions via `shared/api/http`, query key factories, query options, `model/types.ts` re-exporting contracts, small UI atoms)
+- [ ] T063 [P] [US1] Implement feature `apps/web/src/features/register-project/` (RHF + zod form for `rootPath`)
+- [ ] T064 [P] [US1] Implement feature `apps/web/src/features/install-hooks/` (dialog showing settings diff, explicit confirm button, uninstall)
+- [ ] T065 [P] [US1] Implement widget `apps/web/src/widgets/overview-stats/` (8 stat cards from `stats` socket + initial REST) and view `apps/web/src/views/overview/`, route `apps/web/src/routes/index.tsx` (loader `ensureQueryData`)
+- [ ] T066 [P] [US1] Implement widget `apps/web/src/widgets/session-table/` ("observe-only" badge for `external_observed` sessions, Session ID, working directory, mode, model or "not available", current task, status badge, last activity relative time, git branch; staleness indicator) and routes `apps/web/src/routes/sessions/index.tsx`, `apps/web/src/routes/sessions/$sessionId.tsx` with view `apps/web/src/views/session/`
+- [ ] T067 [US1] Implement widget `apps/web/src/widgets/agent-canvas/` using `@xyflow/react` (custom `AgentNode` in `components/agent-node.tsx` showing name, type, current task, status; parent/child + communication + dependency edge types; edges animate for 1.5 s on related events; auto-layout; click opens details) and route `apps/web/src/routes/canvas.tsx`
+- [ ] T068 [US1] Implement widget `apps/web/src/widgets/agent-details-panel/` (Sheet: identity/role, assignment, status, activity timeline with event source + reliability tags, tool events, files changed, task history, output summaries, errors, token usage/cost only when reported else `unavailable-badge`) and route `apps/web/src/routes/agents/$agentId.tsx`
+- [ ] T069 [US1] Implement widget `apps/web/src/widgets/log-viewer/` (virtualised list, live append, filters session/agent/type/mode/time/severity bound to URL via `validateSearch` zod, text search) + feature `apps/web/src/features/export-events/`; route `apps/web/src/routes/logs.tsx`
+- [ ] T070 [US1] Add MSW handlers `apps/web/tests/msw/handlers/{sessions,agents,events,projects}.ts` and component tests next to widgets (`*.test.tsx`) for overview-stats, session-table, agent-canvas node render, agent-details unavailable usage, log-viewer filters
 
-**Checkpoint**: US1 fully functional — MVP demo of live monitoring with real Claude Code sessions
+**Checkpoint**: US1 fully functional Ã¢â‚¬â€ MVP demo of live monitoring with real Claude Code sessions
 
 ---
 
 ## Phase 4: User Story 2 - Submit a task and launch an approved execution plan (Priority: P1)
 
-**Goal**: Natural-language task → analysis → mode recommendation → relevant questions → plan → approval → running Multi-Session or Subagents execution → verification
+**Goal**: Natural-language task Ã¢â€ â€™ analysis Ã¢â€ â€™ mode recommendation Ã¢â€ â€™ relevant questions Ã¢â€ â€™ plan Ã¢â€ â€™ approval Ã¢â€ â€™ running Multi-Session or Subagents execution Ã¢â€ â€™ verification
 
-**Independent Test**: quickstart V3 + V4 — analysis shows stack/instructions/skills/agents/MCP; Agent Teams disabled with reason when flag unset; plan has IDs, deps, owners, conflicts; destructive task waits for approval; approved run shows status transitions and final verification
+**Independent Test**: quickstart V3 + V4 Ã¢â‚¬â€ analysis shows stack/instructions/skills/agents/MCP; Agent Teams disabled with reason when flag unset; plan has IDs, deps, owners, conflicts; destructive task waits for approval; approved run shows status transitions and final verification
 
-### Tests for User Story 2 ⚠️
+### Tests for User Story 2 Ã¢Å¡Â Ã¯Â¸Â
 
-- [ ] T070 [US2] Spike S3: script `apps/server/scripts/spike-sdk.ts` running SDK `query()` in streaming-input mode against a scratch repo: send message via `streamInput`, `interrupt()`, then new query with `resume: sessionId`; record message fixtures to `apps/server/tests/fixtures/sdk/*.jsonl` and results in research.md (S3)
-- [ ] T071 [P] [US2] Unit test `apps/server/tests/unit/execution-orchestrator/execution-state.test.ts`: all allowed transitions `draft → analyzing → awaiting_mode → configuring → plan_ready → awaiting_approval → running ⇄ paused → verifying → completed|failed|cancelled`; invalid ones throw CONFLICT
-- [ ] T072 [P] [US2] Unit test `apps/server/tests/unit/task-manager/task-state.test.ts`: transitions per data-model "Task transitions"; dependency graph must be a DAG (cycle ⇒ validation error)
-- [ ] T073 [P] [US2] Unit test `apps/server/tests/unit/execution-orchestrator/conflict-detector.test.ts`: overlapping `ownedPaths` globs between parallel tasks flagged (picomatch), non-overlapping not flagged
-- [ ] T074 [P] [US2] Unit test `apps/server/tests/unit/execution-orchestrator/scheduler.test.ts`: respects dependencies, `maxParallelSessions` default 4 (≤ 8), conflicting tasks serialised or assigned separate worktrees, risky tasks (`riskClass` ≠ normal) not started without approval
-- [ ] T075 [P] [US2] Unit test `apps/server/tests/unit/execution-orchestrator/mode-advisor.test.ts`: unavailable modes carry `unavailableReason` (Agent Teams without `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`), recommendation + reason by complexity/parallelism
-- [ ] T076 [P] [US2] Unit test `apps/server/tests/unit/permission-manager/approval-gate.test.ts`: request stays pending forever (no timeout auto-approve), approve/reject resolve, session death → `expired_session`, every decision audited
-- [ ] T077 [P] [US2] Contract test `apps/server/tests/contract/agent-sdk-adapter.test.ts` replaying S3 fixtures: `system:init` → session.started with model, `parent_tool_use_id` → subagent agent tree, `result` → usage with `reportsUsage: 'estimate'`, `canUseTool` routed to ApprovalGate
-- [ ] T078 [P] [US2] Integration test `apps/server/tests/integration/executions-flow.test.ts` with `FakeRuntimeAdapter` (`apps/server/tests/fakes/fake-runtime-adapter.ts`, test-only): POST /executions → modes → mode → questions → config → plan → approve → tasks run → verification
-- [ ] T079 [P] [US2] E2E `e2e/us2-task-to-execution.spec.ts` (test build with fake adapter enabled via `NEXORA_TEST_FAKE_RUNTIME=1`, refused when `NODE_ENV=production`): wizard flow, risky task approval checkbox, status board updates, axe clean
+- [ ] T071 [US2] Spike S3: script `apps/server/scripts/spike-sdk.ts` running SDK `query()` in streaming-input mode against a scratch repo: send message via `streamInput`, `interrupt()`, then new query with `resume: sessionId`; record message fixtures to `apps/server/tests/fixtures/sdk/*.jsonl` and results in research.md (S3)
+- [ ] T072 [P] [US2] Unit test `apps/server/tests/unit/execution-orchestrator/execution-state.test.ts`: all allowed transitions `draft Ã¢â€ â€™ analyzing Ã¢â€ â€™ awaiting_mode Ã¢â€ â€™ configuring Ã¢â€ â€™ plan_ready Ã¢â€ â€™ awaiting_approval Ã¢â€ â€™ running Ã¢â€¡â€ž paused Ã¢â€ â€™ verifying Ã¢â€ â€™ completed|failed|cancelled`; invalid ones throw CONFLICT
+- [ ] T073 [P] [US2] Unit test `apps/server/tests/unit/task-manager/task-state.test.ts`: transitions per data-model "Task transitions"; dependency graph must be a DAG (cycle Ã¢â€¡â€™ validation error)
+- [ ] T074 [P] [US2] Unit test `apps/server/tests/unit/execution-orchestrator/conflict-detector.test.ts`: overlapping `ownedPaths` globs between parallel tasks flagged (picomatch), non-overlapping not flagged
+- [ ] T075 [P] [US2] Unit test `apps/server/tests/unit/execution-orchestrator/scheduler.test.ts`: respects dependencies, `maxParallelSessions` default 4 (Ã¢â€°Â¤ 8), conflicting tasks serialised or assigned separate worktrees, risky tasks (`riskClass` Ã¢â€°Â  normal) not started without approval
+- [ ] T076 [P] [US2] Unit test `apps/server/tests/unit/execution-orchestrator/mode-advisor.test.ts`: unavailable modes carry `unavailableReason` (Agent Teams without `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`), recommendation + reason by complexity/parallelism
+- [ ] T077 [P] [US2] Unit test `apps/server/tests/unit/permission-manager/approval-gate.test.ts`: request stays pending forever (no timeout auto-approve), approve/reject resolve, session death Ã¢â€ â€™ `expired_session`, every decision audited
+- [ ] T078 [P] [US2] Unit test `apps/server/tests/unit/permission-manager/scope-guard.test.ts`: Write/Edit/MultiEdit/NotebookEdit targeting paths outside the session worktree root or the task's `ownedPaths` Ã¢â€ â€™ deny + audit entry; reads inside the project allowed; Bash routed to ApprovalGate (not auto-allowed); applies to both PreToolUse hook and `canUseTool` paths
+- [ ] T079 [P] [US2] Unit test `apps/server/tests/unit/session-manager/liveness.test.ts`: no activity for `idleTimeoutMs` (default 600 000) Ã¢â€ â€™ status `unresponsive` + `error` event; exceeding `turnTimeoutMs` (default 1 800 000) Ã¢â€ â€™ interrupt where capability allows, task `failed` with reason `timeout`; values read from execution config
+- [ ] T080 [P] [US2] Unit test `apps/server/tests/unit/execution-orchestrator/analysis-consent.test.ts`: default analysis performs only local inspection (no runtime started); model-backed analysis/planning refused with APPROVAL_REQUIRED until `modelAnalysisConsent` is true or a per-project always-allow preference exists (FR-008)
+- [ ] T081 [P] [US2] Contract test `apps/server/tests/contract/agent-sdk-adapter.test.ts` replaying S3 fixtures: `system:init` Ã¢â€ â€™ session.started with model, `parent_tool_use_id` Ã¢â€ â€™ subagent agent tree, `result` Ã¢â€ â€™ usage with `reportsUsage: 'estimate'`, `canUseTool` routed to ApprovalGate
+- [ ] T082 [P] [US2] Integration test `apps/server/tests/integration/executions-flow.test.ts` with `FakeRuntimeAdapter` (`apps/server/tests/fakes/fake-runtime-adapter.ts`, test-only): POST /executions Ã¢â€ â€™ modes Ã¢â€ â€™ mode Ã¢â€ â€™ questions Ã¢â€ â€™ config Ã¢â€ â€™ plan Ã¢â€ â€™ approve Ã¢â€ â€™ tasks run Ã¢â€ â€™ verification
+- [ ] T083 [P] [US2] E2E `e2e/us2-task-to-execution.spec.ts` (served by `start:e2e`; fake adapter enabled via `NEXORA_TEST_FAKE_RUNTIME=1` only when `NODE_ENV=test` Ã¢â‚¬â€ server refuses to start with the flag in any other environment): wizard flow, risky task approval checkbox, status board updates, axe clean
 
 ### Implementation for User Story 2
 
-- [ ] T080 [US2] Implement runtime interface + capability profiles `apps/server/src/modules/runtime-manager/{runtime-adapter.ts,capabilities.ts,errors.ts}` per `contracts/runtime-adapter.md` (CapabilityUnsupportedError → 422)
-- [ ] T081 [US2] Implement Agent SDK adapter `apps/server/src/modules/runtime-manager/adapters/agent-sdk/{agent-sdk.adapter.ts,message-mapper.ts}` (streaming input, `cwd` validated by path guard, `permissionMode` default `default`, `agents`, `allowedTools`, `maxTurns`, `maxBudgetUsd`, `resume`; `canUseTool` → ApprovalGate; `close`, `interrupt`, `streamInput`, `setPermissionMode`) to pass T077
-- [ ] T082 [P] [US2] Implement CLI headless adapter `apps/server/src/modules/runtime-manager/adapters/cli-headless/cli-headless.adapter.ts` (`claude -p --input-format stream-json --output-format stream-json --verbose`, stdin messages, SIGTERM stop, `--resume`) sharing `message-mapper.ts`
-- [ ] T083 [US2] Implement runtime manager `apps/server/src/modules/runtime-manager/runtime-manager.ts` (`detect()`: `claude --version`, auth check, Agent Teams env flag in process env + user/project settings `env`; registry of adapters) and route `GET /runtime/environment` in `apps/server/src/http/routes/runtime.ts`
-- [ ] T084 [P] [US2] Implement skill/agent/MCP discovery `apps/server/src/modules/skill-registry/discovery.ts` (project `.claude/skills`, `.claude/commands`, `.claude/agents`, user `~/.claude/{skills,agents}`, enabled plugins; `executable` = user-invocable) and `apps/server/src/modules/mcp-registry/discovery.ts` (`.mcp.json`, user config; secrets stripped via redactor)
-- [ ] T085 [US2] Implement analysis service `apps/server/src/modules/execution-orchestrator/analysis/analysis.service.ts` (stack detection from manifests/lockfiles, CLAUDE.md/AGENTS.md, discovery results, complexity estimate via read-only SDK query `permissionMode: 'plan'` returning zod-validated `TaskAnalysis` JSON)
-- [ ] T086 [US2] Implement mode advisor + question service `apps/server/src/modules/execution-orchestrator/{mode-advisor.ts,questions.ts}` (only relevant questions, each with `recommendedDefault`) to pass T075
-- [ ] T087 [US2] Implement planner `apps/server/src/modules/execution-orchestrator/planner/{planner.ts,conflict-detector.ts}` (read-only SDK query producing tasks with ID `T-<n>`, title 1–200, owner role, deps, priority, `ownedPaths`, `riskClass`; DAG validation; conflicts) to pass T072, T073
-- [ ] T088 [US2] Implement git workspace module `apps/server/src/modules/git-workspace/{worktree.service.ts,diff.service.ts}` (`git worktree add <repo>/.nexora/worktrees/<execution>/<task> -b nexora/<execution>/<task>`, cleanup, changed files via `git diff --name-only`; never force-push)
-- [ ] T089 [US2] Implement approval gate + approvals routes `apps/server/src/modules/permission-manager/approval.service.ts`, `apps/server/src/http/routes/approvals.ts` (`GET /approvals?status=pending`, `POST /approvals/:id/decision`) to pass T076
-- [ ] T090 [US2] Implement task manager `apps/server/src/modules/task-manager/{task.repository.ts,task-state.ts,task.service.ts}` (statuses, attempts, changedFiles, testResults) to pass T072
-- [ ] T091 [US2] Implement orchestrator `apps/server/src/modules/execution-orchestrator/{execution-state.ts,orchestrator.ts,scheduler.ts}` (state machine, scheduler with deps/parallelism/worktrees/risk gating, emits task/execution events) to pass T071, T074
-- [ ] T092 [US2] Implement mode executors `apps/server/src/modules/execution-orchestrator/modes/{multi-session.ts,subagents.ts}` (multi-session: one SDK session per task, coordinator messaging via Communication Manager; subagents: one SDK session with 8 role definitions from `apps/server/src/modules/execution-orchestrator/agents/roles.ts` — Architect, Frontend Developer, Backend Developer, Database Engineer, QA Engineer, Security Reviewer, Code Reviewer, DevOps Engineer — plus discovered project agents; main agent review/integration step)
-- [ ] T093 [US2] Implement verifier `apps/server/src/modules/execution-orchestrator/verifier.ts` (collect completed/failed tasks, changed files, run detected test command in project via allowlisted runner only if user approved in config, parse pass/fail counts)
-- [ ] T094 [US2] Implement executions routes `apps/server/src/http/routes/executions.ts` (`POST /executions`, `GET /executions/:id`, `GET/PUT …/modes|mode`, `GET …/questions`, `PUT …/config`, `POST …/plan`, `POST …/approve` with `permissionBypass` requiring typed confirmation string, `GET …/verification`, `GET …/tasks`) and wire into Hono app
-- [ ] T095 [P] [US2] Implement entities `apps/web/src/entities/{execution,task,approval}/` (api, key factories, types)
-- [ ] T096 [P] [US2] Implement feature `apps/web/src/features/submit-task/` (project select + prompt textarea 1–20 000 chars, RHF + zod) and analysis summary widget `apps/web/src/widgets/analysis-summary/`
-- [ ] T097 [P] [US2] Implement feature `apps/web/src/features/choose-mode/` (mode cards: available/recommended badge/reason; unavailable disabled with reason + how to enable)
-- [ ] T098 [P] [US2] Implement feature `apps/web/src/features/answer-questions/` (dynamic RHF form from Question[] with defaults; strategy, agent config, skills, MCP, parallelism, approval checkpoints)
-- [ ] T099 [US2] Implement feature `apps/web/src/features/approve-plan/` (plan table: ID, title, description, agent, mode, deps, priority, status; conflict highlights; checkbox per risky task; permission-bypass toggle off by default requiring typed confirmation)
-- [ ] T100 [US2] Implement views/routes `apps/web/src/views/new-execution/` + `apps/web/src/routes/executions/new.tsx` (wizard steps with URL step param) and `apps/web/src/views/execution/` + `apps/web/src/routes/executions/$executionId.tsx` (live task statuses, verification summary)
+- [ ] T084 [US2] Implement runtime interface + capability profiles `apps/server/src/modules/runtime-manager/{runtime-adapter.ts,capabilities.ts,errors.ts}` per `contracts/runtime-adapter.md` (CapabilityUnsupportedError Ã¢â€ â€™ 422)
+- [ ] T085 [US2] Implement Agent SDK adapter `apps/server/src/modules/runtime-manager/adapters/agent-sdk/{agent-sdk.adapter.ts,message-mapper.ts}` (streaming input, `cwd` validated by path guard, `permissionMode` default `default`, `agents`, `allowedTools`, `maxTurns`, `maxBudgetUsd`, `resume`; `canUseTool` Ã¢â€ â€™ ApprovalGate; `close`, `interrupt`, `streamInput`, `setPermissionMode`) to pass T081
+- [ ] T086 [P] [US2] Implement CLI headless adapter `apps/server/src/modules/runtime-manager/adapters/cli-headless/cli-headless.adapter.ts` (`claude -p --input-format stream-json --output-format stream-json --verbose`, stdin messages, SIGTERM stop, `--resume`) sharing `message-mapper.ts`
+- [ ] T087 [US2] Implement runtime manager `apps/server/src/modules/runtime-manager/runtime-manager.ts` (`detect()`: `claude --version`, auth check, Agent Teams env flag in process env + user/project settings `env`; registry of adapters) and route `GET /runtime/environment` in `apps/server/src/http/routes/runtime.ts`
+- [ ] T088 [P] [US2] Implement skill/agent/MCP discovery `apps/server/src/modules/skill-registry/discovery.ts` (project `.claude/skills`, `.claude/commands`, `.claude/agents`, user `~/.claude/{skills,agents}`, enabled plugins; `executable` = user-invocable) and `apps/server/src/modules/mcp-registry/discovery.ts` (`.mcp.json`, user config; secrets stripped via redactor)
+- [ ] T089 [US2] Implement analysis service `apps/server/src/modules/execution-orchestrator/analysis/analysis.service.ts` (default = local heuristic: stack detection from manifests/lockfiles, CLAUDE.md/AGENTS.md, discovery results, heuristic complexity; optional model-backed refinement via read-only SDK query `permissionMode: 'plan'` returning zod-validated `TaskAnalysis` JSON, only with consent per FR-008) to pass T080
+- [ ] T090 [US2] Implement mode advisor + question service `apps/server/src/modules/execution-orchestrator/{mode-advisor.ts,questions.ts}` (only relevant questions, each with `recommendedDefault`) to pass T076
+- [ ] T091 [US2] Implement planner `apps/server/src/modules/execution-orchestrator/planner/{planner.ts,conflict-detector.ts}` (consent-gated per FR-008; read-only SDK query in the execution worktree producing tasks with ID `T-<n>`, title 1Ã¢â‚¬â€œ200, owner role, deps, priority, `ownedPaths`, `riskClass`; DAG validation; conflicts) to pass T073, T074
+- [ ] T092 [US2] Implement git workspace module `apps/server/src/modules/git-workspace/{worktree.service.ts,diff.service.ts}` (every managed execution gets an execution-level worktree `git worktree add <repo>/.nexora/worktrees/<execution>/main -b nexora/<execution>` stored in `Execution.worktreePath`; parallel conflicting tasks additionally get `<repo>/.nexora/worktrees/<execution>/<task>` on `nexora/<execution>/<task>`; add `.nexora/` to the target repo's `.git/info/exclude`; cleanup, changed files via `git diff --name-only`; never force-push)
+- [ ] T093 [US2] Implement approval gate + approvals routes `apps/server/src/modules/permission-manager/approval.service.ts`, `apps/server/src/http/routes/approvals.ts` (`GET /approvals?status=pending`, `POST /approvals/:id/decision`) to pass T077
+- [ ] T094 [US2] Implement scope guard `apps/server/src/modules/permission-manager/scope-guard.ts` and wire it into the Agent SDK adapter both as SDK `hooks.PreToolUse` (covers auto-approved tools, which skip `canUseTool`) and inside `canUseTool`; CLI headless adapter enforces via `--permission-prompt-tool` + PreToolUse hook; to pass T078
+- [ ] T095 [US2] Implement task manager `apps/server/src/modules/task-manager/{task.repository.ts,task-state.ts,task.service.ts}` (statuses, attempts, changedFiles, testResults) to pass T073
+- [ ] T096 [US2] Implement liveness monitor `apps/server/src/modules/session-manager/liveness-monitor.ts` (timer per managed session reset on every event; idle Ã¢â€ â€™ `unresponsive`; turn timeout Ã¢â€ â€™ `interrupt()` if capability, else stop; marks task failed `timeout`) to pass T079
+- [ ] T097 [US2] Implement orchestrator `apps/server/src/modules/execution-orchestrator/{execution-state.ts,orchestrator.ts,scheduler.ts}` (state machine, scheduler with deps/parallelism/worktrees/risk gating, emits task/execution events) to pass T072, T075
+- [ ] T098 [US2] Unit test `apps/server/tests/unit/communication-manager/communication.test.ts`: send to session/agent only via adapter `sendMessage` when capability allows (else CAPABILITY_UNSUPPORTED), Message row + `message.sent` event recorded, summary redacted and Ã¢â€°Â¤ 500 chars
+- [ ] T099 [US2] Implement communication manager `apps/server/src/modules/communication-manager/{communication.service.ts,message.repository.ts}` (send to session/agent via adapter `sendMessage`, record Message + `message.sent` event, summaries redacted, user-visible text only) to pass T098
+- [ ] T100 [US2] Implement mode executors `apps/server/src/modules/execution-orchestrator/modes/{multi-session.ts,subagents.ts}` (every session `cwd` = execution worktree or task worktree, never the project root; multi-session: one SDK session per task, coordinator messaging via Communication Manager; subagents: one SDK session in the execution worktree with 8 role definitions from `apps/server/src/modules/execution-orchestrator/agents/roles.ts` Ã¢â‚¬â€ Architect, Frontend Developer, Backend Developer, Database Engineer, QA Engineer, Security Reviewer, Code Reviewer, DevOps Engineer Ã¢â‚¬â€ plus discovered project agents; main agent review/integration step)
+- [ ] T101 [US2] Implement verifier `apps/server/src/modules/execution-orchestrator/verifier.ts` (collect completed/failed tasks, changed files, run detected test command in project via allowlisted runner only if user approved in config, parse pass/fail counts)
+- [ ] T102 [US2] Implement executions routes `apps/server/src/http/routes/executions.ts` (`POST /executions`, `GET /executions/:id`, `GET/PUT Ã¢â‚¬Â¦/modes|mode`, `GET Ã¢â‚¬Â¦/questions`, `PUT Ã¢â‚¬Â¦/config`, `POST Ã¢â‚¬Â¦/plan`, `POST Ã¢â‚¬Â¦/approve` with `permissionBypass` requiring typed confirmation string, `GET Ã¢â‚¬Â¦/verification`, `GET Ã¢â‚¬Â¦/tasks`) and wire into Hono app
+- [ ] T103 [P] [US2] Implement entities `apps/web/src/entities/{execution,task,approval}/` (api, key factories, types)
+- [ ] T104 [P] [US2] Implement feature `apps/web/src/features/submit-task/` (project select + prompt textarea 1Ã¢â‚¬â€œ20 000 chars, RHF + zod; consent dialog before model-backed analysis/planning stating it consumes model usage, with per-project "always allow" toggle that can be revoked Ã¢â‚¬â€ FR-008) and analysis summary widget `apps/web/src/widgets/analysis-summary/`
+- [ ] T105 [P] [US2] Implement feature `apps/web/src/features/choose-mode/` (mode cards: available/recommended badge/reason; unavailable disabled with reason + how to enable)
+- [ ] T106 [P] [US2] Implement feature `apps/web/src/features/answer-questions/` (dynamic RHF form from Question[] with defaults; strategy, agent config, skills, MCP, parallelism, approval checkpoints)
+- [ ] T107 [US2] Implement feature `apps/web/src/features/approve-plan/` (plan table: ID, title, description, agent, mode, deps, priority, status; conflict highlights; checkbox per risky task; permission-bypass toggle off by default requiring typed confirmation)
+- [ ] T108 [US2] Implement views/routes `apps/web/src/views/new-execution/` + `apps/web/src/routes/executions/new.tsx` (wizard steps with URL step param) and `apps/web/src/views/execution/` + `apps/web/src/routes/executions/$executionId.tsx` (live task statuses, verification summary)
 
-**Checkpoint**: US1 + US2 work — orchestrated runs visible in monitoring views
+**Checkpoint**: US1 + US2 work Ã¢â‚¬â€ orchestrated runs visible in monitoring views
 
 ---
 
 ## Phase 5: User Story 3 - Control running executions safely (Priority: P2)
 
-**Goal**: Stop, interrupt, resume, message, approve/reject, retry, assign, request review — capability-gated
+**Goal**: Stop, interrupt, resume, message, approve/reject, retry, assign, request review Ã¢â‚¬â€ capability-gated
 
-**Independent Test**: quickstart V5 — approve one, reject one, stop execution ≤ 5 s, Pause disabled with reason, retry links attempts, all in audit log
+**Independent Test**: quickstart V5 Ã¢â‚¬â€ approve one, reject one, stop execution Ã¢â€°Â¤ 5 s, Pause disabled with reason, retry links attempts, all in audit log
 
-### Tests for User Story 3 ⚠️
+### Tests for User Story 3 Ã¢Å¡Â Ã¯Â¸Â
 
-- [ ] T101 [P] [US3] Unit test `apps/server/tests/unit/runtime-manager/capability-gate.test.ts`: every control on each RuntimeKind matches the capability matrix; unsupported → CAPABILITY_UNSUPPORTED
-- [ ] T102 [P] [US3] Integration test `apps/server/tests/integration/controls.test.ts` (fake adapter): stop ≤ 5 s → `stopped`; retry creates attempt+1 linked via `previousAttemptId`; assign task; request review; messages persisted as Message + event; audit entries for each
-- [ ] T103 [P] [US3] E2E `e2e/us3-controls.spec.ts`: approvals inbox approve/reject, stop, disabled Pause tooltip text, distinct state badges, axe clean
+- [ ] T109 [P] [US3] Unit test `apps/server/tests/unit/runtime-manager/capability-gate.test.ts`: every control on each RuntimeKind matches the capability matrix; unsupported Ã¢â€ â€™ CAPABILITY_UNSUPPORTED
+- [ ] T110 [P] [US3] Integration test `apps/server/tests/integration/controls.test.ts` (fake adapter): stop Ã¢â€°Â¤ 5 s Ã¢â€ â€™ `stopped`; retry creates attempt+1 linked via `previousAttemptId`; assign task; request review; messages persisted as Message + event; audit entries for each
+- [ ] T111 [P] [US3] E2E `e2e/us3-controls.spec.ts`: approvals inbox approve/reject, stop, disabled Pause tooltip text, distinct state badges, axe clean
 
 ### Implementation for User Story 3
 
-- [ ] T104 [US3] Implement communication manager `apps/server/src/modules/communication-manager/{communication.service.ts,message.repository.ts}` (send to session/agent via adapter `sendMessage`, record Message + `message.sent` event, summaries redacted, user-visible text only)
-- [ ] T105 [US3] Implement control operations in `apps/server/src/modules/execution-orchestrator/controls.ts` (stop, interrupt-and-hold labelled "Interrupt & hold" only when all runtimes support interrupt+resume, resume, cancel task, retry, assign additional task, request review by Code Reviewer role, restart session) to pass T101, T102
-- [ ] T106 [US3] Implement routes `apps/server/src/http/routes/controls.ts`: `POST /executions/:id/{stop,pause,resume}`, `POST /tasks/:id/{cancel,retry,review}`, `POST /executions/:id/tasks`, `POST /sessions/:id/{stop,interrupt,restart,resume,messages}`, `POST /agents/:id/messages`
-- [ ] T107 [P] [US3] Implement feature `apps/web/src/features/control-session/` (buttons derived only from `capabilities`; unsupported disabled with reason tooltip; confirmation dialog for stop)
-- [ ] T108 [P] [US3] Implement feature `apps/web/src/features/decide-approval/` + widget `apps/web/src/widgets/approvals-inbox/` (pending list, approve/reject with note, toast on new approval request)
-- [ ] T109 [P] [US3] Implement features `apps/web/src/features/{retry-task,send-message,assign-task,request-review}/`
-- [ ] T110 [US3] Integrate controls into agent-details-panel, session view and execution view (`apps/web/src/widgets/agent-details-panel/`, `apps/web/src/views/session/`, `apps/web/src/views/execution/`)
+- [ ] T112 [US3] Implement control operations in `apps/server/src/modules/execution-orchestrator/controls.ts` (controls only for Nexora-started sessions Ã¢â‚¬â€ observed sessions are observe-only; stop, interrupt-and-hold labelled "Interrupt & hold" (API name `pause`) only when all runtimes support interrupt+resume, resume, cancel task, retry, assign additional task, request review by Code Reviewer role, restart session) to pass T109, T110
+- [ ] T113 [US3] Implement routes `apps/server/src/http/routes/controls.ts`: `POST /executions/:id/{stop,pause,resume}`, `POST /tasks/:id/{cancel,retry,review}`, `POST /executions/:id/tasks`, `POST /sessions/:id/{stop,interrupt,restart,resume,messages}`, `POST /agents/:id/messages`
+- [ ] T114 [P] [US3] Implement feature `apps/web/src/features/control-session/` (buttons derived only from `capabilities`; unsupported disabled with reason tooltip; confirmation dialog for stop)
+- [ ] T115 [P] [US3] Implement feature `apps/web/src/features/decide-approval/` + widget `apps/web/src/widgets/approvals-inbox/` (pending list, approve/reject with note, toast on new approval request)
+- [ ] T116 [P] [US3] Implement Communication Center widget `apps/web/src/widgets/message-feed/` + entity `apps/web/src/entities/message/` + route `apps/web/src/routes/communication.tsx` (sender, receiver, timestamp, type, related task, summary; live via socket; no hidden reasoning) with component test `apps/web/src/widgets/message-feed/message-feed.test.tsx`
+- [ ] T117 [P] [US3] Implement features `apps/web/src/features/{retry-task,send-message,assign-task,request-review}/`
+- [ ] T118 [US3] Integrate controls into agent-details-panel, session view and execution view (`apps/web/src/widgets/agent-details-panel/`, `apps/web/src/views/session/`, `apps/web/src/views/execution/`)
 
 **Checkpoint**: Human control complete for Multi-Session and Subagents modes
 
@@ -222,12 +233,12 @@ testable increment.
 
 **Goal**: Kanban (Backlog, Todo, In Progress, Review, Completed, Failed) with state-valid drag-and-drop
 
-**Independent Test**: quickstart V6 — pending→Todo accepted; running→Completed refused with message
+**Independent Test**: quickstart V6 Ã¢â‚¬â€ pendingÃ¢â€ â€™Todo accepted; runningÃ¢â€ â€™Completed refused with message
 
-- [ ] T111 [P] [US4] Unit test `apps/server/tests/unit/task-manager/board-move.test.ts`: column derivation (Backlog=pending; Todo=queued; In Progress=planning/running/waiting_for_input/blocked; Review=reviewing; Completed; Failed=failed/cancelled); user move allowed only `pending⇄queued`, else CONFLICT with reason
-- [ ] T112 [US4] Implement `PATCH /tasks/:id/status` in `apps/server/src/http/routes/tasks.ts` using `apps/server/src/modules/task-manager/board.ts` to pass T111
-- [ ] T113 [US4] Implement widget `apps/web/src/widgets/kanban-board/` (`@dnd-kit`, keyboard-accessible DnD, optimistic move with rollback + toast on 409, filters by execution) and feature `apps/web/src/features/move-task/`; route `apps/web/src/routes/tasks.tsx`
-- [ ] T114 [P] [US4] Component test `apps/web/src/widgets/kanban-board/kanban-board.test.tsx` and E2E `e2e/us4-board.spec.ts`
+- [ ] T119 [P] [US4] Unit test `apps/server/tests/unit/task-manager/board-move.test.ts`: column derivation (Backlog=pending; Todo=queued; In Progress=planning/running/waiting_for_input/blocked; Review=reviewing; Completed; Failed=failed/cancelled); user move allowed only `pendingÃ¢â€¡â€žqueued`, else CONFLICT with reason
+- [ ] T120 [US4] Implement `PATCH /tasks/:id/status` in `apps/server/src/http/routes/tasks.ts` using `apps/server/src/modules/task-manager/board.ts` to pass T119
+- [ ] T121 [US4] Implement widget `apps/web/src/widgets/kanban-board/` (`@dnd-kit`, keyboard-accessible DnD, optimistic move with rollback + toast on 409, filters by execution) and feature `apps/web/src/features/move-task/`; route `apps/web/src/routes/tasks.tsx`
+- [ ] T122 [P] [US4] Component test `apps/web/src/widgets/kanban-board/kanban-board.test.tsx` and E2E `e2e/us4-board.spec.ts`
 
 **Checkpoint**: Board usable over any execution
 
@@ -237,24 +248,24 @@ testable increment.
 
 **Goal**: Visual, versioned workflows with sequential/parallel steps, conditions, approvals, retries, error paths
 
-**Independent Test**: quickstart V7 — parallel nodes run together, approval waits, retry policy honoured, v2 save keeps v1 runnable
+**Independent Test**: quickstart V7 Ã¢â‚¬â€ parallel nodes run together, approval waits, retry policy honoured, v2 save keeps v1 runnable
 
-### Tests for User Story 5 ⚠️
+### Tests for User Story 5 Ã¢Å¡Â Ã¯Â¸Â
 
-- [ ] T115 [P] [US5] Unit test `apps/server/tests/unit/workflow-engine/graph-validator.test.ts`: single start, reachable end, no cycles, node kinds `agent, skill, mcp_tool, condition, approval, parallel_fork, parallel_join, start, end`, retry `maxAttempts ≤ 5`, onError `fail|continue|goto(nodeId)` target exists, skill nodes only for `executable` skills
-- [ ] T116 [P] [US5] Unit test `apps/server/tests/unit/workflow-engine/executor.test.ts` (fake node executors): fork/join parallelism, condition branch, approval wait, retry with backoff, error edges, cancellation
-- [ ] T117 [P] [US5] Unit test `apps/server/tests/unit/workflow-engine/condition-evaluator.test.ts`: safe expression evaluation (no `eval`/`Function`), access only to previous node outputs
+- [ ] T123 [P] [US5] Unit test `apps/server/tests/unit/workflow-engine/graph-validator.test.ts`: single start, reachable end, no cycles, node kinds `agent, skill, mcp_tool, condition, approval, parallel_fork, parallel_join, start, end`, retry `maxAttempts Ã¢â€°Â¤ 5`, onError `fail|continue|goto(nodeId)` target exists, skill nodes only for `executable` skills
+- [ ] T124 [P] [US5] Unit test `apps/server/tests/unit/workflow-engine/executor.test.ts` (fake node executors): fork/join parallelism, condition branch, approval wait, retry with backoff, error edges, cancellation
+- [ ] T125 [P] [US5] Unit test `apps/server/tests/unit/workflow-engine/condition-evaluator.test.ts`: safe expression evaluation (no `eval`/`Function`), access only to previous node outputs
 
 ### Implementation for User Story 5
 
-- [ ] T118 [US5] Implement graph validator + versioning repository `apps/server/src/modules/workflow-engine/{graph-validator.ts,workflow.repository.ts}` (versions immutable, increment int) to pass T115
-- [ ] T119 [US5] Implement condition evaluator `apps/server/src/modules/workflow-engine/condition-evaluator.ts` (sandboxed expression library, e.g. `filtrex`) to pass T117
-- [ ] T120 [US5] Implement executor `apps/server/src/modules/workflow-engine/{executor.ts,node-executors/{agent.ts,skill.ts,mcp-tool.ts,approval.ts}}` (agent → SDK session; skill → SDK session prompted with skill slash command; mcp_tool → SDK session with that MCP server enabled; approval → ApprovalGate) emitting `workflow.started|node_changed|completed` to pass T116
-- [ ] T121 [US5] Implement workflow mode executor `apps/server/src/modules/execution-orchestrator/modes/workflow.ts` and routes `apps/server/src/http/routes/workflows.ts` (`GET/POST /workflows`, `GET/POST /workflows/:id/versions`, `POST /workflows/:id/versions/:v/run`)
-- [ ] T122 [P] [US5] Add built-in templates `apps/server/src/modules/workflow-engine/templates/{spec-driven.json,tdd-feature.json,review-and-merge.json}` seeded on first run
-- [ ] T123 [P] [US5] Implement entity `apps/web/src/entities/workflow/` (api, keys, types)
-- [ ] T124 [US5] Implement widget `apps/web/src/widgets/workflow-editor/` (`@xyflow/react`; node palette for agent, skill, MCP tool, condition, approval, parallel fork/join; property panel per node with RHF + zod; live run state overlay per node) and feature `apps/web/src/features/edit-workflow/` (save as new version, run); route `apps/web/src/routes/workflows/index.tsx`, `apps/web/src/routes/workflows/$workflowId.tsx`
-- [ ] T125 [P] [US5] Component tests for workflow-editor and E2E `e2e/us5-workflows.spec.ts`
+- [ ] T126 [US5] Implement graph validator + versioning repository `apps/server/src/modules/workflow-engine/{graph-validator.ts,workflow.repository.ts}` (versions immutable, increment int) to pass T123
+- [ ] T127 [US5] Implement condition evaluator `apps/server/src/modules/workflow-engine/condition-evaluator.ts` (sandboxed expression library, e.g. `filtrex`) to pass T125
+- [ ] T128 [US5] Implement executor `apps/server/src/modules/workflow-engine/{executor.ts,node-executors/{agent.ts,skill.ts,mcp-tool.ts,approval.ts}}` (agent Ã¢â€ â€™ SDK session; skill Ã¢â€ â€™ SDK session prompted with skill slash command; mcp_tool Ã¢â€ â€™ SDK session with that MCP server enabled; approval Ã¢â€ â€™ ApprovalGate) emitting `workflow.started|node_changed|completed` to pass T124
+- [ ] T129 [US5] Implement workflow mode executor `apps/server/src/modules/execution-orchestrator/modes/workflow.ts` and routes `apps/server/src/http/routes/workflows.ts` (`GET/POST /workflows`, `GET/POST /workflows/:id/versions`, `POST /workflows/:id/versions/:v/run`)
+- [ ] T130 [P] [US5] Add built-in templates `apps/server/src/modules/workflow-engine/templates/{spec-driven.json,tdd-feature.json,review-and-merge.json}` seeded on first run
+- [ ] T131 [P] [US5] Implement entity `apps/web/src/entities/workflow/` (api, keys, types)
+- [ ] T132 [US5] Implement widget `apps/web/src/widgets/workflow-editor/` (`@xyflow/react`; node palette for agent, skill, MCP tool, condition, approval, parallel fork/join; property panel per node with RHF + zod; live run state overlay per node) and feature `apps/web/src/features/edit-workflow/` (save as new version, run); route `apps/web/src/routes/workflows/index.tsx`, `apps/web/src/routes/workflows/$workflowId.tsx`
+- [ ] T133 [P] [US5] Component tests for workflow-editor and E2E `e2e/us5-workflows.spec.ts`
 
 **Checkpoint**: Workflow mode works end-to-end
 
@@ -266,21 +277,21 @@ testable increment.
 
 **Independent Test**: quickstart V8 + mode-disabled check when flag unset; no simulated team ever created
 
-### Tests for User Story 6 ⚠️
+### Tests for User Story 6 Ã¢Å¡Â Ã¯Â¸Â
 
-- [ ] T126 [US6] Spike S2: verify `node-pty` prebuilt install on Windows 10 / Node 22, launch interactive `claude` with `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in PTY, create a 2-teammate team, capture hook payloads (TaskCreated, TaskCompleted, TeammateIdle) and team files to `apps/server/tests/fixtures/teams/`; record result + fallback decision in research.md (S2)
-- [ ] T127 [P] [US6] Contract test `apps/server/tests/contract/agent-team-adapter.test.ts`: fixtures → team_lead/teammate agents, team tasks, messages from inbox files (`best_effort`), capabilities `canSendMessage: 'lead_only'`, `canPause/canResume: false`
-- [ ] T128 [P] [US6] Unit test `apps/server/tests/unit/execution-orchestrator/hybrid-planner.test.ts`: every task in hybrid plan has `mode` + non-empty `mechanismReason`; Agent Teams never chosen when unavailable
+- [ ] T134 [US6] Spike S2: verify `node-pty` prebuilt install on Windows 10 / Node 22, launch interactive `claude` with `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in PTY, create a 2-teammate team, capture hook payloads (TaskCreated, TaskCompleted, TeammateIdle) and team files to `apps/server/tests/fixtures/teams/`; record result + fallback decision in research.md (S2)
+- [ ] T135 [P] [US6] Contract test `apps/server/tests/contract/agent-team-adapter.test.ts`: fixtures Ã¢â€ â€™ team_lead/teammate agents, team tasks, messages from inbox files (`best_effort`), capabilities `canSendMessage: 'lead_only'`, `canPause/canResume: false`
+- [ ] T136 [P] [US6] Unit test `apps/server/tests/unit/execution-orchestrator/hybrid-planner.test.ts`: every task in hybrid plan has `mode` + non-empty `mechanismReason`; Agent Teams never chosen when unavailable
 
 ### Implementation for User Story 6
 
-- [ ] T129 [US6] Implement PTY adapter `apps/server/src/modules/runtime-manager/adapters/agent-team-pty/{agent-team-pty.adapter.ts,team-files-watcher.ts}` (spawn `claude` interactive in `node-pty` with flag env, initial prompt as input, Ctrl-C interrupt, read-only polling of `~/.claude/teams/<team>/config.json`, `inboxes/*.json`, `~/.claude/tasks/<team>/` — never write them) to pass T127; observe-only fallback when node-pty unavailable
-- [ ] T130 [US6] Implement Agent Teams enablement flow: `POST /runtime/agent-teams/enable` in `apps/server/src/http/routes/runtime.ts` writing `env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS="1"` to project `.claude/settings.local.json` only after confirm, audited
-- [ ] T131 [US6] Implement PTY websocket bridge `apps/server/src/realtime/terminal-gateway.ts` (namespace `/terminal`, only for Nexora-spawned lead sessions, auth required)
-- [ ] T132 [US6] Implement mode executors `apps/server/src/modules/execution-orchestrator/modes/{agent-teams.ts,hybrid.ts}` and hybrid planning rules in `apps/server/src/modules/execution-orchestrator/planner/hybrid-planner.ts` to pass T128
-- [ ] T133 [P] [US6] Implement widget `apps/web/src/widgets/terminal/` (`@xterm/xterm` bound to `/terminal` socket; `useEffect` allowed — external system: xterm + socket) embedded in agent-details-panel for team leads
-- [ ] T134 [P] [US6] Show team task list + teammate statuses on canvas and agent details (`apps/web/src/widgets/agent-canvas/components/team-group.tsx`), and hybrid mechanism/reason column in `apps/web/src/features/approve-plan/`
-- [ ] T135 [P] [US6] E2E `e2e/us6-agent-teams.spec.ts` (fixture-driven): disabled mode with enable instructions; team visualisation from fixtures
+- [ ] T137 [US6] Implement PTY adapter `apps/server/src/modules/runtime-manager/adapters/agent-team-pty/{agent-team-pty.adapter.ts,team-files-watcher.ts}` (spawn `claude` interactive in `node-pty` with flag env, initial prompt as input, Ctrl-C interrupt, read-only polling of `~/.claude/teams/<team>/config.json`, `inboxes/*.json`, `~/.claude/tasks/<team>/` Ã¢â‚¬â€ never write them) to pass T135; observe-only fallback when node-pty unavailable
+- [ ] T138 [US6] Implement Agent Teams enablement flow: `POST /runtime/agent-teams/enable` in `apps/server/src/http/routes/runtime.ts` writing `env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS="1"` to project `.claude/settings.local.json` only after confirm, audited
+- [ ] T139 [US6] Implement PTY websocket bridge `apps/server/src/realtime/terminal-gateway.ts` (namespace `/terminal`, only for Nexora-spawned lead sessions, auth required)
+- [ ] T140 [US6] Implement mode executors `apps/server/src/modules/execution-orchestrator/modes/{agent-teams.ts,hybrid.ts}` and hybrid planning rules in `apps/server/src/modules/execution-orchestrator/planner/hybrid-planner.ts` to pass T136
+- [ ] T141 [P] [US6] Implement widget `apps/web/src/widgets/terminal/` (`@xterm/xterm` bound to `/terminal` socket; `useEffect` allowed Ã¢â‚¬â€ external system: xterm + socket) embedded in agent-details-panel for team leads
+- [ ] T142 [P] [US6] Show team task list + teammate statuses on canvas and agent details (`apps/web/src/widgets/agent-canvas/components/team-group.tsx`), and hybrid mechanism/reason column in `apps/web/src/features/approve-plan/`
+- [ ] T143 [P] [US6] E2E `e2e/us6-agent-teams.spec.ts` (fixture-driven): disabled mode with enable instructions; team visualisation from fixtures
 
 **Checkpoint**: All five execution modes available (Agent Teams where supported)
 
@@ -290,20 +301,20 @@ testable increment.
 
 **Goal**: Inventory of skills/agents/MCP with health and permission status; GitHub data via `gh` (installed in T001) and local git
 
-**Independent Test**: quickstart V9 — lists match project, secrets redacted, GitHub view works with gh authenticated and shows guidance when gh missing/unauthenticated
+**Independent Test**: quickstart V9 Ã¢â‚¬â€ lists match project, secrets redacted, GitHub view works with gh authenticated and shows guidance when gh missing/unauthenticated
 
-### Tests for User Story 7 ⚠️
+### Tests for User Story 7 Ã¢Å¡Â Ã¯Â¸Â
 
-- [ ] T136 [P] [US7] Unit test `apps/server/tests/unit/github-integration/gh-status.test.ts`: `gh` missing → `not_installed` + hint `winget install --id GitHub.cli -e`; `gh auth status` failing → `not_authenticated` + hint `gh auth login`; ok → `connected`
-- [ ] T137 [P] [US7] Unit test `apps/server/tests/unit/mcp-registry/redaction.test.ts`: MCP configs with `env`/`headers` secrets are never returned; permission status derived from settings `permissions.allow/deny/ask`
+- [ ] T144 [P] [US7] Unit test `apps/server/tests/unit/github-integration/gh-status.test.ts`: `gh` missing Ã¢â€ â€™ `not_installed` + hint `winget install --id GitHub.cli -e`; `gh auth status` failing Ã¢â€ â€™ `not_authenticated` + hint `gh auth login`; ok Ã¢â€ â€™ `connected`
+- [ ] T145 [P] [US7] Unit test `apps/server/tests/unit/mcp-registry/redaction.test.ts`: MCP configs with `env`/`headers` secrets are never returned; permission status derived from settings `permissions.allow/deny/ask`
 
 ### Implementation for User Story 7
 
-- [ ] T138 [US7] Implement integrations service + persistence `apps/server/src/modules/skill-registry/skill-registry.service.ts`, `apps/server/src/modules/mcp-registry/mcp-registry.service.ts` (health: MCP stdio/http reachability check with timeout, `unknown` when not checkable; permission status) and route `GET /integrations?projectId=` in `apps/server/src/http/routes/integrations.ts`
-- [ ] T139 [US7] Implement GitHub integration `apps/server/src/modules/github-integration/{gh-status.ts,github.service.ts}` (read-only `gh api` GETs via allowlisted runner: repos, branches, commits, pulls, pull files, reviews; local fallback for branches/commits via `git`) and routes `apps/server/src/http/routes/github.ts` (`GET /github/status`, `GET /github/repos/:owner/:repo/{branches,commits,pulls}`, `GET …/pulls/:n/files`) to pass T136
-- [ ] T140 [P] [US7] Implement entities `apps/web/src/entities/{integration,github}/` and view `apps/web/src/views/integrations/` + route `apps/web/src/routes/integrations.tsx` (tabs: Skills, Agents, MCP servers with tools, health, permission status)
-- [ ] T141 [P] [US7] Implement view `apps/web/src/views/github/` + route `apps/web/src/routes/github.tsx` (repo picker from registered projects' remotes; branches, commits, PRs, changed files, review status; setup guidance card when `not_installed`/`not_authenticated`)
-- [ ] T142 [P] [US7] Component tests for integrations + github views with MSW, E2E `e2e/us7-integrations.spec.ts`
+- [ ] T146 [US7] Implement integrations service + persistence `apps/server/src/modules/skill-registry/skill-registry.service.ts`, `apps/server/src/modules/mcp-registry/mcp-registry.service.ts` (health: MCP stdio/http reachability check with timeout, `unknown` when not checkable; permission status) and route `GET /integrations?projectId=` in `apps/server/src/http/routes/integrations.ts`
+- [ ] T147 [US7] Implement GitHub integration `apps/server/src/modules/github-integration/{gh-status.ts,github.service.ts}` (read-only `gh api` GETs via allowlisted runner: repos, branches, commits, pulls, pull files, reviews; local fallback for branches/commits via `git`) and routes `apps/server/src/http/routes/github.ts` (`GET /github/status`, `GET /github/repos/:owner/:repo/{branches,commits,pulls}`, `GET Ã¢â‚¬Â¦/pulls/:n/files`) to pass T144
+- [ ] T148 [P] [US7] Implement entities `apps/web/src/entities/{integration,github}/` and view `apps/web/src/views/integrations/` + route `apps/web/src/routes/integrations.tsx` (tabs: Skills, Agents, MCP servers with tools, health, permission status)
+- [ ] T149 [P] [US7] Implement view `apps/web/src/views/github/` + route `apps/web/src/routes/github.tsx` (repo picker from registered projects' remotes; branches, commits, PRs, changed files, review status; setup guidance card when `not_installed`/`not_authenticated`)
+- [ ] T150 [P] [US7] Component tests for integrations + github views with MSW, E2E `e2e/us7-integrations.spec.ts`
 
 **Checkpoint**: Integrations visible; GitHub live when gh is authenticated
 
@@ -313,12 +324,12 @@ testable increment.
 
 **Goal**: Optional authenticated MCP endpoint exposing the 14 tools over the same services
 
-**Independent Test**: quickstart V10 — token-authenticated client lists sessions; `start_execution` with risky task returns `approval_required`
+**Independent Test**: quickstart V10 Ã¢â‚¬â€ token-authenticated client lists sessions; `start_execution` with risky task returns `approval_required`
 
-- [ ] T143 [P] [US8] Integration test `apps/server/tests/integration/mcp-server.test.ts` (MCP client SDK over Streamable HTTP): disabled by default (404), unauthenticated → 401, `read` token cannot call control tools, invalid input → `isError` with VALIDATION_FAILED, `start_execution` never approves risky tasks, every call audited with actor `mcp_client:<name>`
-- [ ] T144 [US8] Implement API token management `apps/server/src/modules/permission-manager/token.service.ts` (hashed storage, scopes `read|control`, create/revoke) and routes `apps/server/src/http/routes/tokens.ts`
-- [ ] T145 [US8] Implement MCP server `apps/server/src/mcp/{server.ts,tools/*.ts}` mounted at `/mcp` (tools per `contracts/mcp-tools.md`, zod → JSON Schema inputs, calling existing module services only) to pass T143
-- [ ] T146 [P] [US8] Implement settings view `apps/web/src/views/settings/` + route `apps/web/src/routes/settings.tsx` (enable MCP server, create/revoke tokens shown once, remote-access status read-only)
+- [ ] T151 [P] [US8] Integration test `apps/server/tests/integration/mcp-server.test.ts` (MCP client SDK over Streamable HTTP): disabled by default (404), unauthenticated Ã¢â€ â€™ 401, `read` token cannot call control tools, invalid input Ã¢â€ â€™ `isError` with VALIDATION_FAILED, `start_execution` never approves risky tasks, every call audited with actor `mcp_client:<name>`
+- [ ] T152 [US8] Implement API token management `apps/server/src/modules/permission-manager/token.service.ts` (hashed storage, scopes `read|control`, create/revoke) and routes `apps/server/src/http/routes/tokens.ts`
+- [ ] T153 [US8] Implement MCP server `apps/server/src/mcp/{server.ts,tools/*.ts}` mounted at `/mcp` (tools per `contracts/mcp-tools.md`, zod Ã¢â€ â€™ JSON Schema inputs, calling existing module services only) to pass T151
+- [ ] T154 [P] [US8] Implement settings view `apps/web/src/views/settings/` + route `apps/web/src/routes/settings.tsx` (enable MCP server, create/revoke tokens shown once, remote-access status read-only)
 
 **Checkpoint**: All user stories complete
 
@@ -326,16 +337,17 @@ testable increment.
 
 ## Phase 11: Polish & Cross-Cutting Concerns
 
-- [ ] T147 Implement restart recovery `apps/server/src/modules/session-manager/recovery.ts`: on boot mark non-reattachable `running` sessions `unknown`, keep history, re-attach observed sessions on next hook
-- [ ] T148 [P] Implement retention job `apps/server/src/modules/event-manager/retention.ts` (default 30 days, configurable; keep error/approval/audit events)
-- [ ] T149 [P] Implement Communication Center widget `apps/web/src/widgets/message-feed/` + route `apps/web/src/routes/communication.tsx` (sender, receiver, timestamp, type, related task, summary; no hidden reasoning)
-- [ ] T150 [P] Load test script `apps/server/scripts/load-test.ts` (10 sessions, 1 000 events/min via ingest) + Playwright perf check that UI interactions stay ≤ 1 s (SC-007)
-- [ ] T151 [P] Secret-leak test `apps/server/tests/integration/secret-leak.test.ts` seeding known secret patterns through hooks, SDK fixtures, MCP configs; assert absent from DB, socket emits, exports, MCP responses (SC-004)
-- [ ] T152 [P] Axe accessibility sweep across all routes `e2e/a11y.spec.ts`; dark and light theme screenshots
-- [ ] T153 Security review of the branch (`/security-review`), fix findings; verify loopback default and remote refusal (quickstart V11)
-- [ ] T154 [P] Documentation in `docs/`: `installation.md`, `configuration.md` (env vars, ports 3022/3023, data dir), `runtime-setup.md` (Claude Code login, Agent Teams flag, node-pty, gh), `mcp-setup.md`, `usage-examples.md`, `troubleshooting.md`, `limitations.md` (no pause, team messaging lead-only, estimated cost, best-effort team files)
-- [ ] T155 [P] Update root `README.md` (overview, quickstart, screenshots, links to docs) and `CLAUDE.md` (project commands, structure, team-front profile + Rsbuild deviation)
-- [ ] T156 Run full `quickstart.md` validation V1–V12 on Windows and record results in `specs/001-ai-orchestration-platform/checklists/validation.md`
+- [ ] T155 [P] Unit test `apps/server/tests/unit/session-manager/recovery.test.ts`: on boot, `running` sessions without a live handle become `unknown`; history preserved; next hook event for that session id re-attaches it as `running`
+- [ ] T156 [P] Unit test `apps/server/tests/unit/event-manager/retention.test.ts`: deletes events older than retention (default 30 days, configurable), keeps `error`/approval events and all audit entries, removes matching FTS rows
+- [ ] T157 Implement restart recovery `apps/server/src/modules/session-manager/recovery.ts`: on boot mark non-reattachable `running` sessions `unknown`, keep history, re-attach observed sessions on next hook; to pass T155
+- [ ] T158 [P] Implement retention job `apps/server/src/modules/event-manager/retention.ts` (default 30 days, configurable; keep error/approval/audit events) to pass T156
+- [ ] T159 [P] Load test script `apps/server/scripts/load-test.ts` (10 sessions, 1 000 events/min via ingest) measuring p95 latency from ingest to rendered event in the dashboard (must be Ã¢â€°Â¤ 2 s, SC-001) + Playwright perf check that UI interactions stay Ã¢â€°Â¤ 1 s (SC-007)
+- [ ] T160 [P] Secret-leak test `apps/server/tests/integration/secret-leak.test.ts` seeding known secret patterns through hooks, SDK fixtures, MCP configs; assert absent from DB, socket emits, exports, MCP responses (SC-004)
+- [ ] T161 [P] Axe accessibility sweep across all routes `e2e/a11y.spec.ts`; dark and light theme screenshots
+- [ ] T162 Security review of the branch (`/security-review`), fix findings; verify loopback default and remote refusal (quickstart V11)
+- [ ] T163 [P] Documentation in `docs/`: `installation.md`, `configuration.md` (env vars, ports 3022/3023, data dir), `runtime-setup.md` (Claude Code login, Agent Teams flag, node-pty, gh), `mcp-setup.md`, `usage-examples.md`, `troubleshooting.md`, `limitations.md` (no true pause Ã¢â‚¬â€ "Interrupt & hold" = interrupt + resume by session id, API name `pause`; observed sessions are observe-only; team messaging lead-only; estimated cost; best-effort team files)
+- [ ] T164 [P] Update root `README.md` (overview, quickstart, screenshots, links to docs) and `CLAUDE.md` (project commands, structure, team-front profile + Rsbuild deviation)
+- [ ] T165 Run full `quickstart.md` validation V1Ã¢â‚¬â€œV12 on Windows and record results in `specs/001-ai-orchestration-platform/checklists/validation.md`
 
 ---
 
@@ -343,31 +355,31 @@ testable increment.
 
 ### Phase Dependencies
 
-- **Setup (Phase 1)**: none — T001 (gh) independent, can run any time before Phase 9
-- **Foundational (Phase 2)**: depends on Setup — BLOCKS all stories
-- **US1 (Phase 3)**: after Foundational — MVP
+- **Setup (Phase 1)**: none Ã¢â‚¬â€ T001 (gh) independent, can run any time before Phase 9
+- **Foundational (Phase 2)**: depends on Setup Ã¢â‚¬â€ BLOCKS all stories
+- **US1 (Phase 3)**: after Foundational Ã¢â‚¬â€ MVP
 - **US2 (Phase 4)**: after Foundational; reuses US1 session/agent projections for live view (integration, not blocking for backend tests)
 - **US3 (Phase 5)**: depends on US2 (needs executions/runtimes to control)
-- **US4 (Phase 6)**: depends on US2 task manager (T090)
-- **US5 (Phase 7)**: depends on US2 runtime adapters + approval gate (T081, T089)
-- **US6 (Phase 8)**: depends on US2 orchestrator (T091) and US1 hook ingest (T056)
-- **US7 (Phase 9)**: depends on Foundational + discovery (T084); GitHub part needs T001
+- **US4 (Phase 6)**: depends on US2 task manager (T095)
+- **US5 (Phase 7)**: depends on US2 runtime adapters + approval gate (T085, T093)
+- **US6 (Phase 8)**: depends on US2 orchestrator (T097) and US1 hook ingest (T057)
+- **US7 (Phase 9)**: depends on Foundational + discovery (T088); GitHub part needs T001
 - **US8 (Phase 10)**: depends on US2 services (and US3 for control tools)
 - **Polish (Phase 11)**: after desired stories
 
 ### Story completion order
 
-`Setup → Foundational → US1 (MVP) → US2 → {US3, US4, US5, US7} → US6 → US8 → Polish`
+`Setup Ã¢â€ â€™ Foundational Ã¢â€ â€™ US1 (MVP) Ã¢â€ â€™ US2 Ã¢â€ â€™ {US3, US4, US5, US7} Ã¢â€ â€™ US6 Ã¢â€ â€™ US8 Ã¢â€ â€™ Polish`
 
 ### Within each story
 
-Tests/spikes first and failing → repositories/models → services → routes → web entities → features/widgets → views/routes.
+Tests/spikes first and failing Ã¢â€ â€™ repositories/models Ã¢â€ â€™ services Ã¢â€ â€™ routes Ã¢â€ â€™ web entities Ã¢â€ â€™ features/widgets Ã¢â€ â€™ views/routes.
 
 ### Parallel Opportunities
 
-- Phase 1: T004–T014 all [P] after T002–T003
-- Phase 2: contract files T015–T018 in parallel; server test-first pairs (T020/T021, T022/T023, T024/T025, T026/T027) in parallel streams; web core T039–T041, T045–T047 in parallel
-- After Foundational: workstreams with disjoint file ownership — (A) server event pipeline + realtime (US1 server), (B) runtime adapters (US2 T080–T083), (C) web entities/widgets, (D) workflow engine (US5 T115–T120). `packages/contracts` has a single owner; changes via review.
+- Phase 1: T004Ã¢â‚¬â€œT015 all [P] after T002Ã¢â‚¬â€œT003
+- Phase 2: contract files T016Ã¢â‚¬â€œT019 in parallel; server test-first pairs (T021/T022, T023/T024, T025/T026, T027/T028) in parallel streams; web core T040Ã¢â‚¬â€œT042, T046Ã¢â‚¬â€œT048 in parallel
+- After Foundational: workstreams with disjoint file ownership Ã¢â‚¬â€ (A) server event pipeline + realtime (US1 server), (B) runtime adapters (US2 T084Ã¢â‚¬â€œT087), (C) web entities/widgets, (D) workflow engine (US5 T123Ã¢â‚¬â€œT128). `packages/contracts` has a single owner; changes via review.
 - After US2: US3, US4, US5, US7 in parallel
 
 ---
@@ -381,7 +393,7 @@ Task: "Unit test session projection in apps/server/tests/unit/session-manager/se
 Task: "Unit test agent tree in apps/server/tests/unit/agent-registry/agent-tree.test.ts"
 Task: "Unit test hook installer in apps/server/tests/unit/project-registry/hook-installer.test.ts"
 
-# Web slices together (after T060):
+# Web slices together (after T061):
 Task: "Entities project/session/agent/event in apps/web/src/entities/"
 Task: "Overview stats widget in apps/web/src/widgets/overview-stats/"
 Task: "Session table widget in apps/web/src/widgets/session-table/"
@@ -406,19 +418,19 @@ Task: "Skill/MCP discovery apps/server/src/modules/{skill-registry,mcp-registry}
 
 1. Phase 1 Setup (incl. gh install T001)
 2. Phase 2 Foundational
-3. Phase 3 US1 → **STOP and VALIDATE** with quickstart V1, V2 → demo live monitoring of real sessions
+3. Phase 3 US1 Ã¢â€ â€™ **STOP and VALIDATE** with quickstart V1, V2 Ã¢â€ â€™ demo live monitoring of real sessions
 
-### Incremental Delivery (each step ends with user approval, per brief §12–13)
+### Incremental Delivery (each step ends with user approval, per brief Ã‚Â§12Ã¢â‚¬â€œ13)
 
-1. Foundation → 2. US1 monitoring (MVP) → 3. US2 orchestration → 4. US3 control + US4 board →
-5. US5 workflows + US7 integrations → 6. US6 Agent Teams/Hybrid → 7. US8 MCP → 8. Polish + docs
+1. Foundation Ã¢â€ â€™ 2. US1 monitoring (MVP) Ã¢â€ â€™ 3. US2 orchestration Ã¢â€ â€™ 4. US3 control + US4 board Ã¢â€ â€™
+5. US5 workflows + US7 integrations Ã¢â€ â€™ 6. US6 Agent Teams/Hybrid Ã¢â€ â€™ 7. US8 MCP Ã¢â€ â€™ 8. Polish + docs
 
 ### Parallel Agent Strategy (after Foundational)
 
 - Lead (main session): owns `packages/contracts`, reviews and integrates
-- Backend agent A: event pipeline / US1 server · Backend agent B: runtime adapters / US2
+- Backend agent A: event pipeline / US1 server Ã‚Â· Backend agent B: runtime adapters / US2
 - Frontend agent: web entities, widgets, views (team-front standards)
-- QA agent: tests-first tasks per story, E2E · Security reviewer: Phase 11 T151, T153
+- QA agent: tests-first tasks per story, E2E Ã‚Â· Security reviewer: Phase 11 T160, T162
 - Each agent works in its own git worktree with disjoint `ownedPaths`
 
 ---
@@ -426,6 +438,6 @@ Task: "Skill/MCP discovery apps/server/src/modules/{skill-registry,mcp-registry}
 ## Notes
 
 - [P] = different files, no dependency on incomplete tasks
-- Spikes S1–S3 (T048, T070, T126) may change adapter details; update research.md + contracts before dependent tasks
+- Spikes S1Ã¢â‚¬â€œS3 (T049, T071, T134) may change adapter details; update research.md + contracts before dependent tasks
 - No placeholder features: anything not working ships as a documented limitation (`docs/limitations.md`)
 - Commit after each task or logical group (Conventional Commits)

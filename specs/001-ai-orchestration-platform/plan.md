@@ -53,11 +53,11 @@ production views; ≤ 150-line components; permission bypass never default
 | Principle | Gate | Pre-research | Post-design |
 |---|---|---|---|
 | I. Spec-Driven | spec → plan → tasks before code; testable acceptance criteria | ✔ spec has 8 independent stories, 10 SCs | ✔ quickstart maps V1–V12 to stories |
-| II. Human Control & Agent Safety | least privilege, approvals for destructive/outward actions, cancel from dashboard, secrets never exposed | ✔ FR-030–033, FR-050–054 | ✔ ApprovalGate never auto-approves; capability-gated controls; redaction before persist/emit/export/MCP; `bypassPermissions` opt-in only |
+| II. Human Control & Agent Safety (v2.0.0) | least privilege, approvals for destructive/outward actions, Nexora-started work stoppable, interrupt/pause/resume only where supported else shown unavailable, observed sessions labelled observe-only, secrets never exposed | ✔ FR-030–034, FR-050–054 | ✔ ApprovalGate never auto-approves; capability-gated controls; "Interrupt & hold" instead of fake pause; redaction before persist/emit/export/MCP; `bypassPermissions` opt-in only |
 | III. Observability | structured events for every state change, audit trail, visible staleness | ✔ FR-020–029 | ✔ Event entity w/ source+reliability; AuditEntry append-only; replay protocol |
 | IV. Contract-Based Integrations | typed adapters, isolation, contract tests | ✔ | ✔ RuntimeAdapter interface + capability matrix; adapter failures isolated per session; fixtures-based contract tests |
 | V. Test-First Quality | TDD for core logic, integration tests on boundaries, CI gate, YAGNI | ✔ | ✔ state machines/scheduler/permission/redactor test-first; own workflow engine instead of Temporal (YAGNI) |
-| Security constraints | isolated workspaces, untrusted content as data, secrets in env, limits, pinned deps | ✔ | ✔ git worktrees, execFile allowlist, path validation, budgets/concurrency, exact versions |
+| Security constraints | isolated workspaces, scope enforcement, untrusted content as data, secrets in env, limits incl. timeouts, pinned deps | ✔ FR-034 | ✔ execution-level worktree for every managed session + per-task worktrees on conflict; scope-guard on PreToolUse + canUseTool; liveness monitor (idle/turn timeouts); execFile allowlist; path validation; budgets/concurrency; exact versions |
 | Workflow gates | feature branch, Conventional Commits, reviewed PRs | ✔ | ✔ husky + commitlint planned |
 
 **Result**: PASS (no violations; Complexity Tracking empty).
@@ -104,7 +104,8 @@ apps/
 │   │       ├── execution-orchestrator/ (analysis, mode-advisor, planner, verifier)
 │   │       ├── task-manager/        ├── workflow-engine/     ├── skill-registry/
 │   │       ├── mcp-registry/        ├── event-manager/       (hook ingest, normaliser, store)
-│   │       ├── communication-manager/ ├── github-integration/ ├── permission-manager/ (approvals, audit)
+│   │       ├── communication-manager/ ├── github-integration/ ├── permission-manager/ (approvals, audit, scope-guard, tokens)
+│   │       ├── project-registry/    # projects, hook installer
 │   │       └── git-workspace/       # worktrees, diffs
 │   └── tests/{unit,contract,integration,fixtures}/
 └── web/
@@ -112,7 +113,8 @@ apps/
     ├── src/
     │   ├── app/                     # providers, router, query-client, socket bridge, theme, styles
     │   ├── routes/                  # thin file routes: index, canvas, sessions, sessions.$id, agents.$id,
-    │   │                            # tasks, workflows, communication, logs, integrations, github, executions.new
+    │   │                            # tasks, workflows, communication, logs, integrations, github, executions.new,
+    │   │                            # executions.$id, settings
     │   ├── views/                   # page compositions per route
     │   ├── widgets/                 # overview-stats, agent-canvas, session-table, kanban-board,
     │   │                            # workflow-editor, log-viewer, message-feed, agent-details-panel, terminal

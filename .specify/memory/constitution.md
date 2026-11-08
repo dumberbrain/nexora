@@ -19,8 +19,12 @@ conflicting agent work. Written specs are the single source of truth for humans 
 - Destructive or outward-facing actions (deleting data, force-pushing, deploying, publishing,
   spending money, sending messages) MUST require explicit human approval unless a user has
   durably pre-authorized that exact action class.
-- Every running agent or workflow MUST be pausable and cancellable from the dashboard; a
-  cancel MUST take effect without waiting for the task to finish.
+- Every agent, session, or workflow started by Nexora MUST be stoppable from the dashboard;
+  a stop MUST take effect without waiting for the task to finish.
+- Interrupt, pause, and resume MUST be offered wherever the runtime supports them; where it
+  does not, the dashboard MUST show the control as unavailable with the reason.
+- Sessions Nexora only observes (not started by Nexora) follow Claude Code's own controls and
+  MUST be labelled "observe-only" in the dashboard.
 - Secrets and credentials MUST NOT appear in prompts sent to third parties, logs, events, or UI.
 
 Rationale: an orchestration platform amplifies mistakes across many agents at once. Humans stay
@@ -93,4 +97,4 @@ Rationale: concurrency and multi-agent coordination produce subtle bugs that man
   violations block merge.
 - Runtime development guidance for agents lives in `CLAUDE.md` and MUST NOT contradict this file.
 
-**Version**: 1.0.0 | **Ratified**: 2026-11-08 | **Last Amended**: 2026-11-08
+**Version**: 2.0.0 | **Ratified**: 2026-11-08 | **Last Amended**: 2026-11-08

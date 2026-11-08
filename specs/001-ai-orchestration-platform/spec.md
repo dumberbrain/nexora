@@ -262,6 +262,10 @@ match the dashboard and that a destructive action still requires human approval.
   changed files, and test results.
 - **FR-007**: System MUST detect tasks that would modify the same files and flag them before
   execution.
+- **FR-008**: Default task analysis MUST NOT consume model usage (local inspection only). Before
+  any model-backed analysis or planning step, the system MUST tell the user it will consume model
+  usage and obtain confirmation; a per-project "always allow" preference counts as confirmation and
+  can be revoked.
 
 **Execution modes**
 
@@ -316,12 +320,17 @@ match the dashboard and that a destructive action still requires human approval.
 - **FR-030**: Users MUST be able to start, stop, cancel tasks, retry failed tasks, send messages to
   agents, assign additional tasks, request reviews, approve/reject approvals, and — where the runtime
   supports it — pause, resume, and restart sessions.
-- **FR-031**: Controls not supported by the underlying runtime MUST be shown as unavailable with a
-  reason, never as operational.
+- **FR-031**: Controls not supported by the underlying runtime (per the capability declaration in
+  FR-016) MUST be shown as unavailable with a reason, never as operational.
 - **FR-032**: States Paused, Waiting for approval, Idle, Running, and Stopped MUST be visually
   distinct.
 - **FR-033**: System MUST require explicit user approval before destructive operations, expensive
   strategies, production deployments, and major architectural changes; no timeout may auto-approve.
+  This applies to Nexora-managed executions; sessions Nexora only observes keep Claude Code's own
+  permission settings and are labelled observe-only.
+- **FR-034**: Every Nexora-managed session MUST run in an isolated workspace and MUST be blocked
+  from writing outside its assigned scope; idle and per-turn timeouts MUST be configurable per
+  execution with safe defaults, and a session exceeding them MUST be surfaced as unresponsive.
 
 **Integrations**
 
@@ -392,7 +401,7 @@ match the dashboard and that a destructive action still requires human approval.
 - **SC-001**: Activity in a connected Claude Code session appears on the dashboard within 2 seconds
   in 95% of cases.
 - **SC-002**: A user goes from submitting a task to an approved, running execution in under
-  5 minutes for a typical feature-sized task.
+  5 minutes for a feature-sized task such as "add a /health endpoint with a test" (quickstart V3).
 - **SC-003**: 100% of destructive, expensive, deployment, and major architectural actions in test
   scenarios are blocked until explicitly approved.
 - **SC-004**: 0 secrets appear in UI, logs, exports, or MCP responses in a test suite seeded with

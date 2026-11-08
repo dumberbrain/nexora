@@ -149,6 +149,27 @@ uv 0.11.1, git 2.35.1; **gh CLI not installed**; `~/.claude/teams` absent (Agent
   external system), no `console.log` (shared logger), a11y, dark default + light theme.
 - **Deviation report** (team standard expects Vite): build tool only; folder structure, router,
   UI kit, state, testing unchanged. CI bundle check uses `size-limit` against Rsbuild output.
+- **Visual language** (user request 2026-11-08): match https://reactivite.vercel.app/ — terminal /
+  CRT phosphor aesthetic. Tokens in `apps/web/src/app/styles/globals.css`: near-black surfaces
+  (`#020202`, panels `#07090b`), phosphor accent `#4ade80` with soft glow, hairline `zinc-800`
+  borders, radius 0.25rem; fonts self-hosted via `@fontsource` — Chakra Petch (uppercase display
+  headings, `text-display`), Geist Mono (body, default), Geist (sans); `[01]` bracket indices
+  (`text-index`), `/SLASH` nav labels, `corner-brackets` on selected panels, faint
+  `bg-terminal-grid`. Optional decorative glyph-rain only on empty states/landing, disabled under
+  `prefers-reduced-motion`, never behind data tables. Light theme keeps structure with green
+  primary. Status colours stay distinct and always paired with a text label (FR-032).
+
+## R13. Toolchain versions (Phase 1, 2026-11-08)
+
+- **TypeScript 6.0.3**, not 7.0: `typescript-eslint` 8.72 peer range is `<6.1.0` (TS 7 is the
+  native Go compiler without the JS API typed linting needs).
+- **ESLint 9.39** (not 10): `eslint-plugin-import` does not support ESLint 10 yet. ESLint 9
+  resolves config from cwd, so the monorepo uses one root `eslint.config.mjs`.
+- **Vitest 5**: `test.projects` in root `vitest.config.ts` replaces `vitest.workspace.ts`.
+- **Git hooks**: user's `husky-set` layout (lib.sh, numbered steps, branch gate allowing spec-kit
+  `NNN-name` branches, commit-msg conventional check, pre-push sweep) instead of
+  lint-staged + commitlint — user decision.
+- `@tanstack/react-router-devtools` is the current name of `@tanstack/router-devtools`.
 
 ## R10. Monorepo layout & tooling
 

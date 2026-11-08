@@ -40,7 +40,8 @@ AuditEntry (append-only)
 | analysis | json | `TaskAnalysis` (see contracts) — stack, skills, agents, MCP, complexity |
 | mode | enum | `multi_session` \| `agent_teams` \| `subagents` \| `workflow` \| `hybrid` |
 | strategy | enum | `spec_driven` \| `plan_first` \| `tdd` \| `direct` \| `research_first` |
-| config | json | answers to follow-up questions (parallelism, approval policy, maxParallelSessions ≤ 8, budgetUsd?) |
+| config | json | answers to follow-up questions (parallelism, approval policy, maxParallelSessions ≤ 8 (default 4), budgetUsd?, idleTimeoutMs (default 600 000), turnTimeoutMs (default 1 800 000), modelAnalysisConsent: boolean) |
+| worktreePath | string | execution-level isolated worktree `<repo>/.nexora/worktrees/<execution>/main` (FR-034) |
 | status | enum | see state machine below |
 | permissionBypass | boolean | default **false**; true only with explicit per-execution confirmation (FR-053) |
 | verification | json? | final summary: tasks done/failed, changed files, test results |
@@ -86,16 +87,21 @@ attempt)`; any non-terminal → `cancelled`. User drag allowed only between `pen
 | id | string | Claude Code session UUID (from init message / hook payload) |
 | executionId | FK? | null for externally started sessions observed via hooks |
 | projectId | FK? | resolved from `cwd` |
-| runtime | enum | `cli_headless` \| `agent_sdk` \| `external_observed` \| `agent_team_member` |
-| cwd / gitBranch / worktreePath? | string | worktreePath when isolated |
+| runtime | enum | `agent_sdk` \| `cli_headless` \| `agent_team_pty` \| `external_observed` (same as `RuntimeKind` in contracts/runtime-adapter.md) |
+| observeOnly | boolean | true for `external_observed`; UI labels "observe-only" |
+| cwd / gitBranch / worktreePath? | string | worktreePath always set for Nexora-managed sessions |
 | model | string? | only when reported |
-| status | enum | `starting, running, idle, waiting_for_approval, paused, stopped, failed, unknown` |
+| status | enum | `starting, running, idle, waiting_for_approval, paused, unresponsive, stopped, failed, unknown` |
 | capabilities | json | `RuntimeCapabilityProfile` snapshot |
 | pid | int? | only for processes Nexora spawned |
 | usage | json? | `{ inputTokens, outputTokens, costUsd }` **only** if runtime reported |
 | lastActivityAt / startedAt / endedAt | epoch ms | |
 
 `unknown` is set on server restart for sessions that cannot be re-attached (edge case).
+`unresponsive` is set when no activity for `idleTimeoutMs`; exceeding `turnTimeoutMs` interrupts
+the session where supported and fails the task with reason `timeout`.
+`paused` is shown in the UI as "Interrupt & hold" (interrupt now, resume later by session id);
+no runtime offers a true pause.
 
 ## Agent
 
@@ -145,7 +151,7 @@ decidedAt?, createdAt`. No auto-approval; `expired_session` only when the reques
   createdAt` — immutable once saved. Node kinds: `agent, skill, mcp_tool, condition, approval,
   parallel_fork, parallel_join, start, end`. Each node: `retry { maxAttempts ≤ 5, backoffMs }`,
   `onError: fail | continue | goto(nodeId)`. Graph validated: single start, reachable end, no
-  cycles except none allowed (v1).
+  cycles (v1).
 - **Run**: `id, versionId, executionId, status, startedAt, endedAt`.
 - **NodeRun**: `id, runId, nodeId, attempt, status, sessionId?, output summary, error?`.
 
