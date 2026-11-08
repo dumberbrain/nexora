@@ -12,12 +12,12 @@ export interface NavItem {
 /** Dashboard pages (FR-023) in reactivite /SLASH style. */
 export const NAV_ITEMS: NavItem[] = [
   { index: "01", label: "overview", to: "/", story: "US1" },
-  { index: "02", label: "canvas", story: "US1" },
-  { index: "03", label: "sessions", story: "US1" },
+  { index: "02", label: "canvas", to: "/canvas", story: "US1" },
+  { index: "03", label: "sessions", to: "/sessions", story: "US1" },
   { index: "04", label: "tasks", story: "US4" },
   { index: "05", label: "workflows", story: "US5" },
   { index: "06", label: "comms", story: "US3" },
-  { index: "07", label: "logs", story: "US1" },
+  { index: "07", label: "logs", to: "/logs", story: "US1" },
   { index: "08", label: "skills & mcp", story: "US7" },
   { index: "09", label: "github", story: "US7" },
 ];
