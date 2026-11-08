@@ -66,7 +66,7 @@ export default defineConfig(
     "**/coverage/**",
     "playwright-report/**",
     "test-results/**",
-    `${WEB}/src/shared/ui/**`, // shadcn sources
+    `${WEB}/src/shared/ui/*.tsx`, // generated shadcn sources (our own code lives in subfolders)
     `${WEB}/src/routeTree.gen.ts`,
     "apps/server/drizzle/**",
     ".specify/**",

@@ -1,0 +1,117 @@
+import { existsSync } from "node:fs";
+import { type Server as HttpServer } from "node:http";
+import { type AddressInfo } from "node:net";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { createAdaptorServer } from "@hono/node-server";
+
+import { type NexoraEnv } from "./config/env";
+import { closeDb, type Db, openDb } from "./db/client";
+import { createApp } from "./http/app";
+import { SessionKeys } from "./http/middleware/session-cookie";
+import { logger as defaultLogger, type Logger } from "./lib/logger";
+import { EventBus, EventStore } from "./modules/event-manager";
+import { AuditService } from "./modules/permission-manager/audit.service";
+import { createGateway, type Gateway } from "./realtime/gateway";
+
+const WEB_PORT = 3022;
+
+/** apps/web/dist, located relative to this module (src/ under tsx, dist/ when bundled). */
+function defaultWebDist(): string {
+  const here = dirname(fileURLToPath(import.meta.url));
+  return resolve(here, "..", "..", "web", "dist");
+}
+
+export interface NexoraServer {
+  url: string;
+  port: number;
+  http: HttpServer;
+  db: Db;
+  bus: EventBus;
+  store: EventStore;
+  audit: AuditService;
+  gateway: Gateway;
+  /** graceful stop: runtimes → realtime → HTTP → flush events → DB */
+  close(): Promise<void>;
+}
+
+export interface CreateServerOptions {
+  env: NexoraEnv;
+  logger?: Logger;
+  /** override SPA location; `null` disables static serving */
+  webDistDir?: string | null;
+}
+
+/** Wire config → DB → modules → Hono + Socket.IO on one HTTP server and start listening. */
+export async function createNexoraServer(opts: CreateServerOptions): Promise<NexoraServer> {
+  const { env } = opts;
+  const log = opts.logger ?? defaultLogger;
+  const startedAt = Date.now();
+
+  const db = openDb({ dataDir: env.dataDir });
+  const bus = new EventBus();
+  const store = new EventStore(db, bus);
+  const audit = new AuditService(db);
+  const keys = new SessionKeys();
+  const ports = [...new Set([env.port, WEB_PORT])];
+
+  const serveSpa = env.nodeEnv !== "development" && opts.webDistDir !== null;
+  const webDistDir = opts.webDistDir ?? defaultWebDist();
+  if (serveSpa && !existsSync(join(webDistDir, "index.html"))) {
+    log.warn({ webDistDir }, "web build not found — run `npm run build`; API still available");
+  }
+
+  const app = createApp({
+    env,
+    db,
+    startedAt,
+    logger: log,
+    keys,
+    ...(serveSpa ? { webDistDir } : {}),
+  });
+
+  const http = createAdaptorServer({ fetch: app.fetch }) as HttpServer;
+  const gateway = createGateway({
+    httpServer: http,
+    store,
+    bus,
+    keys,
+    policy: { remote: env.remote, ports },
+    envToken: env.token,
+  });
+
+  await new Promise<void>((resolveListen, reject) => {
+    http.once("error", reject);
+    http.listen(env.port, env.host, () => resolveListen());
+  });
+  const port = (http.address() as AddressInfo).port;
+  const url = `http://${env.host.includes(":") ? `[${env.host}]` : env.host}:${port}`;
+  if (env.testFakeRuntime) log.warn("NEXORA_TEST_FAKE_RUNTIME=1 — test-only fake runtime enabled");
+  log.info(
+    { url, dataDir: env.dataDir, remote: env.remote, nodeEnv: env.nodeEnv },
+    "nexora listening",
+  );
+
+  let closed = false;
+  return {
+    url,
+    port,
+    http,
+    db,
+    bus,
+    store,
+    audit,
+    gateway,
+    close: async () => {
+      if (closed) return;
+      closed = true;
+      // runtime adapters are stopped here once they exist (Phase 4)
+      await gateway.close();
+      await new Promise<void>((r) => http.close(() => r()));
+      store.close();
+      closeDb(db);
+      log.info("nexora stopped");
+    },
+  };
+}
