@@ -1,0 +1,18 @@
+{
+  "name": "@nexora/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared zod schemas and types for Nexora server, web and MCP",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "zod": "4.6.7"
+  }
+}

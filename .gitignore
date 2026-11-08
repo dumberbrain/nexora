@@ -1,1 +1,41 @@
 .claude/settings.local.json
+
+# dependencies
+node_modules/
+
+# build output
+dist/
+build/
+*.tsbuildinfo
+apps/web/src/routeTree.gen.ts
+
+# local data
+.nexora/
+*.db
+*.db-wal
+*.db-shm
+
+# env
+.env
+.env.*
+!.env.example
+
+# tests
+.playwright-mcp/
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# logs
+*.log
+npm-debug.log*
+
+# os / editors
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/*
+!.vscode/extensions.json
+.idea/

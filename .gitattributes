@@ -1,0 +1,8 @@
+# LF everywhere: Prettier enforces endOfLine "lf" and sh hooks break on CRLF (Windows checkouts).
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+.husky/** text eol=lf

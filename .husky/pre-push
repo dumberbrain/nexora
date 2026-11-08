@@ -1,0 +1,43 @@
+# Runs the cheap half of CI BEFORE the push: whole-repo lint, types, tarball.
+# Install and build steps are deliberately absent — they take minutes and are
+# CI's job. This is the sweep a staged view cannot do: a config edit that breaks
+# an untouched file, or an artifact leaking into the tarball.
+#
+# Bypass: `HUSKY=0 git push` or `git push --no-verify`.
+
+set -e
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+
+. "$ROOT/.husky/lib.sh"
+
+# The step count is CONSTANT. A skipped step (no node_modules) still consumes
+# its number rather than shrinking the denominator, so "how many are left" means
+# the same thing on every machine.
+TOTAL=3
+T_ALL="$(now_ms)"
+
+printf '\n  pre-push · %s checks (~30s)\n\n' "$TOTAL"
+
+step "lint"
+if [ -d node_modules ]; then
+  npm run --silent lint || fail "lint failed"
+  step_ok
+else
+  step_skip "no node_modules, CI still checks this"
+fi
+
+step "typecheck"
+if [ -d node_modules ]; then
+  npm run --silent typecheck || fail "typecheck failed"
+  step_ok
+else
+  step_skip "no node_modules, CI still checks this"
+fi
+
+step "package.json version"
+node -e 'const v=require("./package.json").version; if(!/^[0-9]+[.][0-9]+[.][0-9]+([-][0-9A-Za-z.-]+)?([+][0-9A-Za-z.-]+)?$/.test(v)){console.error("package.json#version is not semver:",JSON.stringify(v));process.exit(1)}' || fail "package.json version is not usable"
+step_ok
+
+printf '\n✓ pre-push checks passed%s\n' "$(since "$T_ALL")"

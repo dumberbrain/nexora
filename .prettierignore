@@ -1,0 +1,11 @@
+dist
+coverage
+playwright-report
+test-results
+node_modules
+apps/web/src/routeTree.gen.ts
+apps/server/drizzle
+package-lock.json
+.specify
+.claude
+specs

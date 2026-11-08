@@ -1,0 +1,98 @@
+# Checks STAGED files only — a commit happens 10-30x more often than a push, so
+# every step here is measured in seconds. The whole-repo sweep lives in
+# `pre-push`; tests and builds are in neither hook (see SKILL.md, cost rule).
+#
+# Bypass: `HUSKY=0 git commit` or `git commit --no-verify`.
+
+set -e
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+
+# fail/step/step_ok/step_skip, count and the timer come from here. TOTAL is
+# computed below from the staged list — unlike pre-push, the denominator here
+# changes with every commit.
+. "$ROOT/.husky/lib.sh"
+
+T_ALL="$(now_ms)"
+
+# 0. Branch name. The message itself is checked in `commit-msg` — impossible
+#    here, because at this point the message does not exist yet. This runs first
+#    so a wrongly-named branch costs no lint seconds, and it is deliberately NOT
+#    a numbered step: the staged list the counter needs has not been read yet.
+#    main/master and a detached HEAD (rebase, bisect) are exempt.
+BRANCH="$(git symbolic-ref --quiet --short HEAD || echo HEAD)"
+case "$BRANCH" in
+  main|master|HEAD) ;;
+  *)
+    # spec-kit feature branches are NNN-<short-name> (e.g. 001-ai-orchestration-platform)
+    if ! echo "$BRANCH" | grep -qE '^((chore|feat|hotfix|bugfix|reconcile|fix|docs|refactor|test|perf|ci|build|style)[/-].+|[0-9]{3}-[a-z0-9-]+)$'; then
+      echo "" >&2
+      echo "✖ Branch name does not follow the rule: $BRANCH" >&2
+      echo "" >&2
+      echo "  Format:  <prefix>/<description>   (or <prefix>-<description>)" >&2
+      echo "           NNN-<short-name>          (spec-kit feature branch)" >&2
+      echo "  Prefixes: chore feat hotfix bugfix reconcile fix docs refactor test perf ci build style" >&2
+      echo "" >&2
+      echo "  Example: feat/user-avatar   fix/login-redirect   002-workflow-editor" >&2
+      echo "  Rename:  git branch -m <new-name>" >&2
+      echo "" >&2
+      exit 1
+    fi
+    ;;
+esac
+
+# --diff-filter=ACM: deleted paths must never be handed to a linter.
+STAGED="$(git diff --cached --name-only --diff-filter=ACM)"
+if [ -z "$STAGED" ]; then
+  echo "  nothing staged — skipped"
+  exit 0
+fi
+
+LINT_FILES="$(echo "$STAGED" | grep -E '\.(ts|tsx|js|jsx|mjs|cjs)$' || true)"
+FMT_FILES="$(echo "$STAGED" | grep -E '\.(ts|tsx|js|jsx|mjs|cjs|json|css|scss|md|ya?ml)$' || true)"
+VERSION_CHECK=0
+if echo "$STAGED" | grep -qx 'package.json'; then VERSION_CHECK=1; fi
+
+# The denominator is built up front so the very first step already prints the
+# right total.
+[ -n "$LINT_FILES" ] && TOTAL=$((TOTAL + 1))
+[ -n "$FMT_FILES" ] && TOTAL=$((TOTAL + 1))
+[ "$VERSION_CHECK" = 1 ] && TOTAL=$((TOTAL + 1))
+
+printf '  branch %s · staged %s files · %s checks\n\n' "$BRANCH" "$(count "$STAGED")" "$TOTAL"
+
+if [ "$TOTAL" = 0 ]; then
+  echo "✓ nothing checkable is staged"
+  exit 0
+fi
+
+# --no-warn-ignored: a staged path eslint ignores (dist/…) would otherwise fail
+# the whole invocation.
+if [ -n "$LINT_FILES" ]; then
+  step "lint · $(count "$LINT_FILES") files"
+  if [ ! -d node_modules ]; then
+    step_skip "no node_modules, CI still checks this"
+  else
+    echo "$LINT_FILES" | xargs npx eslint --no-warn-ignored || fail "lint failed"
+    step_ok
+  fi
+fi
+
+if [ -n "$FMT_FILES" ]; then
+  step "prettier --check · $(count "$FMT_FILES") files"
+  if [ ! -d node_modules ]; then
+    step_skip "no node_modules, CI still checks this"
+  else
+    echo "$FMT_FILES" | xargs npx prettier --check --ignore-unknown || fail "formatting differs from prettier"
+    step_ok
+  fi
+fi
+
+if [ "$VERSION_CHECK" = 1 ]; then
+  step "package.json version"
+  node -e 'const v=require("./package.json").version; if(!/^[0-9]+[.][0-9]+[.][0-9]+([-][0-9A-Za-z.-]+)?([+][0-9A-Za-z.-]+)?$/.test(v)){console.error("package.json#version is not semver:",JSON.stringify(v));process.exit(1)}' || fail "package.json version is not usable"
+  step_ok
+fi
+
+printf '\n✓ pre-commit passed%s\n' "$(since "$T_ALL")"

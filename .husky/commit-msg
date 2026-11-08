@@ -1,0 +1,48 @@
+# Checks the subject line of the commit message. This cannot live in
+# `pre-commit`: the message does not exist yet at that point — the editor opens
+# AFTER pre-commit returns. Git passes the message file path as $1.
+#
+# Bypass: `HUSKY=0 git commit` or `git commit --no-verify`.
+
+set -e
+
+PREFIXES='chore|feat|hotfix|bugfix|reconcile|fix|docs|refactor|test|perf|ci|build|style'
+
+MSG_FILE="$1"
+if [ -z "$MSG_FILE" ] || [ ! -f "$MSG_FILE" ]; then
+  echo "✖ commit-msg: no message file was passed" >&2
+  exit 1
+fi
+
+# Subject line only. Git's template comments (`#`) are on later lines.
+SUBJECT="$(sed -n '1p' "$MSG_FILE")"
+
+# Git's own generated messages are exempt — banning merge, revert and autosquash
+# markers would break `git merge` and `rebase -i --autosquash` on messages the
+# user never wrote.
+case "$SUBJECT" in
+  Merge\ *|Revert\ *|Reapply\ *|fixup!*|squash!*|amend!*) exit 0 ;;
+esac
+
+# Git aborts an empty message itself; skipping it here keeps the error from
+# naming the wrong cause.
+if [ -z "$SUBJECT" ]; then
+  exit 0
+fi
+
+# `feat: …`, `fix(auth): …`, `feat(api)!: …` — the scope and the breaking `!`
+# are optional.
+if ! echo "$SUBJECT" | grep -qE "^($PREFIXES)(\([a-z0-9._/-]+\))?!?: .+"; then
+  echo "" >&2
+  echo "✖ Commit message does not follow the rule:" >&2
+  echo "    $SUBJECT" >&2
+  echo "" >&2
+  echo "  Format:  <prefix>[(scope)][!]: <description>" >&2
+  echo "  Prefixes: chore feat hotfix bugfix reconcile fix docs refactor test perf ci build style" >&2
+  echo "" >&2
+  echo "  Example: feat: add user avatar to the header" >&2
+  echo "           fix(auth): stop refreshing an expired token" >&2
+  echo "           feat(api)!: drop the v1 endpoints" >&2
+  echo "" >&2
+  exit 1
+fi
