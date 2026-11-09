@@ -213,7 +213,7 @@ testable increment.
 
 - [X] T109 [P] [US3] Unit test `apps/server/tests/unit/runtime-manager/capability-gate.test.ts`: every control on each RuntimeKind matches the capability matrix; unsupported → CAPABILITY_UNSUPPORTED
 - [X] T110 [P] [US3] Integration test `apps/server/tests/integration/controls.test.ts` (fake adapter): stop ≤ 5 s → `stopped`; retry creates attempt+1 linked via `previousAttemptId`; assign task; request review; messages persisted as Message + event; audit entries for each
-- [ ] T111 [P] [US3] E2E `e2e/us3-controls.spec.ts`: approvals inbox approve/reject, stop, disabled Pause tooltip text, distinct state badges, axe clean
+- [X] T111 [P] [US3] E2E `e2e/us3-controls.spec.ts`: approvals inbox approve/reject, stop, disabled Pause tooltip text, distinct state badges, axe clean
 
 ### Implementation for User Story 3
 

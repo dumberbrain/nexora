@@ -5,6 +5,7 @@ import { type Db } from "./db/client";
 import { type AppBindings } from "./http/context";
 import { registerApprovalRoutes } from "./http/routes/approvals";
 import { registerConsentRoutes } from "./http/routes/consent";
+import { registerControlRoutes, registerMessageRoutes } from "./http/routes/controls";
 import { registerExecutionRoutes } from "./http/routes/executions";
 import { registerRuntimeRoutes } from "./http/routes/runtime";
 import { type Logger } from "./lib/logger";
@@ -15,6 +16,7 @@ import {
   type Orchestration,
   type WorktreeProvider,
 } from "./modules/execution-orchestrator";
+import { type ControlService, createControls } from "./modules/execution-orchestrator/controls";
 import { DiffService, WorktreeService } from "./modules/git-workspace";
 import { type AuditService } from "./modules/permission-manager/audit.service";
 import { AgentSdkAdapter, CliHeadlessAdapter, RuntimeManager } from "./modules/runtime-manager";
@@ -79,6 +81,7 @@ export interface OrchestrationLayerDeps {
 export interface OrchestrationLayer {
   runtime: RuntimeManager;
   orchestration: Orchestration;
+  controls: ControlService;
   registerRoutes(api: Hono<AppBindings>): void;
   /** stop scheduling, then every managed runtime, then liveness timers */
   close(): Promise<void>;
@@ -113,14 +116,25 @@ export function createOrchestrationLayer(deps: OrchestrationLayerDeps): Orchestr
     capabilityOf: (id) => services.sessions.get(id)?.capabilities ?? null,
   });
 
+  const controls = createControls({
+    orchestration,
+    audit,
+    runtime,
+    sessions: services.sessions,
+    agents: services.agents,
+  });
+
   return {
     runtime,
     orchestration,
+    controls,
     registerRoutes: (api) => {
       registerRuntimeRoutes(api, { runtime });
       registerExecutionRoutes(api, orchestration);
       registerApprovalRoutes(api, orchestration);
       registerConsentRoutes(api, { consent: orchestration.consent, projects: services.projects });
+      registerControlRoutes(api, { controls });
+      registerMessageRoutes(api, { communication: orchestration.communication });
     },
     close: async () => {
       await orchestration.close();

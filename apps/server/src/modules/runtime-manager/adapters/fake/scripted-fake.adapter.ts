@@ -20,6 +20,9 @@ import {
  * each session writes one marker file inside its own worktree `cwd`, emits the matching events
  * and completes its turn after `stepMs`.
  */
+/** A task session whose prompt contains this marker never finishes on its own (US3 control E2E). */
+export const FAKE_HOLD_MARKER = "[e2e:hold]";
+
 export class ScriptedFakeAdapter implements RuntimeAdapter {
   readonly kind: RuntimeKind = "agent_sdk";
 
@@ -62,7 +65,9 @@ export class ScriptedFakeAdapter implements RuntimeAdapter {
       payload: { model: "fake", cwd: input.cwd, permissionMode: input.permissionMode },
     });
 
+    const hold = input.permissionMode !== "plan" && input.prompt.includes(FAKE_HOLD_MARKER);
     const timer = setTimeout(() => {
+      if (hold) return;
       if (finished) return;
       // read-only queries (plan mode) only answer; task sessions write one marker file
       if (input.permissionMode !== "plan" && input.taskId) {

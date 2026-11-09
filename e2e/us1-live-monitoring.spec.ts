@@ -62,10 +62,12 @@ test("live logs search, and export the filtered result as CSV", async ({
   page,
   expectNoA11yViolations,
 }) => {
+  // the E2E server is shared with the US2/US3 specs, so newer events may push the recorded
+  // session off the first page: search for it instead of expecting it unfiltered
   await page.goto("/logs");
-  await expect(page.getByText(`Modified ${S1.writtenFile}`)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Apply" })).toBeVisible();
 
-  await page.getByLabel(/search text/i).fill("Modified");
+  await page.getByLabel(/search text/i).fill(`Modified ${S1.writtenFile}`);
   await page.getByRole("button", { name: "Apply" }).click();
   await expect(page.getByText(`Modified ${S1.writtenFile}`)).toBeVisible();
   await expect(page.getByText(`Read ${S1.writtenFile}`)).toHaveCount(0);
