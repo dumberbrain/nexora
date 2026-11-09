@@ -3,9 +3,12 @@ import { http } from "@/shared/api";
 import {
   type AssignTaskInput,
   type ExecutionTasks,
+  type MoveTaskInput,
   type RequestReviewInput,
   type Task,
+  type TaskBoardFilters,
   type TaskControlInput,
+  type TaskList,
   type TaskRef,
 } from "../model/types";
 
@@ -33,6 +36,14 @@ export const taskApi = {
   /** a new attempt linked to the previous one (`previousAttemptId`) */
   retry: (ref: TaskRef, input: TaskControlInput = {}) =>
     http.post<Task>(taskPath(ref, "retry"), input).then((r) => r.data),
+
+  /** GET /tasks — the US4 board across executions, newest execution first */
+  list: (filters: TaskBoardFilters, opts: Opts = {}) =>
+    http.get<TaskList>("/tasks", { ...opts, params: filters }).then((r) => r.data),
+
+  /** PATCH …/tasks/:id/status — user move, only pending ⇄ queued (else 409 with a reason) */
+  move: (ref: TaskRef, input: MoveTaskInput) =>
+    http.patch<Task>(taskPath(ref, "status"), input).then((r) => r.data),
 
   /** review by the Code Reviewer role */
   requestReview: (ref: TaskRef, input: RequestReviewInput = {}) =>

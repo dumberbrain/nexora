@@ -9,6 +9,7 @@ import { projectHandlers } from "./projects";
 import { runtimeHandlers } from "./runtime";
 import { sessionHandlers } from "./sessions";
 import { statsHandlers } from "./stats";
+import { taskHandlers } from "./tasks";
 
 export { agentFixtures } from "./agents";
 export { approvalFixtures } from "./approvals";
@@ -31,8 +32,9 @@ export {
   sessionFixtures,
 } from "./sessions";
 export { statsFixture } from "./stats";
+export { boardFixtures, resetTaskBoard } from "./tasks";
 
-/** Default handlers (US1 monitoring + US2 orchestration + US3 controls); tests override per case with `server.use(...)`. */
+/** Default handlers (US1 monitoring + US2 orchestration + US3 controls + US4 board); tests override per case with `server.use(...)`. */
 export const handlers: RequestHandler[] = [
   ...projectHandlers,
   ...sessionHandlers,
@@ -43,4 +45,5 @@ export const handlers: RequestHandler[] = [
   ...approvalHandlers,
   ...messageHandlers,
   ...runtimeHandlers,
+  ...taskHandlers,
 ];
