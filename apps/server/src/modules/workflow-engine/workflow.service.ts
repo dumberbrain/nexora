@@ -77,6 +77,14 @@ export class WorkflowService {
     return { items: this.deps.repo.listVersions(id) };
   }
 
+  /** One version with its graph (older versions stay readable and runnable). */
+  version(id: string, version: number): WorkflowVersion {
+    this.definition(id);
+    const v = this.deps.repo.getVersion(id, version);
+    if (!v) throw new AppError("NOT_FOUND", "Workflow version not found");
+    return v;
+  }
+
   async saveVersion(id: string, graph: unknown, actor: string): Promise<WorkflowVersion> {
     this.definition(id);
     const parsed = await this.checked(graph);

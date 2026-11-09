@@ -21,7 +21,15 @@ import { readJson } from "../request";
 export interface WorkflowRouteDeps {
   workflows: Pick<
     WorkflowService,
-    "list" | "get" | "create" | "versions" | "saveVersion" | "validate" | "run" | "runDetail"
+    | "list"
+    | "get"
+    | "create"
+    | "versions"
+    | "version"
+    | "saveVersion"
+    | "validate"
+    | "run"
+    | "runDetail"
   >;
 }
 
@@ -67,6 +75,13 @@ export function registerWorkflowRoutes(api: Hono<AppBindings>, deps: WorkflowRou
     const id = idParam(c.req.param("id"));
     const { graph } = GraphBodySchema.parse(await readJson(c));
     return c.json<WorkflowVersion>(await workflows.saveVersion(id, graph, c.get("actor")), 201);
+  });
+
+  api.get("/workflows/:id/versions/:v", (c) => {
+    const id = idParam(c.req.param("id"));
+    const v = VersionParamSchema.safeParse(c.req.param("v"));
+    if (!v.success) throw new AppError("NOT_FOUND", "Workflow version not found");
+    return c.json<WorkflowVersion>(workflows.version(id, v.data));
   });
 
   api.post("/workflows/:id/versions/:v/run", async (c) => {

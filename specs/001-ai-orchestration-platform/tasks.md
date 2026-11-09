@@ -265,7 +265,7 @@ testable increment.
 - [X] T130 [P] [US5] Add built-in templates `apps/server/src/modules/workflow-engine/templates/{spec-driven.json,tdd-feature.json,review-and-merge.json}` seeded on first run
 - [X] T131 [P] [US5] Implement entity `apps/web/src/entities/workflow/` (api, keys, types)
 - [X] T132 [US5] Implement widget `apps/web/src/widgets/workflow-editor/` (`@xyflow/react`; node palette for agent, skill, MCP tool, condition, approval, parallel fork/join; property panel per node with RHF + zod; live run state overlay per node) and feature `apps/web/src/features/edit-workflow/` (save as new version, run); route `apps/web/src/routes/workflows/index.tsx`, `apps/web/src/routes/workflows/$workflowId.tsx`
-- [ ] T133 [P] [US5] Component tests for workflow-editor and E2E `e2e/us5-workflows.spec.ts`
+- [X] T133 [P] [US5] Component tests for workflow-editor and E2E `e2e/us5-workflows.spec.ts`
 
 **Checkpoint**: Workflow mode works end-to-end
 

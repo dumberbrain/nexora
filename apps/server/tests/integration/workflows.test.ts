@@ -147,6 +147,15 @@ describe("workflows API (T129)", () => {
     const detail = WorkflowDetailSchema.parse(await json(await get(`/workflows/${created.id}`)));
     expect(detail.latest?.version).toBe(2);
 
+    // an older version stays readable with its own graph
+    const v1 = WorkflowVersionSchema.parse(
+      await json(await get(`/workflows/${created.id}/versions/1`)),
+    );
+    expect(v1.version).toBe(1);
+    expect(v1.graph.nodes.find((n) => n.id === "c")?.label).toBe("c");
+    expect((await get(`/workflows/${created.id}/versions/9`)).status).toBe(404);
+    expect((await get(`/workflows/${created.id}/versions/x`)).status).toBe(404);
+
     const res = await post(`/workflows/${created.id}/versions/1/run`, { projectId });
     expect(res.status).toBe(201);
     const { executionId, run } = RunWorkflowResultSchema.parse(await json(res));

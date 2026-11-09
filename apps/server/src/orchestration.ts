@@ -9,6 +9,7 @@ import { registerControlRoutes, registerMessageRoutes } from "./http/routes/cont
 import { registerExecutionRoutes } from "./http/routes/executions";
 import { registerRuntimeRoutes } from "./http/routes/runtime";
 import { registerTaskRoutes } from "./http/routes/tasks";
+import { registerWorkflowRoutes } from "./http/routes/workflows";
 import { type Logger } from "./lib/logger";
 import { runCommand } from "./lib/process";
 import { type EventBus, type EventStore } from "./modules/event-manager";
@@ -25,6 +26,7 @@ import { ScriptedFakeAdapter } from "./modules/runtime-manager/adapters/fake/scr
 import { type ClaudeProbe } from "./modules/runtime-manager/environment";
 import { gitBranchOf } from "./modules/session-manager";
 import { type BoardService, createBoard } from "./modules/task-manager/board";
+import { createWorkflowEngine, type WorkflowEngine } from "./modules/workflow-engine";
 import { type Services } from "./services";
 
 /**
@@ -85,6 +87,7 @@ export interface OrchestrationLayer {
   orchestration: Orchestration;
   controls: ControlService;
   board: BoardService;
+  workflows: WorkflowEngine;
   registerRoutes(api: Hono<AppBindings>): void;
   /** stop scheduling, then every managed runtime, then liveness timers */
   close(): Promise<void>;
@@ -134,11 +137,25 @@ export function createOrchestrationLayer(deps: OrchestrationLayerDeps): Orchestr
     audit,
   });
 
+  const workflows = createWorkflowEngine({
+    db,
+    bus,
+    store,
+    audit,
+    logger,
+    orchestration,
+    runtime,
+    projects: services.projects,
+  });
+  // built-in templates (spec-driven, TDD feature, review and merge) — idempotent
+  workflows.seed();
+
   return {
     runtime,
     orchestration,
     controls,
     board,
+    workflows,
     registerRoutes: (api) => {
       registerRuntimeRoutes(api, { runtime });
       registerExecutionRoutes(api, orchestration);
@@ -147,6 +164,7 @@ export function createOrchestrationLayer(deps: OrchestrationLayerDeps): Orchestr
       registerControlRoutes(api, { controls });
       registerMessageRoutes(api, { communication: orchestration.communication });
       registerTaskRoutes(api, { board });
+      registerWorkflowRoutes(api, { workflows: workflows.service });
     },
     close: async () => {
       await orchestration.close();
