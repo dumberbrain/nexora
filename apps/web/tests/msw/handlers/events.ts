@@ -78,6 +78,7 @@ export const eventHandlers = [
     const cursor = sp.get("cursor");
     const limit = Number(sp.get("limit") ?? 50);
     const matching = eventFixtures
+      .filter((e) => !sp.get("executionId") || e.executionId === sp.get("executionId"))
       .filter((e) => !sp.get("sessionId") || e.sessionId === sp.get("sessionId"))
       .filter((e) => !sp.get("agentId") || e.agentId === sp.get("agentId"))
       .filter((e) => !types || types.includes(e.type))
