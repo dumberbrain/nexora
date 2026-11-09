@@ -100,6 +100,10 @@ Node `config` is validated per kind (`NODE_CONFIG_SCHEMAS` in contracts/api/work
 
 | GET | `/integrations?projectId=` | skills, commands, agents, MCP servers (secrets stripped) |
 | GET | `/runtime/environment` | Claude Code version, auth status, Agent Teams support, gh status |
+| POST | `/runtime/agent-teams/enable` | `{ projectId, confirmation: "enable agent teams" }` → writes the flag to the project's `.claude/settings.local.json` (audited) |
+| GET | `/sessions/:id/team` | `TeamView` of a Nexora-started Agent Teams lead (members, tasks, messages — `best_effort`) |
+
+Terminal: Socket.IO namespace `/terminal` (auth required, Nexora-spawned lead sessions only): `terminal:attach` → ack with backlog, `terminal:input`, `terminal:resize`, server `terminal:output`, `terminal:exit` (contracts/api/teams.ts).
 | GET | `/github/status` | `connected \| not_installed \| not_authenticated` + setup hint |
 | GET | `/github/repos/:owner/:repo/{branches,commits,pulls}` | via `gh api` (read-only) |
 | GET | `/github/repos/:owner/:repo/pulls/:n/files` | changed files + review status |
