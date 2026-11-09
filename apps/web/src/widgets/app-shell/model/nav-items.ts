@@ -18,6 +18,6 @@ export const NAV_ITEMS: NavItem[] = [
   { index: "05", label: "workflows", to: "/workflows", story: "US5" },
   { index: "06", label: "comms", to: "/communication", story: "US3" },
   { index: "07", label: "logs", to: "/logs", story: "US1" },
-  { index: "08", label: "skills & mcp", story: "US7" },
-  { index: "09", label: "github", story: "US7" },
+  { index: "08", label: "skills & mcp", to: "/integrations", story: "US7" },
+  { index: "09", label: "github", to: "/github", story: "US7" },
 ];
