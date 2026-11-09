@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { executionModesQuery, type Execution } from "@/entities/execution";
 import { EmptyState, ErrorState, LoadingState } from "@/shared/ui/state";
 
+import { EnableAgentTeams } from "./components/enable-agent-teams";
 import { ModeForm } from "./components/mode-form";
 
 interface ChooseModeFormProps {
@@ -36,5 +37,11 @@ export function ChooseModeForm({ execution, onChosen }: ChooseModeFormProps) {
       />
     );
   }
-  return <ModeForm execution={execution} options={modes.data} onChosen={onChosen} />;
+  const teams = modes.data.find((o) => o.mode === "agent_teams");
+  return (
+    <div className="flex flex-col gap-4">
+      <ModeForm execution={execution} options={modes.data} onChosen={onChosen} />
+      {teams && !teams.available ? <EnableAgentTeams execution={execution} /> : null}
+    </div>
+  );
 }

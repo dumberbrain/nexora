@@ -5,25 +5,25 @@ import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/shared/ui/
 
 import { PlanRow } from "./plan-row";
 
-const COLUMNS = [
-  "ID",
-  "Task",
-  "Agent",
-  "Mode",
-  "Depends on",
-  "Priority",
-  "Status",
-  "Owned paths",
-  "Risk",
+const BEFORE_MODE = ["ID", "Task", "Agent"];
+const AFTER_MODE = ["Depends on", "Priority", "Status", "Owned paths", "Risk"];
+
+/** A hybrid plan (US6) mixes mechanisms per task — show each one and the planner's reason. */
+const columnsFor = (hybrid: boolean) => [
+  ...BEFORE_MODE,
+  ...(hybrid ? ["Mechanism", "Reason"] : ["Mode"]),
+  ...AFTER_MODE,
 ];
 
 interface PlanTableProps {
   plan: ExecutionTasks;
+  /** the execution runs in hybrid mode */
+  hybrid: boolean;
   approveInput: Omit<ComponentProps<"input">, "type" | "value">;
 }
 
 /** The structured plan (FR-006) — every task with all its planning fields. */
-export function PlanTable({ plan, approveInput }: PlanTableProps) {
+export function PlanTable({ plan, hybrid, approveInput }: PlanTableProps) {
   const conflicts = conflictsByTask(plan.conflicts);
   return (
     <div className="overflow-x-auto border border-border bg-card">
@@ -31,7 +31,7 @@ export function PlanTable({ plan, approveInput }: PlanTableProps) {
         <caption className="sr-only">Execution plan</caption>
         <TableHeader>
           <TableRow>
-            {COLUMNS.map((c) => (
+            {columnsFor(hybrid).map((c) => (
               <TableHead key={c} className="font-mono text-[10px] tracking-widest uppercase">
                 {c}
               </TableHead>
@@ -44,6 +44,7 @@ export function PlanTable({ plan, approveInput }: PlanTableProps) {
               key={t.id}
               task={t}
               conflicts={conflicts.get(t.id) ?? []}
+              hybrid={hybrid}
               approveInput={approveInput}
             />
           ))}
