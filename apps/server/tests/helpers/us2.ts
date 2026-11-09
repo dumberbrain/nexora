@@ -2,16 +2,19 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
+import { type Hono } from "hono";
+
 import { testEnv } from "./us1";
 import { closeDb, openDb, type Db } from "../../src/db/client";
 import { createApp } from "../../src/http/app";
+import { type AppBindings } from "../../src/http/context";
 import { registerApiRoutes } from "../../src/http/routes";
 import { registerApprovalRoutes } from "../../src/http/routes/approvals";
 import { registerConsentRoutes } from "../../src/http/routes/consent";
 import { registerControlRoutes, registerMessageRoutes } from "../../src/http/routes/controls";
 import { registerExecutionRoutes } from "../../src/http/routes/executions";
 import { registerTaskRoutes } from "../../src/http/routes/tasks";
-import { createLogger } from "../../src/lib/logger";
+import { createLogger, type Logger } from "../../src/lib/logger";
 import { EventBus, EventStore } from "../../src/modules/event-manager";
 import { createOrchestration, type Orchestration } from "../../src/modules/execution-orchestrator";
 import {
@@ -82,6 +85,21 @@ export interface Us2HarnessOptions {
   sessionRows?: boolean;
   /** cap for stopping runtimes (default 4 500 ms) */
   stopTimeoutMs?: number;
+  /** extra module graphs on top of US2 (e.g. US5 workflows): returns their route registration */
+  extend?: (parts: Us2Parts) => (api: Hono<AppBindings>) => void;
+}
+
+/** What an {@link Us2HarnessOptions.extend} hook can build on. */
+export interface Us2Parts {
+  db: Db;
+  bus: EventBus;
+  store: EventStore;
+  audit: AuditService;
+  logger: Logger;
+  services: Services;
+  orchestration: Orchestration;
+  runtime: FakeManagedRuntime;
+  home: string;
 }
 
 /**
@@ -136,6 +154,17 @@ export async function createUs2Harness(opts: Us2HarnessOptions = {}): Promise<Us
     approvals: orchestration.approvals,
     audit,
   });
+  const extraRoutes = opts.extend?.({
+    db,
+    bus,
+    store,
+    audit,
+    logger,
+    services,
+    orchestration,
+    runtime,
+    home,
+  });
   const app = createApp({
     env: testEnv,
     db,
@@ -149,6 +178,7 @@ export async function createUs2Harness(opts: Us2HarnessOptions = {}): Promise<Us
       registerControlRoutes(api, { controls });
       registerMessageRoutes(api, { communication: orchestration.communication });
       registerTaskRoutes(api, { board });
+      extraRoutes?.(api);
     },
   });
   await Promise.resolve();

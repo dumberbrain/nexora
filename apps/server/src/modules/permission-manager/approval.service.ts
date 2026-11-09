@@ -26,6 +26,8 @@ export interface ApprovalServiceDeps {
 
 /** orchestrator operation name for "may this risky task start?" requests */
 export const TASK_START_ACTION = "task.start";
+/** operation name of a workflow `approval` node */
+export const WORKFLOW_APPROVAL_ACTION = "workflow.approval";
 
 /**
  * Approval gate (T093, FR-033). Requests are persisted (redacted) and stay pending until a human
@@ -73,6 +75,36 @@ export class ApprovalService implements ApprovalGate {
       riskClass: req.riskClass,
       details: { title: req.title, reason: `Task ${req.taskId} is classified ${req.riskClass}` },
     });
+  }
+
+  /**
+   * Workflow `approval` node (US5): pending until a human decides — never by timeout. The
+   * decision promise resolves deny when the request is expired (run cancelled, execution stopped).
+   */
+  requestWorkflowApproval(req: {
+    executionId: string;
+    nodeId: string;
+    label: string;
+    message: string;
+    riskClass: RiskClass;
+  }): { approval: ApprovalRequest; decision: Promise<Verdict> } {
+    const approval = this.insert({
+      executionId: req.executionId,
+      taskId: null,
+      sessionId: null,
+      agentId: null,
+      action: WORKFLOW_APPROVAL_ACTION,
+      riskClass: req.riskClass,
+      details: { nodeId: req.nodeId, title: req.label, reason: req.message },
+    });
+    const decision = new Promise<Verdict>((resolve) => this.waiting.set(approval.id, resolve));
+    return { approval, decision };
+  }
+
+  /** Expire one pending request (deny); false when it was no longer pending. */
+  expireRequest(id: string, reason: string): boolean {
+    const a = this.repo.get(id);
+    return a?.status === "pending" ? this.expire([a], reason) > 0 : false;
   }
 
   list(status?: ApprovalStatus, executionId?: string): ApprovalRequest[] {

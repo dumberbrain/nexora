@@ -252,17 +252,17 @@ testable increment.
 
 ### Tests for User Story 5 ⚠️
 
-- [ ] T123 [P] [US5] Unit test `apps/server/tests/unit/workflow-engine/graph-validator.test.ts`: single start, reachable end, no cycles, node kinds `agent, skill, mcp_tool, condition, approval, parallel_fork, parallel_join, start, end`, retry `maxAttempts ≤ 5`, onError `fail|continue|goto(nodeId)` target exists, skill nodes only for `executable` skills
-- [ ] T124 [P] [US5] Unit test `apps/server/tests/unit/workflow-engine/executor.test.ts` (fake node executors): fork/join parallelism, condition branch, approval wait, retry with backoff, error edges, cancellation
-- [ ] T125 [P] [US5] Unit test `apps/server/tests/unit/workflow-engine/condition-evaluator.test.ts`: safe expression evaluation (no `eval`/`Function`), access only to previous node outputs
+- [X] T123 [P] [US5] Unit test `apps/server/tests/unit/workflow-engine/graph-validator.test.ts`: single start, reachable end, no cycles, node kinds `agent, skill, mcp_tool, condition, approval, parallel_fork, parallel_join, start, end`, retry `maxAttempts ≤ 5`, onError `fail|continue|goto(nodeId)` target exists, skill nodes only for `executable` skills
+- [X] T124 [P] [US5] Unit test `apps/server/tests/unit/workflow-engine/executor.test.ts` (fake node executors): fork/join parallelism, condition branch, approval wait, retry with backoff, error edges, cancellation
+- [X] T125 [P] [US5] Unit test `apps/server/tests/unit/workflow-engine/condition-evaluator.test.ts`: safe expression evaluation (no `eval`/`Function`), access only to previous node outputs
 
 ### Implementation for User Story 5
 
-- [ ] T126 [US5] Implement graph validator + versioning repository `apps/server/src/modules/workflow-engine/{graph-validator.ts,workflow.repository.ts}` (versions immutable, increment int) to pass T123
-- [ ] T127 [US5] Implement condition evaluator `apps/server/src/modules/workflow-engine/condition-evaluator.ts` (sandboxed expression library, e.g. `filtrex`) to pass T125
-- [ ] T128 [US5] Implement executor `apps/server/src/modules/workflow-engine/{executor.ts,node-executors/{agent.ts,skill.ts,mcp-tool.ts,approval.ts}}` (agent → SDK session; skill → SDK session prompted with skill slash command; mcp_tool → SDK session with that MCP server enabled; approval → ApprovalGate) emitting `workflow.started|node_changed|completed` to pass T124
-- [ ] T129 [US5] Implement workflow mode executor `apps/server/src/modules/execution-orchestrator/modes/workflow.ts` and routes `apps/server/src/http/routes/workflows.ts` (`GET/POST /workflows`, `GET/POST /workflows/:id/versions`, `POST /workflows/:id/versions/:v/run`)
-- [ ] T130 [P] [US5] Add built-in templates `apps/server/src/modules/workflow-engine/templates/{spec-driven.json,tdd-feature.json,review-and-merge.json}` seeded on first run
+- [X] T126 [US5] Implement graph validator + versioning repository `apps/server/src/modules/workflow-engine/{graph-validator.ts,workflow.repository.ts}` (versions immutable, increment int) to pass T123
+- [X] T127 [US5] Implement condition evaluator `apps/server/src/modules/workflow-engine/condition-evaluator.ts` (sandboxed expression library, e.g. `filtrex`) to pass T125
+- [X] T128 [US5] Implement executor `apps/server/src/modules/workflow-engine/{executor.ts,node-executors/{agent.ts,skill.ts,mcp-tool.ts,approval.ts}}` (agent → SDK session; skill → SDK session prompted with skill slash command; mcp_tool → SDK session with that MCP server enabled; approval → ApprovalGate) emitting `workflow.started|node_changed|completed` to pass T124
+- [X] T129 [US5] Implement workflow mode executor `apps/server/src/modules/execution-orchestrator/modes/workflow.ts` and routes `apps/server/src/http/routes/workflows.ts` (`GET/POST /workflows`, `GET/POST /workflows/:id/versions`, `POST /workflows/:id/versions/:v/run`)
+- [X] T130 [P] [US5] Add built-in templates `apps/server/src/modules/workflow-engine/templates/{spec-driven.json,tdd-feature.json,review-and-merge.json}` seeded on first run
 - [ ] T131 [P] [US5] Implement entity `apps/web/src/entities/workflow/` (api, keys, types)
 - [ ] T132 [US5] Implement widget `apps/web/src/widgets/workflow-editor/` (`@xyflow/react`; node palette for agent, skill, MCP tool, condition, approval, parallel fork/join; property panel per node with RHF + zod; live run state overlay per node) and feature `apps/web/src/features/edit-workflow/` (save as new version, run); route `apps/web/src/routes/workflows/index.tsx`, `apps/web/src/routes/workflows/$workflowId.tsx`
 - [ ] T133 [P] [US5] Component tests for workflow-editor and E2E `e2e/us5-workflows.spec.ts`

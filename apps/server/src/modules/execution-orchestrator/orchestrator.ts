@@ -5,6 +5,7 @@ import {
   type Execution,
   type ExecutionConfig,
   ExecutionConfigSchema,
+  type ExecutionMode,
   type ExecutionStatus,
   type ExecutionTasks,
   type GeneratePlanInput,
@@ -118,7 +119,29 @@ interface LiveExecution {
   sessions: Map<string, LiveSession>;
   worktreePaths: Set<string>;
   stopping: boolean;
+  /** a run the orchestrator does not schedule itself (workflow mode) */
+  external?: ExternalRun;
 }
+
+/**
+ * Work an execution delegates to another engine (workflow mode, T129). The orchestrator keeps the
+ * execution state machine, the worktree and the stop control; the engine runs its own sessions.
+ */
+export interface ExternalRun {
+  /** settles once the run reached its end */
+  readonly done: Promise<"completed" | "failed" | "cancelled">;
+  /** cancel the run and stop its sessions; resolves when it ended */
+  cancel(): Promise<void>;
+  /** the run's live managed sessions (US3 controls) */
+  liveSessions(): LiveSessionInfo[];
+}
+
+/** Starts an external run inside a freshly created execution (already `running`, worktree ready). */
+export type ExternalStart<T> = (ctx: {
+  execution: Execution;
+  projectRoot: string;
+  worktreePath: string;
+}) => { run: ExternalRun; result: T };
 
 const ULID = /^[0-9A-HJKMNP-TV-Z]{26}$/;
 const MODE_EDITABLE: ReadonlySet<ExecutionStatus> = new Set([
@@ -237,6 +260,89 @@ export class Orchestrator {
         return this.setStatus(this.get(id), "failed", { endedAt: this.now() });
       }
     });
+  }
+
+  /**
+   * Create an execution that skips the analysis/plan wizard and is run by an external engine
+   * (workflow mode): the execution worktree is created first, the execution starts `running`,
+   * and the engine's outcome drives `verifying → completed | failed` (or `cancelled`).
+   */
+  async launchExternal<T>(
+    input: { projectId: string; prompt: string; mode: ExecutionMode },
+    actor: string,
+    start: ExternalStart<T>,
+  ): Promise<{ execution: Execution; result: T }> {
+    const project = this.deps.projects.getRow(input.projectId);
+    const now = this.now();
+    const id = newId(now);
+    const worktreePath = await this.deps.worktrees.executionWorktree(project.rootPath, id);
+    const e = this.deps.executions.insert({
+      id,
+      projectId: project.id,
+      prompt: input.prompt,
+      analysis: null,
+      mode: input.mode,
+      strategy: null,
+      config: ExecutionConfigSchema.parse({}),
+      status: "running",
+      permissionBypass: false,
+      worktreePath,
+      verification: null,
+      createdAt: now,
+      startedAt: now,
+      endedAt: null,
+    });
+    this.deps.emitter.entity("execution", id, { ...e });
+    this.deps.audit.record({
+      actor,
+      action: "execution.create",
+      targetType: "execution",
+      targetId: id,
+      outcome: "success",
+      details: { projectId: project.id, mode: input.mode, promptChars: input.prompt.length },
+    });
+    const live = this.liveOf(id);
+    live.worktreePaths.add(worktreePath);
+    let started: { run: ExternalRun; result: T };
+    try {
+      started = start({ execution: e, projectRoot: project.rootPath, worktreePath });
+    } catch (err) {
+      this.deps.logger.error({ err, executionId: id }, "external run failed to start");
+      this.setStatus(e, "failed", { endedAt: this.now() });
+      this.live.delete(id);
+      throw err;
+    }
+    live.external = started.run;
+    started.run.done.then(
+      (outcome) =>
+        this.background(id, "finishing an external run", () => this.finishExternal(id, outcome)),
+      (err: unknown) => {
+        this.deps.logger.error({ err, executionId: id }, "external run crashed");
+        this.background(id, "finishing an external run", () => this.finishExternal(id, "failed"));
+      },
+    );
+    return { execution: e, result: started.result };
+  }
+
+  private async finishExternal(id: string, outcome: "completed" | "failed" | "cancelled") {
+    const e = this.deps.executions.get(id);
+    if (!e || isTerminalExecution(e.status)) {
+      this.live.delete(id);
+      return;
+    }
+    if (outcome === "cancelled") {
+      this.setStatus(e, "cancelled", { endedAt: this.now() });
+    } else {
+      const current = e.status === "paused" ? this.setStatus(e, "running") : e;
+      const verifying = this.setStatus(current, "verifying");
+      const verification = await this.verify(verifying);
+      const ok = outcome === "completed" && verification.failedTaskIds.length === 0;
+      this.setStatus(this.get(id), ok ? "completed" : "failed", {
+        verification,
+        endedAt: this.now(),
+      });
+    }
+    this.live.delete(id);
   }
 
   /** Model-backed analysis refinement — requires consent (FR-008). */
@@ -446,7 +552,10 @@ export class Orchestrator {
       }
       const live = this.liveOf(id);
       live.stopping = true;
-      await Promise.all([...live.sessions.values()].map((s) => this.stopHandle(id, s.handle)));
+      await Promise.all([
+        ...[...live.sessions.values()].map((s) => this.stopHandle(id, s.handle)),
+        ...(live.external ? [this.bounded(id, live.external.cancel(), "cancel of the run")] : []),
+      ]);
       live.sessions.clear();
       for (const t of this.deps.tasks.list(id)) {
         if (!isTerminalTask(t.status)) this.deps.tasks.transition(id, t.id, "cancelled");
@@ -467,6 +576,12 @@ export class Orchestrator {
   async close(): Promise<void> {
     this.closed = true;
     this.offDecided();
+    // external runs (workflows) end with the process: cancel them while storage is still open
+    await Promise.all(
+      [...this.live].flatMap(([id, l]) =>
+        l.external ? [this.bounded(id, l.external.cancel(), "cancel of the run")] : [],
+      ),
+    );
     await Promise.allSettled([...this.chains.values()]);
   }
 
@@ -488,7 +603,8 @@ export class Orchestrator {
   }
 
   liveSessions(id: string): LiveSessionInfo[] {
-    return [...(this.live.get(id)?.sessions ?? new Map<string, LiveSession>()).entries()].map(
+    const state = this.live.get(id);
+    const own = [...(state?.sessions ?? new Map<string, LiveSession>()).entries()].map(
       ([key, s]) => ({
         key,
         sessionId: s.sessionId,
@@ -497,6 +613,7 @@ export class Orchestrator {
         kind: s.handle.kind,
       }),
     );
+    return [...own, ...(state?.external?.liveSessions() ?? [])];
   }
 
   /** The execution and tasks a live managed session works on; null when not orchestrated. */
@@ -521,6 +638,12 @@ export class Orchestrator {
       const e = this.get(id);
       if (e.status !== "running") {
         throw new AppError("CONFLICT", `Execution is ${e.status}; only a running one can be held`);
+      }
+      if (this.live.get(id)?.external) {
+        throw new AppError(
+          "CAPABILITY_UNSUPPORTED",
+          `${e.mode ?? "This"} execution cannot be held; stop it instead`,
+        );
       }
       const live = [...this.liveOf(id).sessions.values()].filter((s) => !s.held);
       await Promise.all(live.map((s) => this.bounded(id, s.handle.interrupt(), "interrupt")));
@@ -673,7 +796,7 @@ export class Orchestrator {
   /** One scheduling round; always runs on the execution's serial chain. */
   private async tick(id: string): Promise<void> {
     const e = this.deps.executions.get(id);
-    if (e?.status !== "running" || this.liveOf(id).stopping) return;
+    if (e?.status !== "running" || this.liveOf(id).stopping || this.liveOf(id).external) return;
     for (const tid of unreachableTasks(this.deps.tasks.list(id))) {
       this.deps.tasks.transition(id, tid, "cancelled");
     }
@@ -978,7 +1101,8 @@ export class Orchestrator {
   /** All tasks terminal and nothing running → verifying → completed | failed. */
   private async maybeFinish(id: string): Promise<void> {
     const e = this.deps.executions.get(id);
-    if (e?.status !== "running" || this.liveOf(id).sessions.size > 0) return;
+    const state = this.liveOf(id);
+    if (e?.status !== "running" || state.sessions.size > 0 || state.external) return;
     const tasks = this.deps.tasks.list(id);
     if (!tasks.every((t) => isTerminalTask(t.status))) return;
     const verifying = this.setStatus(e, "verifying");

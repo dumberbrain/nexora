@@ -1,0 +1,85 @@
+{
+  "name": "Spec-driven feature",
+  "description": "Write a spec and a plan, get the plan approved, implement it, then verify it against the spec.",
+  "graph": {
+    "nodes": [
+      {
+        "id": "start",
+        "kind": "start",
+        "label": "Start",
+        "config": {},
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "specify",
+        "kind": "agent",
+        "label": "Write spec",
+        "config": {
+          "role": "architect",
+          "prompt": "Write a concise specification for the goal in specs/: user stories, acceptance criteria and open questions. Do not implement anything.",
+          "ownedPaths": ["specs/**"]
+        },
+        "position": { "x": 220, "y": 0 }
+      },
+      {
+        "id": "plan",
+        "kind": "agent",
+        "label": "Plan",
+        "config": {
+          "role": "architect",
+          "prompt": "Turn the specification into an implementation plan with small, ordered tasks and the files each task touches. Save it next to the spec.",
+          "ownedPaths": ["specs/**"]
+        },
+        "position": { "x": 440, "y": 0 }
+      },
+      {
+        "id": "approve-plan",
+        "kind": "approval",
+        "label": "Approve plan",
+        "config": {
+          "message": "Review the spec and plan in the execution worktree before implementation starts.",
+          "riskClass": "architecture"
+        },
+        "position": { "x": 660, "y": 0 }
+      },
+      {
+        "id": "implement",
+        "kind": "agent",
+        "label": "Implement",
+        "config": {
+          "role": "backend-developer",
+          "prompt": "Implement the approved plan task by task, with tests for each behaviour.",
+          "ownedPaths": []
+        },
+        "retry": { "maxAttempts": 2, "backoffMs": 5000 },
+        "position": { "x": 880, "y": 0 }
+      },
+      {
+        "id": "verify",
+        "kind": "agent",
+        "label": "Verify",
+        "config": {
+          "role": "qa-engineer",
+          "prompt": "Run the test suite and check every acceptance criterion of the spec. Report pass/fail per criterion.",
+          "ownedPaths": []
+        },
+        "position": { "x": 1100, "y": 0 }
+      },
+      {
+        "id": "end",
+        "kind": "end",
+        "label": "End",
+        "config": {},
+        "position": { "x": 1320, "y": 0 }
+      }
+    ],
+    "edges": [
+      { "id": "e1", "source": "start", "target": "specify" },
+      { "id": "e2", "source": "specify", "target": "plan" },
+      { "id": "e3", "source": "plan", "target": "approve-plan" },
+      { "id": "e4", "source": "approve-plan", "target": "implement" },
+      { "id": "e5", "source": "implement", "target": "verify" },
+      { "id": "e6", "source": "verify", "target": "end" }
+    ]
+  }
+}

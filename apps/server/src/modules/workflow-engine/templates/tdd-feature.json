@@ -1,0 +1,97 @@
+{
+  "name": "TDD feature",
+  "description": "Write failing tests first, implement until they pass (with retries), then review — or hand off a fix when tests stay red.",
+  "graph": {
+    "nodes": [
+      {
+        "id": "start",
+        "kind": "start",
+        "label": "Start",
+        "config": {},
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "tests",
+        "kind": "agent",
+        "label": "Write failing tests",
+        "config": {
+          "role": "qa-engineer",
+          "prompt": "Write focused tests for the goal. They must fail now because the behaviour does not exist yet. Do not implement the feature.",
+          "ownedPaths": []
+        },
+        "position": { "x": 220, "y": 0 }
+      },
+      {
+        "id": "implement",
+        "kind": "agent",
+        "label": "Implement",
+        "config": {
+          "role": "backend-developer",
+          "prompt": "Implement the smallest change that makes the new tests pass without breaking existing ones. Do not weaken the tests.",
+          "ownedPaths": []
+        },
+        "retry": { "maxAttempts": 3, "backoffMs": 5000 },
+        "position": { "x": 440, "y": 0 }
+      },
+      {
+        "id": "run-tests",
+        "kind": "agent",
+        "label": "Run tests",
+        "config": {
+          "role": "qa-engineer",
+          "prompt": "Run the whole test suite. End your answer with the line ALL TESTS PASS if and only if every test passed; otherwise list the failures.",
+          "ownedPaths": []
+        },
+        "position": { "x": 660, "y": 0 }
+      },
+      {
+        "id": "green",
+        "kind": "condition",
+        "label": "Tests green?",
+        "config": {
+          "expression": "nodes[\"run-tests\"].status == \"completed\" && contains(nodes[\"run-tests\"].output, \"ALL TESTS PASS\")"
+        },
+        "position": { "x": 880, "y": 0 }
+      },
+      {
+        "id": "review",
+        "kind": "agent",
+        "label": "Review",
+        "config": {
+          "role": "code-reviewer",
+          "prompt": "Review the change for correctness, readability and test quality. Fix small issues directly and list anything bigger.",
+          "ownedPaths": []
+        },
+        "position": { "x": 1100, "y": -80 }
+      },
+      {
+        "id": "fix",
+        "kind": "agent",
+        "label": "Fix failures",
+        "config": {
+          "role": "backend-developer",
+          "prompt": "The test run reported failures. Fix the implementation (not the tests) and summarise what still fails, if anything.",
+          "ownedPaths": []
+        },
+        "position": { "x": 1100, "y": 80 }
+      },
+      {
+        "id": "end",
+        "kind": "end",
+        "label": "End",
+        "config": {},
+        "position": { "x": 1320, "y": 0 }
+      }
+    ],
+    "edges": [
+      { "id": "e1", "source": "start", "target": "tests" },
+      { "id": "e2", "source": "tests", "target": "implement" },
+      { "id": "e3", "source": "implement", "target": "run-tests" },
+      { "id": "e4", "source": "run-tests", "target": "green" },
+      { "id": "e5", "source": "green", "target": "review", "branch": "true" },
+      { "id": "e6", "source": "green", "target": "fix", "branch": "false" },
+      { "id": "e7", "source": "review", "target": "end" },
+      { "id": "e8", "source": "fix", "target": "end" }
+    ]
+  }
+}
