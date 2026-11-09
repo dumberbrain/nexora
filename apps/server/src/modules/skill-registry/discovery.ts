@@ -34,7 +34,8 @@ export interface DiscoveredItem {
 }
 
 export interface DiscoveryRoots {
-  projectRoot: string;
+  /** null → user-level and plugin items only */
+  projectRoot: string | null;
   homeDir: string;
 }
 
@@ -180,8 +181,12 @@ async function enabledPluginIds(roots: DiscoveryRoots): Promise<Set<string>> {
   const flags = new Map<string, boolean>();
   for (const file of [
     join(roots.homeDir, ".claude", "settings.json"),
-    join(roots.projectRoot, ".claude", "settings.json"),
-    join(roots.projectRoot, ".claude", "settings.local.json"),
+    ...(roots.projectRoot
+      ? [
+          join(roots.projectRoot, ".claude", "settings.json"),
+          join(roots.projectRoot, ".claude", "settings.local.json"),
+        ]
+      : []),
   ]) {
     const parsed = SettingsSchema.safeParse(await readJson(file));
     if (!parsed.success) continue;
@@ -213,7 +218,9 @@ async function pluginItems(roots: DiscoveryRoots): Promise<DiscoveredItem[]> {
 
 export async function discoverSkills(roots: DiscoveryRoots): Promise<DiscoveredItem[]> {
   return [
-    ...(await scanClaudeDir(join(roots.projectRoot, ".claude"), "project", null)),
+    ...(roots.projectRoot
+      ? await scanClaudeDir(join(roots.projectRoot, ".claude"), "project", null)
+      : []),
     ...(await scanClaudeDir(join(roots.homeDir, ".claude"), "user", null)),
     ...(await pluginItems(roots)),
   ];

@@ -305,13 +305,13 @@ testable increment.
 
 ### Tests for User Story 7 ⚠️
 
-- [ ] T144 [P] [US7] Unit test `apps/server/tests/unit/github-integration/gh-status.test.ts`: `gh` missing → `not_installed` + hint `winget install --id GitHub.cli -e`; `gh auth status` failing → `not_authenticated` + hint `gh auth login`; ok → `connected`
-- [ ] T145 [P] [US7] Unit test `apps/server/tests/unit/mcp-registry/redaction.test.ts`: MCP configs with `env`/`headers` secrets are never returned; permission status derived from settings `permissions.allow/deny/ask`
+- [X] T144 [P] [US7] Unit test `apps/server/tests/unit/github-integration/gh-status.test.ts`: `gh` missing → `not_installed` + hint `winget install --id GitHub.cli -e`; `gh auth status` failing → `not_authenticated` + hint `gh auth login`; ok → `connected`
+- [X] T145 [P] [US7] Unit test `apps/server/tests/unit/mcp-registry/redaction.test.ts`: MCP configs with `env`/`headers` secrets are never returned; permission status derived from settings `permissions.allow/deny/ask`
 
 ### Implementation for User Story 7
 
-- [ ] T146 [US7] Implement integrations service + persistence `apps/server/src/modules/skill-registry/skill-registry.service.ts`, `apps/server/src/modules/mcp-registry/mcp-registry.service.ts` (health: MCP stdio/http reachability check with timeout, `unknown` when not checkable; permission status) and route `GET /integrations?projectId=` in `apps/server/src/http/routes/integrations.ts`
-- [ ] T147 [US7] Implement GitHub integration `apps/server/src/modules/github-integration/{gh-status.ts,github.service.ts}` (read-only `gh api` GETs via allowlisted runner: repos, branches, commits, pulls, pull files, reviews; local fallback for branches/commits via `git`) and routes `apps/server/src/http/routes/github.ts` (`GET /github/status`, `GET /github/repos/:owner/:repo/{branches,commits,pulls}`, `GET …/pulls/:n/files`) to pass T144
+- [X] T146 [US7] Implement integrations service + persistence `apps/server/src/modules/skill-registry/skill-registry.service.ts`, `apps/server/src/modules/mcp-registry/mcp-registry.service.ts` (health: MCP stdio/http reachability check with timeout, `unknown` when not checkable; permission status) and route `GET /integrations?projectId=` in `apps/server/src/http/routes/integrations.ts`
+- [X] T147 [US7] Implement GitHub integration `apps/server/src/modules/github-integration/{gh-status.ts,github.service.ts}` (read-only `gh api` GETs via allowlisted runner: repos, branches, commits, pulls, pull files, reviews; local fallback for branches/commits via `git`) and routes `apps/server/src/http/routes/github.ts` (`GET /github/status`, `GET /github/repos/:owner/:repo/{branches,commits,pulls}`, `GET …/pulls/:n/files`) to pass T144
 - [ ] T148 [P] [US7] Implement entities `apps/web/src/entities/{integration,github}/` and view `apps/web/src/views/integrations/` + route `apps/web/src/routes/integrations.tsx` (tabs: Skills, Agents, MCP servers with tools, health, permission status)
 - [ ] T149 [P] [US7] Implement view `apps/web/src/views/github/` + route `apps/web/src/routes/github.tsx` (repo picker from registered projects' remotes; branches, commits, PRs, changed files, review status; setup guidance card when `not_installed`/`not_authenticated`)
 - [ ] T150 [P] [US7] Component tests for integrations + github views with MSW, E2E `e2e/us7-integrations.spec.ts`
