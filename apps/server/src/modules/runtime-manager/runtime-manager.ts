@@ -132,6 +132,11 @@ export class RuntimeManager implements ManagedRuntime {
     return value;
   }
 
+  /** Drop the environment() cache (e.g. right after Agent Teams were enabled). */
+  invalidateEnvironment(): void {
+    this.envCache = null;
+  }
+
   /** Uncached detection — never spends model usage. */
   async detect(): Promise<RuntimeEnvironment> {
     const env = this.deps.env ?? process.env;
@@ -310,6 +315,14 @@ export class RuntimeManager implements ManagedRuntime {
       },
       setPermissionMode: (mode) => started.setPermissionMode(mode),
     };
+    if (started.onWaitingForInput) {
+      const listen = started.onWaitingForInput.bind(started);
+      // a start-up dialog waits for a human: no idle/turn timeout while it is open
+      listen((waiting) => {
+        if (knownId) this.liveness.setWaiting(knownId, waiting);
+      });
+      wrapped.onWaitingForInput = (listener) => listen(listener);
+    }
     ref.wrapped = wrapped;
     return wrapped;
   }

@@ -128,6 +128,12 @@ export interface SessionHandle {
   interrupt(): Promise<void>;
   sendMessage(text: string): Promise<void>;
   setPermissionMode(mode: StartSessionInput["permissionMode"]): Promise<void>;
+  /**
+   * Interactive runtimes only (Agent Teams PTY): `true` while a start-up dialog (workspace trust,
+   * new MCP servers) waits for the user to answer in the terminal, `false` once answered.
+   * Returns an unsubscribe function.
+   */
+  onWaitingForInput?(listener: (waiting: boolean) => void): () => void;
 }
 
 export interface RuntimeDetection {

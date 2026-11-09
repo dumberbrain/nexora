@@ -12,10 +12,12 @@ import { splitSubGoals } from "./subgoals";
 export const IMPLEMENTED_MODES: ReadonlySet<ExecutionMode> = new Set([
   "multi_session",
   "subagents",
+  "agent_teams",
+  "hybrid",
 ]);
 
 export const AGENT_TEAMS_HOW_TO_ENABLE =
-  'Set CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 in your environment or in the "env" block of ~/.claude/settings.json, then restart Nexora.';
+  'Enable Agent Teams for this project in Nexora (type "enable agent teams" to confirm; it writes CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 to .claude/settings.local.json), or set CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 in your environment or in the "env" block of ~/.claude/settings.json.';
 
 const MODE_ORDER: ExecutionMode[] = [
   "multi_session",
@@ -27,9 +29,9 @@ const MODE_ORDER: ExecutionMode[] = [
 
 const NOT_YET: Partial<Record<ExecutionMode, string>> = {
   agent_teams:
-    "Agent Teams execution arrives in US6; Nexora does not emulate teams with subagents.",
-  workflow: "Workflow mode arrives in US5 (workflow builder and engine).",
-  hybrid: "Hybrid mode arrives in US6 (combines teams, sessions, workflows, skills and MCP).",
+    "Agent Teams execution is not available; Nexora does not emulate teams with subagents.",
+  workflow: "Workflow mode runs from the Workflows page (choose a template and run it).",
+  hybrid: "Hybrid mode is not available.",
 };
 
 const SESSION_RUNTIMES: RuntimeKind[] = ["agent_sdk", "cli_headless"];
@@ -46,6 +48,15 @@ interface Availability {
   runtimes: RuntimeKind[];
   unavailableReason: string | null;
   howToEnable: string | null;
+}
+
+/** Agent Teams can run: the flag is set and the PTY runtime (node-pty) is available. */
+export function agentTeamsUsable(env: RuntimeEnvironment): boolean {
+  return (
+    env.claude.installed &&
+    env.agentTeams.enabled &&
+    env.runtimes.some((r) => r.kind === "agent_team_pty" && r.available)
+  );
 }
 
 function availability(mode: ExecutionMode, input: AdviseInput): Availability {
@@ -77,6 +88,8 @@ function availability(mode: ExecutionMode, input: AdviseInput): Availability {
     const reasons = usable.map((r) => `${r.kind}: ${r.reason ?? "unavailable"}`).join("; ");
     return no(`No runtime can run this mode (${reasons || "none detected"}).`);
   }
+  // hybrid may hand some tasks to an Agent Teams lead — only when Agent Teams are usable
+  if (mode === "hybrid" && agentTeamsUsable(env)) runtimes.push("agent_team_pty");
   return { available: true, runtimes, unavailableReason: null, howToEnable: null };
 }
 
@@ -96,11 +109,11 @@ function reasonFor(mode: ExecutionMode, goals: number, analysis: TaskAnalysis): 
         ? `One primary session delegates ${goals} sub-goals to specialised agents and integrates the result; cheaper but sequential. Suggested strategy: plan_first.`
         : `A single focused goal (${c} complexity) fits one primary session that delegates to specialists and reviews the result. Suggested strategy: direct.`;
     case "agent_teams":
-      return "Native Claude Code Agent Teams: a lead coordinates teammates with a shared task list.";
+      return "Native Claude Code Agent Teams: an interactive lead (its terminal is shown in Nexora) spawns teammates that coordinate through a shared task list and messages. Team state is polled best effort.";
     case "workflow":
       return "Repeatable, versioned step graph with approvals and retries.";
     case "hybrid":
-      return "Combines mechanisms per task and explains which one runs each task.";
+      return "Chooses a mechanism per task (own session, subagents, or an Agent Teams lead when available) and explains each choice in the plan.";
   }
 }
 

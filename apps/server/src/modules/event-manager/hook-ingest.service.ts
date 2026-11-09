@@ -39,6 +39,7 @@ function agentObservation(p: HookPayload): AgentObservation {
  */
 export class HookIngestService {
   private readonly now: () => number;
+  private readonly observers = new Set<(p: HookPayload) => void>();
 
   constructor(private readonly deps: HookIngestDeps) {
     this.now = deps.now ?? Date.now;
@@ -48,6 +49,15 @@ export class HookIngestService {
   authenticate(token: string | undefined): ProjectRow | undefined {
     if (!token || token.length > MAX_TOKEN_LENGTH) return undefined;
     return this.deps.projects.findByTokenHash(hashToken(token));
+  }
+
+  /**
+   * Extra consumer of every accepted payload, after the projection (e.g. the Agent Teams PTY
+   * adapter, which folds hooks of the leads it started into their team). Returns an unsubscribe.
+   */
+  addObserver(fn: (p: HookPayload) => void): () => void {
+    this.observers.add(fn);
+    return () => this.observers.delete(fn);
   }
 
   ingest(project: ProjectRow, p: HookPayload): void {
@@ -70,6 +80,13 @@ export class HookIngestService {
       for (const e of normalizeHook(p, { parentAgentId })) this.deps.store.append({ ...e, ts });
     } catch (err) {
       this.deps.logger.error({ err, ...log }, "hook event append failed");
+    }
+    for (const fn of this.observers) {
+      try {
+        fn(p);
+      } catch (err) {
+        this.deps.logger.error({ err, ...log }, "hook observer failed");
+      }
     }
   }
 }

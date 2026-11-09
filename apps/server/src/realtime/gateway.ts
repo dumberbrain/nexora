@@ -42,7 +42,54 @@ export interface Gateway {
 
 const REPLAY_CHUNK = 500;
 
-function readCookie(header: string | undefined, name: string): string | undefined {
+/** What socketAuth stores on `socket.data`. */
+export interface SocketAuthData {
+  actor?: string;
+  /** API-token scope; absent for the session cookie and the env token (full access) */
+  scope?: "read" | "control";
+}
+
+export type SocketAuthOptions = Pick<GatewayOptions, "keys" | "envToken" | "verifyApiToken">;
+
+/**
+ * Handshake auth shared by every namespace (/live, /terminal): a bearer token (env token or API
+ * token) or the loopback session cookie. Sets `socket.data.actor` for auditing.
+ */
+export function socketAuth(
+  opts: SocketAuthOptions,
+): (
+  socket: { handshake: Socket["handshake"]; data: unknown },
+  next: (err?: Error) => void,
+) => void {
+  return (socket, next) => {
+    const data = socket.data as SocketAuthData;
+    const auth = socket.handshake.auth as { token?: unknown } | undefined;
+    const token =
+      (typeof auth?.token === "string" ? auth.token : undefined) ??
+      bearerToken(socket.handshake.headers.authorization);
+    if (token) {
+      if (opts.envToken && safeEqual(token, opts.envToken)) {
+        data.actor = "user";
+        return next();
+      }
+      const api = opts.verifyApiToken?.(token);
+      if (api) {
+        data.actor = `mcp_client:${api.name}`;
+        data.scope = api.scope;
+        return next();
+      }
+      return next(new Error("auth: invalid token"));
+    }
+    const cookie = readCookie(socket.handshake.headers.cookie, SESSION_COOKIE);
+    if (safeEqual(cookie, opts.keys.session)) {
+      data.actor = "user";
+      return next();
+    }
+    return next(new Error("auth: session required"));
+  };
+}
+
+export function readCookie(header: string | undefined, name: string): string | undefined {
   for (const part of (header ?? "").split(";")) {
     const [k, ...v] = part.trim().split("=");
     if (k === name) return decodeURIComponent(v.join("="));
@@ -87,20 +134,7 @@ export function createGateway(opts: GatewayOptions): Gateway {
   });
   const live = io.of(LIVE_NAMESPACE);
 
-  live.use((socket, next) => {
-    const auth = socket.handshake.auth as { token?: unknown } | undefined;
-    const token =
-      (typeof auth?.token === "string" ? auth.token : undefined) ??
-      bearerToken(socket.handshake.headers.authorization);
-    if (token) {
-      if (opts.envToken && safeEqual(token, opts.envToken)) return next();
-      if (opts.verifyApiToken?.(token)) return next();
-      return next(new Error("auth: invalid token"));
-    }
-    const cookie = readCookie(socket.handshake.headers.cookie, SESSION_COOKIE);
-    if (safeEqual(cookie, opts.keys.session)) return next();
-    return next(new Error("auth: session required"));
-  });
+  live.use(socketAuth(opts));
 
   live.on("connection", (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
     socket.on("subscribe", (raw, ack) => {

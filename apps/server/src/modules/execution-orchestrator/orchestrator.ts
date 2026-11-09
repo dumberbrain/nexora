@@ -24,9 +24,12 @@ import { type ConsentService } from "./consent.service";
 import { assertExecutionTransition, isTerminalExecution } from "./execution-state";
 import { type ExecutionPatch, type ExecutionRepository } from "./execution.repository";
 import { adviseModes } from "./mode-advisor";
+import { agentTeamsGate, agentTeamsPrompt, TEAM_KEY } from "./modes/agent-teams";
+import { hybridDispatch } from "./modes/hybrid";
 import { filesOwnedBy, taskPrompt } from "./modes/multi-session";
 import { subagentDefinitions, subagentsGate, subagentsPrompt, unionScope } from "./modes/subagents";
 import { detectConflicts } from "./planner/conflict-detector";
+import { planHybrid } from "./planner/hybrid-planner";
 import { heuristicPlan, parsePlanOutput, planPrompt } from "./planner/planner";
 import { buildQuestions } from "./questions";
 import { nextStarts, unreachableTasks } from "./scheduler";
@@ -92,7 +95,10 @@ export interface SessionLocation {
 type SessionStart = Pick<
   StartSessionInput,
   "cwd" | "projectRoot" | "prompt" | "ownedPaths" | "agents" | "maxBudgetUsd" | "resumeSessionId"
->;
+> & {
+  /** runtime to start on (default: the RuntimeManager default) — agent_team_pty for team leads */
+  runtime?: RuntimeKind;
+};
 
 export const RESTART_PROMPT =
   "Nexora restarted this session. Continue with your task from where you left off.";
@@ -115,7 +121,7 @@ interface LiveSession {
 }
 
 interface LiveExecution {
-  /** key: task id (multi-session) or "*" (subagents) */
+  /** key: task id (one session per task), "*" (subagents batch) or "*team" (Agent Teams lead) */
   sessions: Map<string, LiveSession>;
   worktreePaths: Set<string>;
   stopping: boolean;
@@ -450,6 +456,15 @@ export class Orchestrator {
         planned = parsePlanOutput(text);
       } else {
         planned = heuristicPlan({ prompt: e.prompt, sequential });
+      }
+      if (e.mode === "hybrid") {
+        const teams = (await this.modes(id)).find((m) => m.mode === "agent_teams");
+        planned = planHybrid(planned, {
+          agentTeams: {
+            available: teams?.available === true,
+            reason: teams?.unavailableReason ?? null,
+          },
+        });
       }
       const items = this.deps.tasks.createPlan(id, e.mode, planned);
       const next =
@@ -801,6 +816,8 @@ export class Orchestrator {
       this.deps.tasks.transition(id, tid, "cancelled");
     }
     if (e.mode === "subagents") await this.tickSubagents(e);
+    else if (e.mode === "agent_teams") await this.tickAgentTeams(e);
+    else if (e.mode === "hybrid") await this.tickHybrid(e);
     else await this.tickMultiSession(e);
     await this.maybeFinish(id);
   }
@@ -817,22 +834,33 @@ export class Orchestrator {
     const root = this.deps.projects.getRow(e.projectId).rootPath;
     for (const s of starts) {
       const task = tasks.find((t) => t.id === s.taskId) as Task;
-      this.assign(e.id, task);
-      try {
-        const cwd =
-          s.workspace === "task"
-            ? await this.deps.worktrees.taskWorktree(root, e.id, task.id)
-            : this.worktreeOf(e);
-        this.liveOf(e.id).worktreePaths.add(cwd);
-        await this.startSession(e, [task.id], task.id, {
-          cwd,
-          projectRoot: root,
-          prompt: taskPrompt(e, task, tasks),
-          ownedPaths: task.ownedPaths.includes("**") ? [] : task.ownedPaths,
-        });
-      } catch (err) {
-        this.failStart(e.id, [task.id], err);
-      }
+      await this.startTaskSession(e, task, s.workspace, tasks, root);
+    }
+  }
+
+  /** One managed session for one task (multi-session mode and hybrid `multi_session` tasks). */
+  private async startTaskSession(
+    e: Execution,
+    task: Task,
+    workspace: "execution" | "task",
+    tasks: readonly Task[],
+    root: string,
+  ): Promise<void> {
+    this.assign(e.id, task);
+    try {
+      const cwd =
+        workspace === "task"
+          ? await this.deps.worktrees.taskWorktree(root, e.id, task.id)
+          : this.worktreeOf(e);
+      this.liveOf(e.id).worktreePaths.add(cwd);
+      await this.startSession(e, [task.id], task.id, {
+        cwd,
+        projectRoot: root,
+        prompt: taskPrompt(e, task, tasks),
+        ownedPaths: task.ownedPaths.includes("**") ? [] : task.ownedPaths,
+      });
+    } catch (err) {
+      this.failStart(e.id, [task.id], err);
     }
   }
 
@@ -840,8 +868,72 @@ export class Orchestrator {
     if (this.liveOf(e.id).sessions.has(SUBAGENTS_KEY)) return;
     const tasks = this.deps.tasks.list(e.id);
     if (subagentsGate(tasks) !== "start") return;
-    const queued = tasks.filter((t) => t.status === "queued");
     const root = this.deps.projects.getRow(e.projectId).rootPath;
+    await this.startSubagents(
+      e,
+      tasks.filter((t) => t.status === "queued"),
+      root,
+    );
+  }
+
+  /** Agent Teams mode: every queued task goes to ONE interactive lead in the execution worktree. */
+  private async tickAgentTeams(e: Execution): Promise<void> {
+    if (this.liveOf(e.id).sessions.has(TEAM_KEY)) return;
+    const tasks = this.deps.tasks.list(e.id);
+    if (agentTeamsGate(tasks) !== "start") return;
+    const root = this.deps.projects.getRow(e.projectId).rootPath;
+    await this.startTeam(
+      e,
+      tasks.filter((t) => t.status === "queued"),
+      root,
+    );
+  }
+
+  /**
+   * Hybrid mode: the scheduler picks this round's tasks (dependencies, approvals, slots); each
+   * runs on the mechanism the hybrid planner chose. A batch mechanism that is already running
+   * picks its next tasks up in a later round.
+   */
+  private async tickHybrid(e: Execution): Promise<void> {
+    const tasks = this.deps.tasks.list(e.id);
+    const starts = nextStarts({
+      tasks,
+      conflicts: this.conflictsOf(e, tasks),
+      approvedRiskyTaskIds: this.deps.approvals.approvedTaskIds(e.id),
+      maxParallelSessions: e.config.maxParallelSessions,
+      sequential: e.config.parallelism === "sequential",
+    });
+    const root = this.deps.projects.getRow(e.projectId).rootPath;
+    const plan = hybridDispatch(starts, tasks);
+    for (const { task, workspace } of plan.sessions) {
+      await this.startTaskSession(e, task, workspace, tasks, root);
+    }
+    const live = this.liveOf(e.id).sessions;
+    if (plan.subagents.length > 0 && !live.has(SUBAGENTS_KEY)) {
+      await this.startSubagents(e, plan.subagents, root);
+    }
+    if (plan.team.length > 0 && !live.has(TEAM_KEY)) {
+      await this.startTeam(e, plan.team, root);
+    }
+  }
+
+  private async startTeam(e: Execution, queued: Task[], root: string): Promise<void> {
+    for (const t of queued) this.assign(e.id, t);
+    const ids = queued.map((t) => t.id);
+    try {
+      await this.startSession(e, ids, TEAM_KEY, {
+        cwd: this.worktreeOf(e),
+        projectRoot: root,
+        prompt: agentTeamsPrompt(e, queued),
+        ownedPaths: unionScope(queued),
+        runtime: "agent_team_pty",
+      });
+    } catch (err) {
+      this.failStart(e.id, ids, err);
+    }
+  }
+
+  private async startSubagents(e: Execution, queued: Task[], root: string): Promise<void> {
     for (const t of queued) this.assign(e.id, t);
     const ids = queued.map((t) => t.id);
     try {
@@ -877,10 +969,12 @@ export class Orchestrator {
     input: SessionStart,
     opts: { restart?: boolean } = {},
   ): Promise<LiveSession> {
-    const taskId = key === SUBAGENTS_KEY ? null : key;
+    const taskId = key.startsWith("*") ? null : key;
+    const { runtime, ...start } = input;
     const handle = await this.deps.runtime.startManagedSession(
       {
-        ...input,
+        ...start,
+        ...(runtime ? { runtime } : {}),
         executionId: e.id,
         taskId,
         executionMode: e.mode ?? "multi_session",
@@ -918,7 +1012,39 @@ export class Orchestrator {
       }
     }
     this.watch(e.id, key, live);
+    handle.onWaitingForInput?.((waiting) => this.onWaitingForInput(e.id, key, live, waiting));
     return live;
+  }
+
+  /**
+   * An interactive lead shows a start-up dialog (workspace trust, new MCP servers): Nexora never
+   * answers it, so the lead's tasks wait for the user (in the terminal) until it is answered.
+   */
+  private onWaitingForInput(
+    executionId: string,
+    key: string,
+    live: LiveSession,
+    waiting: boolean,
+  ): void {
+    this.background(executionId, "start-up dialog handling", () => {
+      if (this.live.get(executionId)?.sessions.get(key) !== live) return Promise.resolve();
+      for (const id of live.taskIds) {
+        const t = this.deps.tasks.get(executionId, id);
+        if (waiting && t.status === "running") {
+          this.deps.tasks.transition(executionId, id, "waiting_for_input", {
+            sessionId: live.sessionId,
+            event: {
+              type: "agent.waiting",
+              summary: `${id} waits for you to answer a Claude Code start-up question in the lead's terminal`,
+              payload: { reason: "startup_dialog" },
+            },
+          });
+        } else if (!waiting && t.status === "waiting_for_input" && !live.held) {
+          this.deps.tasks.transition(executionId, id, "running", { sessionId: live.sessionId });
+        }
+      }
+      return Promise.resolve();
+    });
   }
 
   /** React to the end of the session's current turn (`done` is per turn). */
@@ -1039,7 +1165,11 @@ export class Orchestrator {
           (id) => this.deps.tasks.get(executionId, id).status === "waiting_for_input",
         );
       if (hold) live.held = true;
-      else state.sessions.delete(key);
+      else {
+        state.sessions.delete(key);
+        // an interactive team lead keeps its process after the team finished — end it
+        if (live.handle.kind === "agent_team_pty") await this.stopHandle(executionId, live.handle);
+      }
       await this.tick(executionId);
     });
   }

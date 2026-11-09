@@ -171,6 +171,21 @@ describe("POST /api/v1/hooks/ingest — auth and validation", () => {
     expect((await postHook(h, body, token, local)).status).toBe(200);
   });
 
+  it("hands accepted payloads to observers (Agent Teams leads); a failing observer is isolated", async () => {
+    const seenByObserver: string[] = [];
+    h.services.ingest.addObserver(() => {
+      throw new Error("observer boom");
+    });
+    const off = h.services.ingest.addObserver((p) => seenByObserver.push(p.hook_event_name));
+    expect((await postHook(h, body, token)).status).toBe(200);
+    expect(seenByObserver).toEqual(["Stop"]);
+    off();
+    await postHook(h, body, token);
+    expect(seenByObserver).toHaveLength(1);
+    expect((await postHook(h, body, undefined)).status).toBe(401);
+    expect(seenByObserver).toHaveLength(1);
+  });
+
   it("accepts unknown hook events without failing", async () => {
     const res = await postHook(h, { ...body, hook_event_name: "SomethingNew" }, token);
     expect(res.status).toBe(200);
