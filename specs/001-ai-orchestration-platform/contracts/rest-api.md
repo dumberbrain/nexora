@@ -88,7 +88,12 @@ Pagination: cursor-based `?cursor=<ULID>&limit=1..200` → `{ items, nextCursor 
 | GET/POST | `/workflows` | list / create definition |
 | GET | `/workflows/:id/versions` | |
 | POST | `/workflows/:id/versions` | save new immutable version (graph validated) |
-| POST | `/workflows/:id/versions/:v/run` | `{ projectId }` → creates execution (mode `workflow`) |
+| GET | `/workflows/:id` | definition + latest version |
+| POST | `/workflows/validate` | `{ graph }` → `{ valid, issues[] }` (no save) |
+| POST | `/workflows/:id/versions/:v/run` | `{ projectId, prompt? }` → 201 `{ executionId, run }` (execution mode `workflow`) |
+| GET | `/executions/:id/workflow-run` | run + version + latest node runs (live overlay) |
+
+Node `config` is validated per kind (`NODE_CONFIG_SCHEMAS` in contracts/api/workflows.ts). Invalid graphs return 400 `VALIDATION_FAILED` with `details: GraphValidation`.
 
 ## Integrations & GitHub
 
