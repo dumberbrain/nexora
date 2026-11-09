@@ -19,7 +19,15 @@ export interface DiscoveredMcpServer {
   url: string | null;
   envKeyCount: number;
   headerKeyCount: number;
+  /** env / header key NAMES (never values) — only with `{ keyNames: true }` */
+  envKeys?: string[];
+  headerKeys?: string[];
   sourcePath: string;
+}
+
+export interface McpDiscoveryOptions {
+  /** also return env/header key names (values are never read into the result) */
+  keyNames?: boolean;
 }
 
 const MAX_FILE_BYTES = 4 * 1024 * 1024;
@@ -62,6 +70,7 @@ function toServers(
   raw: Record<string, unknown> | undefined,
   scope: DiscoveredMcpServer["scope"],
   sourcePath: string,
+  opts: McpDiscoveryOptions,
 ): DiscoveredMcpServer[] {
   const out: DiscoveredMcpServer[] = [];
   for (const [name, value] of Object.entries(raw ?? {})) {
@@ -77,6 +86,12 @@ function toServers(
       url: s.url ? redactString(s.url) : null,
       envKeyCount: Object.keys(s.env ?? {}).length,
       headerKeyCount: Object.keys(s.headers ?? {}).length,
+      ...(opts.keyNames
+        ? {
+            envKeys: Object.keys(s.env ?? {}).map(redactString),
+            headerKeys: Object.keys(s.headers ?? {}).map(redactString),
+          }
+        : {}),
       sourcePath,
     });
   }
@@ -92,18 +107,21 @@ function samePath(a: string, b: string): boolean {
   return n(a) === n(b);
 }
 
-export async function discoverMcpServers(roots: {
-  projectRoot: string;
-  homeDir: string;
-}): Promise<DiscoveredMcpServer[]> {
-  const projectFile = join(roots.projectRoot, ".mcp.json");
+export async function discoverMcpServers(
+  /** `projectRoot: null` → user-level servers only (no project file, no per-project block) */
+  roots: { projectRoot: string | null; homeDir: string },
+  opts: McpDiscoveryOptions = {},
+): Promise<DiscoveredMcpServer[]> {
+  const { projectRoot } = roots;
   const userFile = join(roots.homeDir, ".claude.json");
-  const project = await readJson(projectFile);
   const user = await readJson(userFile);
-  const local = Object.entries(user?.projects ?? {}).find(([p]) => samePath(p, roots.projectRoot));
+  if (projectRoot === null) return toServers(user?.mcpServers, "user", userFile, opts);
+  const projectFile = join(projectRoot, ".mcp.json");
+  const project = await readJson(projectFile);
+  const local = Object.entries(user?.projects ?? {}).find(([p]) => samePath(p, projectRoot));
   return [
-    ...toServers(project?.mcpServers, "project", projectFile),
-    ...toServers(user?.mcpServers, "user", userFile),
-    ...toServers(local?.[1].mcpServers, "user", userFile),
+    ...toServers(project?.mcpServers, "project", projectFile, opts),
+    ...toServers(user?.mcpServers, "user", userFile, opts),
+    ...toServers(local?.[1].mcpServers, "user", userFile, opts),
   ];
 }
