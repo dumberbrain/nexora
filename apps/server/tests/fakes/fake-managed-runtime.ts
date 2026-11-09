@@ -18,6 +18,7 @@ import {
   type SessionResult,
   type StartSessionInput,
 } from "../../src/modules/runtime-manager/runtime-adapter";
+import { type SessionRepository } from "../../src/modules/session-manager/session.repository";
 
 export type StartInput = StartSessionInput & {
   executionMode: ExecutionMode;
@@ -71,13 +72,19 @@ export function fakeEnvironment(opts: { agentTeams?: boolean } = {}): RuntimeEnv
   };
 }
 
+/**
+ * One fake session. `done` is per turn like the real adapters: a message sent after the turn
+ * ended (e.g. after an interrupt) opens a new turn.
+ */
 export class FakeSession implements SessionHandle {
   readonly kind: RuntimeKind = "agent_sdk";
   readonly sessionId: Promise<string>;
-  readonly done: Promise<SessionResult>;
   readonly sent: string[] = [];
   stopped = false;
+  interrupts = 0;
+  private turn!: Promise<SessionResult>;
   private resolveDone!: (r: SessionResult) => void;
+  private settled = false;
 
   constructor(
     readonly id: string,
@@ -85,30 +92,47 @@ export class FakeSession implements SessionHandle {
     readonly approvals: ApprovalGate,
     readonly onTurnTimeout: ((info: { sessionId: string; taskId: string | null }) => void) | null,
     private readonly sendSupported: boolean,
+    private readonly owner: FakeManagedRuntime | null = null,
   ) {
     this.sessionId = Promise.resolve(id);
-    this.done = new Promise((resolve) => (this.resolveDone = resolve));
+    this.openTurn();
+  }
+
+  get done(): Promise<SessionResult> {
+    return this.turn;
   }
 
   finish(outcome: SessionOutcome, resultText: string | null = "done", error: string | null = null) {
+    if (this.settled) return;
+    this.settled = true;
     this.resolveDone({ outcome, sessionId: this.id, resultText, usage: null, error });
   }
 
   stop(): Promise<void> {
     this.stopped = true;
+    if (this.owner?.hangStop) return new Promise<void>(() => undefined);
     this.finish("stopped", null);
+    this.owner?.patchRow(this.id, { status: "stopped", endedAt: Date.now() });
     return Promise.resolve();
   }
 
   interrupt(): Promise<void> {
+    this.interrupts += 1;
     this.finish("interrupted", null);
     return Promise.resolve();
   }
 
   sendMessage(text: string): Promise<void> {
     if (!this.sendSupported) throw new CapabilityUnsupportedError(this.kind, "sendMessage");
+    if (this.stopped) return Promise.reject(new Error("session is stopped"));
     this.sent.push(text);
+    if (this.settled) this.openTurn();
     return Promise.resolve();
+  }
+
+  private openTurn(): void {
+    this.settled = false;
+    this.turn = new Promise((resolve) => (this.resolveDone = resolve));
   }
 
   setPermissionMode(): Promise<void> {
@@ -124,6 +148,12 @@ export class FakeManagedRuntime implements ManagedRuntime {
   env: RuntimeEnvironment = fakeEnvironment();
   sendSupported = true;
   failNextStart: Error | null = null;
+  /** when set, every started session gets a session row (like RuntimeManager) */
+  rows: Pick<SessionRepository, "get" | "insert" | "update"> | null = null;
+  /** capabilities written to those rows */
+  rowCapabilities: RuntimeCapabilityProfile = capabilityProfile();
+  /** stop() never resolves (a hung runtime) */
+  hangStop = false;
   private seq = 0;
 
   environment(): Promise<RuntimeEnvironment> {
@@ -150,8 +180,32 @@ export class FakeManagedRuntime implements ManagedRuntime {
       deps.approvals,
       deps.onTurnTimeout ?? null,
       this.sendSupported,
+      this,
     );
     this.sessions.push(s);
+    if (this.rows) {
+      const ts = Date.now();
+      this.rows.insert({
+        id,
+        executionId: input.executionId,
+        executionMode: input.executionMode,
+        currentTaskId: input.taskId,
+        projectId: null,
+        runtime: this.rowCapabilities.runtime,
+        observeOnly: false,
+        cwd: input.cwd,
+        gitBranch: null,
+        worktreePath: input.cwd,
+        model: null,
+        status: "running",
+        capabilities: this.rowCapabilities,
+        pid: null,
+        usage: null,
+        lastActivityAt: ts,
+        startedAt: ts,
+        endedAt: null,
+      });
+    }
     return Promise.resolve(s);
   }
 
@@ -166,6 +220,10 @@ export class FakeManagedRuntime implements ManagedRuntime {
 
   stopAll(): Promise<void> {
     return Promise.all(this.sessions.map((s) => s.stop())).then(() => undefined);
+  }
+
+  patchRow(id: string, patch: Parameters<SessionRepository["update"]>[1]): void {
+    if (this.rows?.get(id)) this.rows.update(id, patch);
   }
 
   /** the session started for a task (latest attempt) */

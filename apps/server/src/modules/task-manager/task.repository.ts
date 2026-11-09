@@ -45,6 +45,21 @@ export class TaskRepository {
     });
   }
 
+  /** Add one task (and its dependency edges) to an existing plan. */
+  insert(t: Task): void {
+    const { dependsOn, testResults, ...row } = t;
+    this.db.transaction((tx) => {
+      tx.insert(tasks)
+        .values({ ...row, testResults: toDbTestResults(testResults) ?? null })
+        .run();
+      for (const dep of dependsOn) {
+        tx.insert(taskDependencies)
+          .values({ executionId: t.executionId, taskId: t.id, dependsOnTaskId: dep })
+          .run();
+      }
+    });
+  }
+
   list(executionId: string): Task[] {
     const deps = this.db
       .select()

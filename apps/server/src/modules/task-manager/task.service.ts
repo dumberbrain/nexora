@@ -18,6 +18,22 @@ export interface TaskServiceDeps {
   now?: () => number;
 }
 
+/** Fields of a task added to a running plan; the service fills id, status and progress. */
+export type NewTask = Pick<
+  Task,
+  | "title"
+  | "description"
+  | "assignedAgentRole"
+  | "mode"
+  | "mechanismReason"
+  | "priority"
+  | "dependsOn"
+  | "ownedPaths"
+  | "riskClass"
+  | "attempt"
+  | "previousAttemptId"
+>;
+
 export interface TransitionOptions {
   /** extra fields written with the status change */
   patch?: TaskPatch;
@@ -79,6 +95,45 @@ export class TaskService {
       this.deps.emitter.entity("task", `${executionId}:${t.id}`, { ...t });
     }
     return tasks;
+  }
+
+  /**
+   * Add a task to a running plan (US3: assign, retry, review). The id is the next `T-<n>`, the
+   * status `pending`; the DAG of the whole plan is re-validated (VALIDATION_FAILED otherwise).
+   */
+  add(executionId: string, input: NewTask): Task {
+    const existing = this.list(executionId);
+    const next = Math.max(0, ...existing.map((t) => Number(t.id.slice(2)) || 0)) + 1;
+    const task: Task = {
+      ...input,
+      id: `T-${next}`,
+      executionId,
+      agentId: null,
+      status: "pending",
+      changedFiles: [],
+      testResults: null,
+      startedAt: null,
+      completedAt: null,
+    };
+    validateDag([...existing, task]);
+    this.deps.repo.insert(task);
+    this.deps.emitter.event({
+      type: "task.created",
+      executionId,
+      taskId: task.id,
+      summary: `${task.id} created: ${task.title}`,
+      payload: {
+        title: task.title,
+        role: task.assignedAgentRole,
+        riskClass: task.riskClass,
+        dependsOn: task.dependsOn,
+        ownedPaths: task.ownedPaths,
+        attempt: task.attempt,
+        previousAttemptId: task.previousAttemptId,
+      },
+    });
+    this.deps.emitter.entity("task", `${executionId}:${task.id}`, { ...task });
+    return task;
   }
 
   list(executionId: string): Task[] {

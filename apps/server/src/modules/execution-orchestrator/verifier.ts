@@ -26,9 +26,13 @@ export async function buildVerification(input: VerificationInput): Promise<Verif
       /* a removed or broken worktree must not hide the rest of the summary */
     }
   }
+  // a failed attempt that was retried is superseded by its newer attempt (US3 retry)
+  const superseded = new Set(input.tasks.map((t) => t.previousAttemptId));
   return {
     completedTaskIds: input.tasks.filter((t) => t.status === "completed").map((t) => t.id),
-    failedTaskIds: input.tasks.filter((t) => t.status === "failed").map((t) => t.id),
+    failedTaskIds: input.tasks
+      .filter((t) => t.status === "failed" && !superseded.has(t.id))
+      .map((t) => t.id),
     changedFiles: [...files].sort(),
     testResults: input.testOutput ? parseTestSummary(input.testOutput) : null,
   };

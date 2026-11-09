@@ -11,6 +11,7 @@ import {
   type ModeOption,
   type PlanConflict,
   type Question,
+  type RuntimeKind,
   type SetModeInput,
   type Task,
   type Verification,
@@ -32,6 +33,7 @@ import { buildVerification } from "./verifier";
 import { type WorktreeProvider } from "./worktree-provider";
 import { AppError } from "../../http/errors";
 import { type Logger } from "../../lib/logger";
+import { settleWithin } from "../../lib/timeout";
 import { newId } from "../../lib/ulid";
 import { type CommunicationService } from "../communication-manager/communication.service";
 import { type DomainEmitter } from "../event-manager/domain-emitter";
@@ -63,7 +65,36 @@ export interface OrchestratorDeps {
   logger: Logger;
   homeDir: string;
   now?: () => number;
+  /** cap for stopping/interrupting runtimes (default 4 500 ms; execution stop must take ≤ 5 s) */
+  stopTimeoutMs?: number;
 }
+
+/** A live managed session as seen by the US3 controls. */
+export interface LiveSessionInfo {
+  /** task id (multi-session) or "*" (subagents) */
+  key: string;
+  sessionId: string | null;
+  taskIds: readonly string[];
+  /** interrupted and held (Interrupt & hold) — resume continues it */
+  held: boolean;
+  kind: RuntimeKind;
+}
+
+/** Where a managed session lives in the orchestrator (the task→session mapping). */
+export interface SessionLocation {
+  executionId: string;
+  key: string;
+  taskIds: readonly string[];
+  held: boolean;
+}
+
+type SessionStart = Pick<
+  StartSessionInput,
+  "cwd" | "projectRoot" | "prompt" | "ownedPaths" | "agents" | "maxBudgetUsd" | "resumeSessionId"
+>;
+
+export const RESTART_PROMPT =
+  "Nexora restarted this session. Continue with your task from where you left off.";
 
 export interface ConsentInput {
   consent: boolean;
@@ -76,6 +107,10 @@ interface LiveSession {
   taskIds: string[];
   cwd: string;
   sessionId: string | null;
+  /** what the session was started with (restart reuses it) */
+  start: SessionStart;
+  /** interrupted turn kept open: the session is alive and its tasks wait for input */
+  held: boolean;
 }
 
 interface LiveExecution {
@@ -107,9 +142,12 @@ export class Orchestrator {
   private readonly now: () => number;
   private closed = false;
   private readonly offDecided: () => void;
+  /** cap for one runtime stop/interrupt call */
+  readonly stopTimeoutMs: number;
 
   constructor(private readonly deps: OrchestratorDeps) {
     this.now = deps.now ?? Date.now;
+    this.stopTimeoutMs = deps.stopTimeoutMs ?? 4500;
     this.offDecided = deps.approvals.onDecided((a) => this.onApprovalDecided(a));
   }
 
@@ -392,7 +430,15 @@ export class Orchestrator {
     return result;
   }
 
+  /**
+   * Stop every runtime of the execution and cancel its open work. Each runtime gets at most
+   * `stopTimeoutMs` (all in parallel), so the whole stop finishes within 5 s even when a runtime
+   * hangs (FR-031).
+   */
   stop(id: string, actor: string): Promise<Execution> {
+    // stop scheduling right away, even while earlier work still occupies the chain
+    const early = this.live.get(id);
+    if (early) early.stopping = true;
     return this.serial(id, async () => {
       const e = this.get(id);
       if (isTerminalExecution(e.status)) {
@@ -400,13 +446,7 @@ export class Orchestrator {
       }
       const live = this.liveOf(id);
       live.stopping = true;
-      await Promise.all(
-        [...live.sessions.values()].map((s) =>
-          s.handle.stop().catch((err: unknown) => {
-            this.deps.logger.warn({ err, executionId: id }, "stopping a session failed");
-          }),
-        ),
-      );
+      await Promise.all([...live.sessions.values()].map((s) => this.stopHandle(id, s.handle)));
       live.sessions.clear();
       for (const t of this.deps.tasks.list(id)) {
         if (!isTerminalTask(t.status)) this.deps.tasks.transition(id, t.id, "cancelled");
@@ -428,6 +468,177 @@ export class Orchestrator {
     this.closed = true;
     this.offDecided();
     await Promise.allSettled([...this.chains.values()]);
+  }
+
+  // ---------------------------------------------------------------- control hooks (US3)
+
+  /** Run `fn` on the execution's serial chain, never interleaved with scheduling. */
+  exclusive<T>(id: string, fn: () => Promise<T> | T): Promise<T> {
+    return this.serial(id, fn);
+  }
+
+  /** Schedule a round after a control changed tasks (cancel, retry, assign). */
+  schedule(id: string): void {
+    this.kick(id);
+  }
+
+  /** Plan conflicts for a task list of this execution (same resolution as the scheduler). */
+  conflicts(e: Execution, tasks: readonly Task[]): PlanConflict[] {
+    return this.conflictsOf(e, tasks);
+  }
+
+  liveSessions(id: string): LiveSessionInfo[] {
+    return [...(this.live.get(id)?.sessions ?? new Map<string, LiveSession>()).entries()].map(
+      ([key, s]) => ({
+        key,
+        sessionId: s.sessionId,
+        taskIds: [...s.taskIds],
+        held: s.held,
+        kind: s.handle.kind,
+      }),
+    );
+  }
+
+  /** The execution and tasks a live managed session works on; null when not orchestrated. */
+  locateSession(sessionId: string): SessionLocation | null {
+    const handle = this.deps.runtime.getHandle(sessionId);
+    for (const [executionId, state] of this.live) {
+      for (const [key, s] of state.sessions) {
+        if (s.sessionId === sessionId || (handle !== undefined && s.handle === handle)) {
+          return { executionId, key, taskIds: [...s.taskIds], held: s.held };
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * "Interrupt & hold" (API `pause`): interrupt every live turn, keep the sessions, stop
+   * scheduling. Capability checks are the caller's job (controls.ts).
+   */
+  pause(id: string): Promise<Execution> {
+    return this.serial(id, async () => {
+      const e = this.get(id);
+      if (e.status !== "running") {
+        throw new AppError("CONFLICT", `Execution is ${e.status}; only a running one can be held`);
+      }
+      const live = [...this.liveOf(id).sessions.values()].filter((s) => !s.held);
+      await Promise.all(live.map((s) => this.bounded(id, s.handle.interrupt(), "interrupt")));
+      return this.setStatus(e, "paused");
+    });
+  }
+
+  /** Continue a held execution: every held session gets `text` and its tasks run again. */
+  resume(id: string, text: string): Promise<Execution> {
+    const result = this.serial(id, async () => {
+      const e = this.get(id);
+      if (e.status !== "paused") {
+        throw new AppError("CONFLICT", `Execution is ${e.status}; only a held one can resume`);
+      }
+      const running = this.setStatus(e, "running");
+      for (const [key, s] of this.liveOf(id).sessions) {
+        if (s.held) await this.resumeLive(id, key, s, text);
+      }
+      return running;
+    });
+    void result.then(
+      () => this.kick(id),
+      () => undefined,
+    );
+    return result;
+  }
+
+  /**
+   * Remove a task from its live session (cancel). A session left without tasks is stopped.
+   * Call inside {@link exclusive}.
+   */
+  async detachTask(executionId: string, taskId: string): Promise<void> {
+    const state = this.live.get(executionId);
+    if (!state) return;
+    for (const [key, s] of [...state.sessions]) {
+      if (!s.taskIds.includes(taskId)) continue;
+      s.taskIds = s.taskIds.filter((t) => t !== taskId);
+      if (s.taskIds.length === 0) {
+        state.sessions.delete(key);
+        await this.stopHandle(executionId, s.handle);
+      }
+    }
+  }
+
+  /** Stop one orchestrated session; its open tasks fail (reason `stopped`, retryable). */
+  async stopSession(sessionId: string): Promise<boolean> {
+    const loc = this.locateSession(sessionId);
+    if (!loc) return false;
+    const { executionId, key } = loc;
+    await this.serial(executionId, async () => {
+      const state = this.liveOf(executionId);
+      const s = state.sessions.get(key);
+      if (!s) return;
+      state.sessions.delete(key);
+      await this.stopHandle(executionId, s.handle);
+      for (const id of s.taskIds) {
+        const t = this.deps.tasks.get(executionId, id);
+        if (isTerminalTask(t.status)) continue;
+        if (t.status !== "running") this.toRunning(executionId, t);
+        this.fail(executionId, id, "stopped", "stopped by the user");
+      }
+      await this.tick(executionId);
+    });
+    return true;
+  }
+
+  /** Resume one held session with `text`. CONFLICT when it is not on hold. */
+  async resumeSession(sessionId: string, text: string): Promise<boolean> {
+    const loc = this.locateSession(sessionId);
+    if (!loc) return false;
+    const { executionId, key } = loc;
+    await this.serial(executionId, async () => {
+      const s = this.liveOf(executionId).sessions.get(key);
+      if (!s?.held) throw new AppError("CONFLICT", "Session is not on hold");
+      await this.resumeLive(executionId, key, s, text);
+    });
+    return true;
+  }
+
+  /**
+   * Restart one orchestrated session: stop the runtime and start a new session for the same
+   * open tasks in the same worktree, resuming the conversation. Resolves with the new session's
+   * id promise (wrapped, so the chain never waits for it); null when not orchestrated.
+   */
+  async restartSession(sessionId: string): Promise<{ sessionId: Promise<string> } | null> {
+    const loc = this.locateSession(sessionId);
+    if (!loc) return null;
+    const { executionId, key } = loc;
+    return this.serial(executionId, async () => {
+      const e = this.get(executionId);
+      if (e.status !== "running" && e.status !== "paused") {
+        throw new AppError("CONFLICT", `Execution is ${e.status}; its sessions cannot restart`);
+      }
+      const state = this.liveOf(executionId);
+      const s = state.sessions.get(key);
+      if (!s) throw new AppError("CONFLICT", "Session is no longer running");
+      const open = s.taskIds.filter((id) => !isTerminalTask(this.deps.tasks.get(e.id, id).status));
+      if (open.length === 0) throw new AppError("CONFLICT", "Session has no open task to restart");
+      state.sessions.delete(key);
+      await this.stopHandle(executionId, s.handle);
+      for (const id of open) this.toRunning(executionId, this.deps.tasks.get(executionId, id));
+      const previous = s.sessionId ?? sessionId;
+      try {
+        const next = await this.startSession(
+          e,
+          open,
+          key,
+          { ...s.start, prompt: RESTART_PROMPT, resumeSessionId: previous },
+          { restart: true },
+        );
+        return { sessionId: next.handle.sessionId };
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        for (const id of open) this.fail(executionId, id, "start_failed", message);
+        await this.maybeFinish(executionId);
+        throw err;
+      }
+    });
   }
 
   // ---------------------------------------------------------------- scheduling
@@ -540,11 +751,9 @@ export class Orchestrator {
     e: Execution,
     taskIds: string[],
     key: string,
-    input: Pick<
-      StartSessionInput,
-      "cwd" | "projectRoot" | "prompt" | "ownedPaths" | "agents" | "maxBudgetUsd"
-    >,
-  ): Promise<void> {
+    input: SessionStart,
+    opts: { restart?: boolean } = {},
+  ): Promise<LiveSession> {
     const taskId = key === SUBAGENTS_KEY ? null : key;
     const handle = await this.deps.runtime.startManagedSession(
       {
@@ -565,21 +774,36 @@ export class Orchestrator {
         onTurnTimeout: () => this.onTurnTimeout(e.id, key),
       },
     );
-    const live: LiveSession = { handle, taskIds, cwd: input.cwd, sessionId: null };
+    const live: LiveSession = {
+      handle,
+      taskIds,
+      cwd: input.cwd,
+      sessionId: null,
+      start: input,
+      held: false,
+    };
     this.liveOf(e.id).sessions.set(key, live);
     void handle.sessionId.then(
       (sid) => (live.sessionId = sid),
       () => undefined,
     );
-    for (const id of taskIds) {
-      this.deps.tasks.transition(e.id, id, "running", {
-        event: { type: "task.started", summary: `${id} started in ${e.mode ?? ""} mode` },
-      });
+    if (!opts.restart) {
+      for (const id of taskIds) {
+        this.deps.tasks.transition(e.id, id, "running", {
+          event: { type: "task.started", summary: `${id} started in ${e.mode ?? ""} mode` },
+        });
+      }
     }
-    handle.done.then(
-      (r) => this.onSessionDone(e.id, key, live, r),
+    this.watch(e.id, key, live);
+    return live;
+  }
+
+  /** React to the end of the session's current turn (`done` is per turn). */
+  private watch(executionId: string, key: string, live: LiveSession): void {
+    live.handle.done.then(
+      (r) => this.onSessionDone(executionId, key, live, r),
       (err: unknown) =>
-        this.onSessionDone(e.id, key, live, {
+        this.onSessionDone(executionId, key, live, {
           outcome: "failed",
           sessionId: live.sessionId,
           resultText: null,
@@ -587,6 +811,39 @@ export class Orchestrator {
           error: err instanceof Error ? err.message : String(err),
         }),
     );
+  }
+
+  /** Send `text` to a held session, run its waiting tasks again and watch the new turn. */
+  private async resumeLive(
+    executionId: string,
+    key: string,
+    live: LiveSession,
+    text: string,
+  ): Promise<void> {
+    await live.handle.sendMessage(text);
+    live.held = false;
+    for (const id of live.taskIds) {
+      const t = this.deps.tasks.get(executionId, id);
+      if (t.status === "waiting_for_input") this.deps.tasks.transition(executionId, id, "running");
+    }
+    this.watch(executionId, key, live);
+  }
+
+  /** handle.stop() bounded by stopTimeoutMs; failures and timeouts are logged, never thrown. */
+  private stopHandle(executionId: string, handle: SessionHandle): Promise<void> {
+    return this.bounded(executionId, handle.stop(), "stop");
+  }
+
+  private async bounded(executionId: string, p: Promise<void>, what: string): Promise<void> {
+    const inTime = await settleWithin(p, this.stopTimeoutMs, (err: unknown) => {
+      this.deps.logger.warn({ err, executionId }, `${what} of a session failed`);
+    });
+    if (!inTime) {
+      this.deps.logger.warn(
+        { executionId, timeoutMs: this.stopTimeoutMs },
+        `${what} of a session timed out`,
+      );
+    }
   }
 
   private failStart(executionId: string, taskIds: string[], err: unknown): void {
@@ -632,11 +889,15 @@ export class Orchestrator {
   ): void {
     this.background(executionId, "handling a finished session", async () => {
       const state = this.liveOf(executionId);
-      if (state.sessions.get(key) === live) state.sessions.delete(key);
+      // a control (stop/restart/cancel) already took this session out and settled its tasks
+      const current = state.sessions.get(key) === live;
       const sid = r.sessionId ?? live.sessionId;
       if (sid) this.deps.approvals.expireForSession(sid);
       const e = this.deps.executions.get(executionId);
-      if (!e || isTerminalExecution(e.status) || state.stopping) return;
+      if (!current || !e || isTerminalExecution(e.status) || state.stopping) {
+        if (current) state.sessions.delete(key);
+        return;
+      }
 
       let changed: string[] = [];
       if (r.outcome === "completed") {
@@ -648,6 +909,14 @@ export class Orchestrator {
         if (t.status !== "running") this.toRunning(executionId, t);
         this.applyOutcome(executionId, t, r, changed, sid);
       }
+      // Interrupt & hold: an interrupted session stays alive while a task waits for input
+      const hold =
+        r.outcome === "interrupted" &&
+        live.taskIds.some(
+          (id) => this.deps.tasks.get(executionId, id).status === "waiting_for_input",
+        );
+      if (hold) live.held = true;
+      else state.sessions.delete(key);
       await this.tick(executionId);
     });
   }

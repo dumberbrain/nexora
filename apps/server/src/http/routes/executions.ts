@@ -44,7 +44,10 @@ function sentConfig(raw: unknown, parsed: ExecutionConfig): Partial<ExecutionCon
   return Object.fromEntries(Object.entries(parsed).filter(([k]) => sent.includes(k)));
 }
 
-/** Executions wizard + run control (T102, contracts/rest-api.md → Executions). */
+/**
+ * Executions wizard (T102, contracts/rest-api.md → Executions). Run controls — stop, pause,
+ * resume — live in ./controls (registerControlRoutes, T113).
+ */
 export function registerExecutionRoutes(
   api: Hono<AppBindings>,
   o: Pick<Orchestration, "orchestrator">,
@@ -98,10 +101,6 @@ export function registerExecutionRoutes(
     const input = ApproveExecutionInputSchema.parse(await bodyOrEmpty(c));
     return c.json<Execution>(await x.approve(c.req.param("id"), input, c.get("actor")));
   });
-
-  api.post("/executions/:id/stop", async (c) =>
-    c.json<Execution>(await x.stop(c.req.param("id"), c.get("actor"))),
-  );
 
   api.get("/executions/:id/verification", async (c) =>
     c.json<Verification>(await x.verification(c.req.param("id"))),

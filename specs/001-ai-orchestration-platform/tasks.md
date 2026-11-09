@@ -211,14 +211,14 @@ testable increment.
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T109 [P] [US3] Unit test `apps/server/tests/unit/runtime-manager/capability-gate.test.ts`: every control on each RuntimeKind matches the capability matrix; unsupported → CAPABILITY_UNSUPPORTED
-- [ ] T110 [P] [US3] Integration test `apps/server/tests/integration/controls.test.ts` (fake adapter): stop ≤ 5 s → `stopped`; retry creates attempt+1 linked via `previousAttemptId`; assign task; request review; messages persisted as Message + event; audit entries for each
+- [X] T109 [P] [US3] Unit test `apps/server/tests/unit/runtime-manager/capability-gate.test.ts`: every control on each RuntimeKind matches the capability matrix; unsupported → CAPABILITY_UNSUPPORTED
+- [X] T110 [P] [US3] Integration test `apps/server/tests/integration/controls.test.ts` (fake adapter): stop ≤ 5 s → `stopped`; retry creates attempt+1 linked via `previousAttemptId`; assign task; request review; messages persisted as Message + event; audit entries for each
 - [ ] T111 [P] [US3] E2E `e2e/us3-controls.spec.ts`: approvals inbox approve/reject, stop, disabled Pause tooltip text, distinct state badges, axe clean
 
 ### Implementation for User Story 3
 
-- [ ] T112 [US3] Implement control operations in `apps/server/src/modules/execution-orchestrator/controls.ts` (controls only for Nexora-started sessions — observed sessions are observe-only; stop, interrupt-and-hold labelled "Interrupt & hold" (API name `pause`) only when all runtimes support interrupt+resume, resume, cancel task, retry, assign additional task, request review by Code Reviewer role, restart session) to pass T109, T110
-- [ ] T113 [US3] Implement routes `apps/server/src/http/routes/controls.ts`: `POST /executions/:id/{stop,pause,resume}`, `POST /tasks/:id/{cancel,retry,review}`, `POST /executions/:id/tasks`, `POST /sessions/:id/{stop,interrupt,restart,resume,messages}`, `POST /agents/:id/messages`
+- [X] T112 [US3] Implement control operations in `apps/server/src/modules/execution-orchestrator/controls.ts` (controls only for Nexora-started sessions — observed sessions are observe-only; stop, interrupt-and-hold labelled "Interrupt & hold" (API name `pause`) only when all runtimes support interrupt+resume, resume, cancel task, retry, assign additional task, request review by Code Reviewer role, restart session) to pass T109, T110
+- [X] T113 [US3] Implement routes `apps/server/src/http/routes/controls.ts`: `POST /executions/:id/{stop,pause,resume}`, `POST /tasks/:id/{cancel,retry,review}`, `POST /executions/:id/tasks`, `POST /sessions/:id/{stop,interrupt,restart,resume,messages}`, `POST /agents/:id/messages`
 - [ ] T114 [P] [US3] Implement feature `apps/web/src/features/control-session/` (buttons derived only from `capabilities`; unsupported disabled with reason tooltip; confirmation dialog for stop)
 - [ ] T115 [P] [US3] Implement feature `apps/web/src/features/decide-approval/` + widget `apps/web/src/widgets/approvals-inbox/` (pending list, approve/reject with note, toast on new approval request)
 - [ ] T116 [P] [US3] Implement Communication Center widget `apps/web/src/widgets/message-feed/` + entity `apps/web/src/entities/message/` + route `apps/web/src/routes/communication.tsx` (sender, receiver, timestamp, type, related task, summary; live via socket; no hidden reasoning) with component test `apps/web/src/widgets/message-feed/message-feed.test.tsx`

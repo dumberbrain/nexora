@@ -1,6 +1,8 @@
 import {
   MAX_EVENT_SUMMARY,
   type Message,
+  type MessageList,
+  type MessageListQuery,
   type Participant,
   type RuntimeCapabilityProfile,
 } from "@nexora/contracts";
@@ -31,6 +33,10 @@ export interface SendToSessionInput {
   type: Message["type"];
   executionId: string | null;
   taskId: string | null;
+  /** recorded receiver (default: the session's main agent) */
+  to?: Participant;
+  /** what the runtime receives when it differs from `text` (e.g. a relay prefix) */
+  deliver?: string;
 }
 
 export interface RecordInput {
@@ -75,14 +81,14 @@ export class CommunicationService {
       throw unsupported(`${caps.runtime} sessions cannot receive messages`);
     }
     try {
-      await handle.sendMessage(input.text);
+      await handle.sendMessage(input.deliver ?? input.text);
     } catch (err) {
       if (err instanceof CapabilityUnsupportedError) throw unsupported(err.message);
       throw err;
     }
     return this.record({
       from: input.from,
-      to: { kind: "agent", agentId: input.sessionId },
+      to: input.to ?? { kind: "agent", agentId: input.sessionId },
       type: input.type,
       text: input.text,
       executionId: input.executionId,
@@ -118,5 +124,10 @@ export class CommunicationService {
 
   list(q: { executionId?: string } = {}): Message[] {
     return this.deps.messages.list(q);
+  }
+
+  /** GET /messages — newest first, cursor-paged. */
+  page(q: MessageListQuery): MessageList {
+    return this.deps.messages.page(q);
   }
 }
