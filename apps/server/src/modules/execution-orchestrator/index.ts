@@ -23,6 +23,7 @@ import { TaskService } from "../task-manager/task.service";
 
 export { Orchestrator } from "./orchestrator";
 export { ConsentService } from "./consent.service";
+export { ControlService, createControls, type ControlDeps } from "./controls";
 export { type WorktreeProvider } from "./worktree-provider";
 
 export interface OrchestrationDeps {
@@ -40,6 +41,8 @@ export interface OrchestrationDeps {
   capabilityOf: (sessionId: string) => RuntimeCapabilityProfile | null;
   /** user home for skill/agent/MCP discovery (default: os.homedir()) */
   homeDir?: string;
+  /** cap for one runtime stop/interrupt (default 4 500 ms — execution stop ≤ 5 s) */
+  stopTimeoutMs?: number;
 }
 
 /** The US2 orchestration module graph (T097–T102). */
@@ -81,6 +84,7 @@ export function createOrchestration(deps: OrchestrationDeps): Orchestration {
     emitter,
     logger: deps.logger,
     homeDir,
+    ...(deps.stopTimeoutMs === undefined ? {} : { stopTimeoutMs: deps.stopTimeoutMs }),
   });
   return {
     orchestrator,

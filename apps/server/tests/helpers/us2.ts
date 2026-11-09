@@ -8,10 +8,15 @@ import { createApp } from "../../src/http/app";
 import { registerApiRoutes } from "../../src/http/routes";
 import { registerApprovalRoutes } from "../../src/http/routes/approvals";
 import { registerConsentRoutes } from "../../src/http/routes/consent";
+import { registerControlRoutes, registerMessageRoutes } from "../../src/http/routes/controls";
 import { registerExecutionRoutes } from "../../src/http/routes/executions";
 import { createLogger } from "../../src/lib/logger";
 import { EventBus, EventStore } from "../../src/modules/event-manager";
 import { createOrchestration, type Orchestration } from "../../src/modules/execution-orchestrator";
+import {
+  type ControlService,
+  createControls,
+} from "../../src/modules/execution-orchestrator/controls";
 import { AuditService } from "../../src/modules/permission-manager/audit.service";
 import { createServices, type Services } from "../../src/services";
 import { FakeManagedRuntime } from "../fakes/fake-managed-runtime";
@@ -24,6 +29,7 @@ export interface Us2Harness {
   audit: AuditService;
   services: Services;
   orchestration: Orchestration;
+  controls: ControlService;
   runtime: FakeManagedRuntime;
   worktrees: FakeWorktrees;
   app: ReturnType<typeof createApp>;
@@ -68,8 +74,18 @@ export function seedProject(root: string): void {
   );
 }
 
-/** US1 services + the US2 orchestration on an in-memory DB, fake runtime and fake worktrees. */
-export async function createUs2Harness(): Promise<Us2Harness> {
+export interface Us2HarnessOptions {
+  /** the fake runtime writes session rows like RuntimeManager (session controls need them) */
+  sessionRows?: boolean;
+  /** cap for stopping runtimes (default 4 500 ms) */
+  stopTimeoutMs?: number;
+}
+
+/**
+ * US1 services + the US2 orchestration (and the US3 control/message routes, wired the same way
+ * as orchestration.ts) on an in-memory DB, fake runtime and fake worktrees.
+ */
+export async function createUs2Harness(opts: Us2HarnessOptions = {}): Promise<Us2Harness> {
   const db = openDb({ dataDir: ":memory:" });
   const bus = new EventBus();
   const store = new EventStore(db, bus, { batchMs: 5 });
@@ -89,6 +105,7 @@ export async function createUs2Harness(): Promise<Us2Harness> {
   const home = mkdtempSync(join(tmpdir(), "nexora-us2-home-"));
   seedProject(root);
   const runtime = new FakeManagedRuntime();
+  if (opts.sessionRows) runtime.rows = services.sessions;
   const worktrees = new FakeWorktrees();
   const orchestration = createOrchestration({
     db,
@@ -101,6 +118,14 @@ export async function createUs2Harness(): Promise<Us2Harness> {
     projects: services.projects,
     capabilityOf: (id) => services.sessions.get(id)?.capabilities ?? null,
     homeDir: home,
+    ...(opts.stopTimeoutMs === undefined ? {} : { stopTimeoutMs: opts.stopTimeoutMs }),
+  });
+  const controls = createControls({
+    orchestration,
+    audit,
+    runtime,
+    sessions: services.sessions,
+    agents: services.agents,
   });
   const app = createApp({
     env: testEnv,
@@ -112,6 +137,8 @@ export async function createUs2Harness(): Promise<Us2Harness> {
       registerExecutionRoutes(api, orchestration);
       registerApprovalRoutes(api, orchestration);
       registerConsentRoutes(api, { consent: orchestration.consent, projects: services.projects });
+      registerControlRoutes(api, { controls });
+      registerMessageRoutes(api, { communication: orchestration.communication });
     },
   });
   await Promise.resolve();
@@ -122,6 +149,7 @@ export async function createUs2Harness(): Promise<Us2Harness> {
     audit,
     services,
     orchestration,
+    controls,
     runtime,
     worktrees,
     app,
