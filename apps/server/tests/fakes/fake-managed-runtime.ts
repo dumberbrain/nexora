@@ -77,7 +77,8 @@ export function fakeEnvironment(opts: { agentTeams?: boolean } = {}): RuntimeEnv
  * ended (e.g. after an interrupt) opens a new turn.
  */
 export class FakeSession implements SessionHandle {
-  readonly kind: RuntimeKind = "agent_sdk";
+  readonly kind: RuntimeKind;
+  private readonly waitingListeners = new Set<(waiting: boolean) => void>();
   readonly sessionId: Promise<string>;
   readonly sent: string[] = [];
   stopped = false;
@@ -94,8 +95,19 @@ export class FakeSession implements SessionHandle {
     private readonly sendSupported: boolean,
     private readonly owner: FakeManagedRuntime | null = null,
   ) {
+    this.kind = input.runtime ?? "agent_sdk";
     this.sessionId = Promise.resolve(id);
     this.openTurn();
+  }
+
+  onWaitingForInput(listener: (waiting: boolean) => void): () => void {
+    this.waitingListeners.add(listener);
+    return () => this.waitingListeners.delete(listener);
+  }
+
+  /** an interactive lead shows (true) / leaves (false) a start-up dialog */
+  setWaiting(waiting: boolean): void {
+    for (const l of [...this.waitingListeners]) l(waiting);
   }
 
   get done(): Promise<SessionResult> {

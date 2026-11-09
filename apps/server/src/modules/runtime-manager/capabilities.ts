@@ -60,3 +60,38 @@ export const FAKE_RUNTIME_CAPABILITIES: RuntimeCapabilityProfile = {
   ...AGENT_SDK_CAPABILITIES,
   notes: ["Test-only simulated runtime (NODE_ENV=test).", ...AGENT_SDK_CAPABILITIES.notes],
 };
+
+/**
+ * Interactive `claude` Agent Teams lead in a pseudo-terminal (research R3, S2). Messages go to the
+ * lead only (typed into its terminal); teammates cannot be messaged, paused or resumed.
+ */
+export const AGENT_TEAM_PTY_CAPABILITIES: RuntimeCapabilityProfile = {
+  runtime: "agent_team_pty",
+  canStart: true,
+  canStop: true,
+  canInterrupt: true,
+  canPause: false,
+  canResume: false,
+  canRestart: false,
+  canSendMessage: "lead_only",
+  canSetPermissionMode: false,
+  emitsEvents: [
+    "session.started",
+    "session.stopped",
+    "agent.spawned",
+    "agent.completed",
+    "agent.waiting",
+    "task.created",
+    "task.completed",
+    "message.sent",
+    "error",
+  ],
+  reportsUsage: "none",
+  notes: [
+    "Native Claude Code Agent Teams: an interactive lead started by Nexora in a terminal.",
+    "Messages reach the team lead only (typed into its terminal, best effort).",
+    "Interrupt sends Ctrl-C to the lead; teammates cannot be paused or resumed.",
+    "Team members, tasks and inbox messages are polled from team files (best effort).",
+    "No usage or cost is reported by an interactive session.",
+  ],
+};

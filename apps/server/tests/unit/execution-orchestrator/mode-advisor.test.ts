@@ -49,7 +49,7 @@ describe("mode advisor", () => {
     expect(teams?.howToEnable).toMatch(/CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1/);
   });
 
-  it("Agent Teams stays unavailable (honestly) while Nexora has no executor for it", () => {
+  it("offers Agent Teams when the flag is set and the PTY runtime is available", () => {
     const teams = byMode(
       adviseModes({
         analysis: analysis("high"),
@@ -57,28 +57,48 @@ describe("mode advisor", () => {
         env: fakeEnvironment({ agentTeams: true }),
       }),
     ).get("agent_teams");
-    expect(teams?.available).toBe(false);
-    expect(teams?.unavailableReason).toMatch(/US6/);
-    const enabled = byMode(
-      adviseModes({
-        analysis: analysis("high"),
-        prompt: MULTI_GOAL,
-        env: fakeEnvironment({ agentTeams: true }),
-        implemented: new Set(["multi_session", "subagents", "agent_teams"]),
-      }),
-    ).get("agent_teams");
-    expect(enabled?.available).toBe(true);
-    expect(enabled?.runtimes).toEqual(["agent_team_pty"]);
+    expect(teams?.available).toBe(true);
+    expect(teams?.runtimes).toEqual(["agent_team_pty"]);
+    expect(teams?.reason).toMatch(/lead/);
   });
 
-  it("workflow and hybrid are unavailable with a reason for now", () => {
+  it("Agent Teams is unavailable (observe-only) when node-pty cannot load, even with the flag", () => {
+    const env = fakeEnvironment({ agentTeams: true });
+    env.runtimes = env.runtimes.map((r) =>
+      r.kind === "agent_team_pty"
+        ? { ...r, available: false, reason: "node-pty could not be loaded (x)" }
+        : r,
+    );
+    const m = byMode(adviseModes({ analysis: analysis("high"), prompt: MULTI_GOAL, env }));
+    expect(m.get("agent_teams")?.available).toBe(false);
+    expect(m.get("agent_teams")?.unavailableReason).toMatch(/node-pty/);
+    // hybrid still runs, without Agent Teams
+    expect(m.get("hybrid")?.available).toBe(true);
+    expect(m.get("hybrid")?.runtimes).not.toContain("agent_team_pty");
+  });
+
+  it("hybrid is available on session runtimes and adds the PTY runtime only with Agent Teams", () => {
+    const off = byMode(
+      adviseModes({ analysis: analysis("low"), prompt: "x", env: fakeEnvironment() }),
+    );
+    expect(off.get("hybrid")?.available).toBe(true);
+    expect(off.get("hybrid")?.runtimes).toEqual(["agent_sdk", "cli_headless"]);
+    const on = byMode(
+      adviseModes({
+        analysis: analysis("low"),
+        prompt: "x",
+        env: fakeEnvironment({ agentTeams: true }),
+      }),
+    );
+    expect(on.get("hybrid")?.runtimes).toContain("agent_team_pty");
+  });
+
+  it("workflow is launched from the Workflows page, not from the execution wizard", () => {
     const m = byMode(
       adviseModes({ analysis: analysis("low"), prompt: "x", env: fakeEnvironment() }),
     );
     expect(m.get("workflow")?.available).toBe(false);
-    expect(m.get("workflow")?.unavailableReason).toMatch(/US5/);
-    expect(m.get("hybrid")?.available).toBe(false);
-    expect(m.get("hybrid")?.unavailableReason).toMatch(/US6/);
+    expect(m.get("workflow")?.unavailableReason).toMatch(/Workflows page/);
   });
 
   it("everything is unavailable when Claude Code is not installed", () => {

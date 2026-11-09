@@ -54,7 +54,12 @@ export class TaskService {
   }
 
   /** Store a fresh plan (ids T-1…T-n, status pending) and emit `task.created` for each task. */
-  createPlan(executionId: string, mode: ExecutionMode, planned: readonly PlannedTask[]): Task[] {
+  /** `planned[i].mode` overrides `mode` per task (hybrid plans). */
+  createPlan(
+    executionId: string,
+    mode: ExecutionMode,
+    planned: readonly (PlannedTask & { mode?: ExecutionMode })[],
+  ): Task[] {
     const tasks: Task[] = planned.map((p, i) => ({
       id: `T-${i + 1}`,
       executionId,
@@ -62,7 +67,7 @@ export class TaskService {
       description: p.description,
       assignedAgentRole: p.assignedAgentRole,
       agentId: null,
-      mode,
+      mode: p.mode ?? mode,
       mechanismReason: p.mechanismReason,
       priority: p.priority,
       status: "pending",

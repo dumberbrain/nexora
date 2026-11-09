@@ -367,6 +367,47 @@ describe("RuntimeManager.startManagedSession", () => {
     }
   });
 
+  it("a start-up dialog of an interactive lead suspends the timeouts and is forwarded", async () => {
+    vi.useFakeTimers();
+    try {
+      const listeners = new Set<(w: boolean) => void>();
+      const original = sdk.start.bind(sdk);
+      vi.spyOn(sdk, "start").mockImplementation(async (input, deps) => {
+        const h = await original(input, deps);
+        h.onWaitingForInput = (l) => {
+          listeners.add(l);
+          return () => listeners.delete(l);
+        };
+        return h;
+      });
+      const handle = await manager.startManagedSession(
+        startInput({ turnTimeoutMs: 1000, idleTimeoutMs: 5000 }),
+        { approvals: { request: () => Promise.resolve("deny") } },
+      );
+      sdk.started.at(-1)?.deps.onSessionId?.(SID, { model: null, cwd: worktree });
+      await vi.advanceTimersByTimeAsync(0);
+      const forwarded: boolean[] = [];
+      handle.onWaitingForInput?.((w) => forwarded.push(w));
+      for (const l of [...listeners]) l(true);
+      await vi.advanceTimersByTimeAsync(3000);
+      expect(sdk.handles.at(-1)?.interrupt).not.toHaveBeenCalled();
+      for (const l of [...listeners]) l(false);
+      await vi.advanceTimersByTimeAsync(1001);
+      expect(sdk.handles.at(-1)?.interrupt).toHaveBeenCalled();
+      expect(forwarded).toEqual([true, false]);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("invalidateEnvironment drops the cached detection", async () => {
+    const spy = vi.spyOn(sdk, "detect");
+    await manager.environment();
+    manager.invalidateEnvironment();
+    await manager.environment();
+    expect(spy).toHaveBeenCalledTimes(2);
+  });
+
   it("stopAll stops every managed session and marks it stopped", async () => {
     const { handle } = await started();
     await manager.stopAll();
