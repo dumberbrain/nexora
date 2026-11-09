@@ -3,7 +3,9 @@ import { type Hono } from "hono";
 import { type Services } from "../../services";
 import { type AppBindings } from "../context";
 import { registerEventRoutes } from "./events";
+import { registerGithubRoutes } from "./github";
 import { registerHookIngestRoute } from "./hooks";
+import { registerIntegrationRoutes } from "./integrations";
 import { registerProjectRoutes } from "./projects";
 import { registerSessionRoutes } from "./sessions";
 
@@ -17,4 +19,6 @@ export function registerApiRoutes(api: Hono<AppBindings>, s: Services): void {
   registerProjectRoutes(api, s);
   registerSessionRoutes(api, s);
   registerEventRoutes(api, s);
+  registerIntegrationRoutes(api, { integrations: s.integrations });
+  registerGithubRoutes(api, { github: s.github });
 }

@@ -314,7 +314,7 @@ testable increment.
 - [X] T147 [US7] Implement GitHub integration `apps/server/src/modules/github-integration/{gh-status.ts,github.service.ts}` (read-only `gh api` GETs via allowlisted runner: repos, branches, commits, pulls, pull files, reviews; local fallback for branches/commits via `git`) and routes `apps/server/src/http/routes/github.ts` (`GET /github/status`, `GET /github/repos/:owner/:repo/{branches,commits,pulls}`, `GET …/pulls/:n/files`) to pass T144
 - [X] T148 [P] [US7] Implement entities `apps/web/src/entities/{integration,github}/` and view `apps/web/src/views/integrations/` + route `apps/web/src/routes/integrations.tsx` (tabs: Skills, Agents, MCP servers with tools, health, permission status)
 - [X] T149 [P] [US7] Implement view `apps/web/src/views/github/` + route `apps/web/src/routes/github.tsx` (repo picker from registered projects' remotes; branches, commits, PRs, changed files, review status; setup guidance card when `not_installed`/`not_authenticated`)
-- [ ] T150 [P] [US7] Component tests for integrations + github views with MSW, E2E `e2e/us7-integrations.spec.ts` — component tests done (views/integrations + views/github), E2E pending (lead)
+- [X] T150 [P] [US7] Component tests for integrations + github views with MSW, E2E `e2e/us7-integrations.spec.ts` — component tests done (views/integrations + views/github), E2E pending (lead)
 
 **Checkpoint**: Integrations visible; GitHub live when gh is authenticated
 

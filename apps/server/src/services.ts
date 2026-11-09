@@ -7,6 +7,7 @@ import { AgentRepository, AgentTree } from "./modules/agent-registry";
 import { type EventBus, type EventStore } from "./modules/event-manager";
 import { HookIngestService } from "./modules/event-manager/hook-ingest.service";
 import { StatsService } from "./modules/event-manager/stats.service";
+import { GithubService } from "./modules/github-integration/github.service";
 import { type AuditService } from "./modules/permission-manager/audit.service";
 import { HookInstaller, ProjectRepository, ProjectService } from "./modules/project-registry";
 import {
@@ -15,6 +16,10 @@ import {
   SessionProjection,
   SessionRepository,
 } from "./modules/session-manager";
+import {
+  createIntegrationsService,
+  type IntegrationsService,
+} from "./modules/skill-registry/integrations.service";
 
 export interface ServicesDeps {
   db: Db;
@@ -42,6 +47,10 @@ export interface Services {
   agentTree: AgentTree;
   ingest: HookIngestService;
   stats: StatsService;
+  /** US7: skills / agents / MCP inventory (secrets stripped) */
+  integrations: IntegrationsService;
+  /** US7: read-only GitHub via gh, local git fallback */
+  github: GithubService;
   /** stop timers and bus subscriptions */
   close(): void;
 }
@@ -65,10 +74,12 @@ export function createServices(deps: ServicesDeps): Services {
   });
   const offEvent = bus.onEvent(() => stats.schedule());
 
+  const projects = new ProjectService(projectRepo, audit);
+
   return {
     store,
     projectRepo,
-    projects: new ProjectService(projectRepo, audit),
+    projects,
     hookInstaller: new HookInstaller({ repo: projectRepo, audit, publicUrl: deps.env.publicUrl }),
     sessions,
     sessionProjection,
@@ -82,6 +93,8 @@ export function createServices(deps: ServicesDeps): Services {
       logger,
     }),
     stats,
+    integrations: createIntegrationsService({ db, projects }),
+    github: new GithubService({ projects }),
     close: () => {
       offEvent();
       stats.close();
