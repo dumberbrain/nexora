@@ -6,6 +6,7 @@ import { AnswerQuestionsForm } from "@/features/answer-questions";
 import { ApprovePlanForm } from "@/features/approve-plan";
 import { ChooseModeForm } from "@/features/choose-mode";
 import { GeneratePlanPanel } from "@/features/generate-plan";
+import { ModelConsentStatus } from "@/features/manage-model-consent";
 import { AnalysisSummary } from "@/widgets/analysis-summary";
 
 interface SetupStepProps {
@@ -35,6 +36,10 @@ export function SetupStepBody({ step, execution, onStep, onLaunched }: SetupStep
   return (
     <div className="flex flex-col gap-4">
       <GeneratePlanPanel executionId={execution.id} projectName={projectName} />
+      <ModelConsentStatus
+        project={{ id: execution.projectId, name: projectName }}
+        className="-mt-2 px-1"
+      />
       <ApprovePlanForm execution={execution} onApproved={(e) => onLaunched(e.id)} />
     </div>
   );

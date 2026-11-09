@@ -4,6 +4,8 @@ import { http } from "@/shared/api";
 
 import {
   type HookPreview,
+  type ModelConsent,
+  type ModelConsentInput,
   type Project,
   type ProjectList,
   type RegisterProjectInput,
@@ -35,4 +37,16 @@ export const projectApi = {
   /** Removes only Nexora's hook entries. Returns the updated project. */
   uninstallHooks: (id: string) =>
     http.delete<Project>(`/projects/${encodeURIComponent(id)}/hooks`).then((r) => r.data),
+
+  /** FR-008 per-project "always allow model usage" */
+  modelConsent: (id: string, opts: Opts = {}) =>
+    http
+      .get<ModelConsent>(`/projects/${encodeURIComponent(id)}/model-consent`, opts)
+      .then((r) => r.data),
+
+  /** PUT `{ alwaysAllow: false }` revokes */
+  setModelConsent: (id: string, input: ModelConsentInput) =>
+    http
+      .put<ModelConsent>(`/projects/${encodeURIComponent(id)}/model-consent`, input)
+      .then((r) => r.data),
 };

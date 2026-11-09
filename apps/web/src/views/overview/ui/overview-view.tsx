@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 
 import { PageHeader } from "@/shared/ui/layout/page-header";
 import { EmptyState } from "@/shared/ui/state";
+import { ApprovalsInbox } from "@/widgets/approvals-inbox";
 import { OverviewStats } from "@/widgets/overview-stats";
 import { SessionTable } from "@/widgets/session-table";
 
@@ -50,7 +51,10 @@ export function OverviewView() {
             caption="Recent sessions"
           />
         </section>
-        <ProjectsPanel />
+        <div className="flex min-w-0 flex-col gap-6">
+          <ApprovalsInbox />
+          <ProjectsPanel />
+        </div>
       </div>
     </div>
   );

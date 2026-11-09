@@ -1,3 +1,5 @@
+import { type Message, type SendMessageInput } from "@nexora/contracts";
+
 import { http } from "@/shared/api";
 
 import { type AgentDetail, type AgentList, type AgentListFilters } from "../model/types";
@@ -18,4 +20,8 @@ export const agentApi = {
 
   byId: (id: string, opts: Opts = {}) =>
     http.get<AgentDetail>(`/agents/${encodeURIComponent(id)}`, opts).then((r) => r.data),
+
+  /** capability-gated (422) → the recorded Message */
+  sendMessage: (id: string, input: SendMessageInput) =>
+    http.post<Message>(`/agents/${encodeURIComponent(id)}/messages`, input).then((r) => r.data),
 };

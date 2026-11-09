@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { HooksStatusTag, projectListQuery } from "@/entities/project";
 import { InstallHooksDialog } from "@/features/install-hooks";
+import { ModelConsentStatus } from "@/features/manage-model-consent";
 import { RegisterProjectForm } from "@/features/register-project";
 import { ErrorState, LoadingState } from "@/shared/ui/state";
 
@@ -45,6 +46,7 @@ export function ProjectsPanel() {
                 >
                   {p.rootPath}
                 </span>
+                <ModelConsentStatus project={p} />
               </div>
               <div className="flex items-center gap-2">
                 <HooksStatusTag installed={p.hooksInstalled} />

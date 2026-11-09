@@ -4,7 +4,11 @@ import { http, HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
 
 import { AgentDetailsPanel } from "./agent-details-panel";
-import { agentFixtures, sessionFixtures } from "../../../../tests/msw/handlers";
+import {
+  agentFixtures,
+  managedSessionFixture,
+  sessionFixtures,
+} from "../../../../tests/msw/handlers";
 import { server } from "../../../../tests/msw/server";
 import { renderWithProviders } from "../../../../tests/render";
 
@@ -52,6 +56,34 @@ describe("AgentDetailsPanel", () => {
     expect(usage).toHaveTextContent("18,204");
     expect(usage).toHaveTextContent("$0.42");
     expect(usage).toHaveTextContent("(runtime estimate)");
+  });
+
+  it("shows the session controls disabled for an observe-only agent", async () => {
+    renderPanel();
+    const controls = await screen.findByRole("region", { name: /controls/i });
+    const pause = await within(controls).findByRole("button", { name: "Interrupt & hold" });
+    expect(pause).toHaveAttribute("aria-disabled", "true");
+    expect(pause).toHaveAccessibleDescription(/observe-only/i);
+    expect(within(controls).getByRole("button", { name: "Send message" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  });
+
+  it("offers live controls and messaging for an agent of a Nexora-managed session", async () => {
+    const detail: AgentDetail = {
+      agent: { ...reviewer, sessionId: managedSessionFixture.id },
+      session: managedSessionFixture,
+      children: [],
+      filesChanged: [],
+    };
+    server.use(http.get("*/api/v1/agents/:id", () => HttpResponse.json(detail)));
+    renderPanel();
+    const controls = await screen.findByRole("region", { name: /controls/i });
+    expect(await within(controls).findByRole("button", { name: "Stop" })).not.toHaveAttribute(
+      "aria-disabled",
+    );
+    expect(within(controls).getByLabelText(/message to code-reviewer/i)).toBeEnabled();
   });
 
   it("lists the agent's events with source and reliability tags", async () => {

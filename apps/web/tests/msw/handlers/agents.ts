@@ -1,7 +1,13 @@
-import { type Agent, type AgentDetail, type AgentList, type ApiErrorBody } from "@nexora/contracts";
+import {
+  type Agent,
+  type AgentDetail,
+  type AgentList,
+  type ApiErrorBody,
+  type Message,
+} from "@nexora/contracts";
 import { http, HttpResponse } from "msw";
 
-import { sessionFixtures } from "./sessions";
+import { sentMessage, sessionFixtures } from "./sessions";
 
 const S1 = "6f1c2a9e-1b7d-4a53-9f0e-2c4d8b7a1e01";
 const S2 = "9a7b3c1d-2e4f-4a6b-8c0d-1e2f3a4b5c02";
@@ -79,5 +85,13 @@ export const agentHandlers = [
       filesChanged:
         agent.kind === "subagent" ? ["apps/web/src/widgets/session-table/index.ts"] : [],
     });
+  }),
+  http.post("*/api/v1/agents/:id/messages", async ({ params, request }) => {
+    const agent = agentFixtures.find((a) => a.id === params.id);
+    if (!agent) return HttpResponse.json(notFound, { status: 404 });
+    const body = (await request.json()) as { text: string };
+    return HttpResponse.json<Message>(
+      sentMessage(body.text, { kind: "agent", agentId: agent.id }, null),
+    );
   }),
 ];

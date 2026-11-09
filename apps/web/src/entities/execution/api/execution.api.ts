@@ -51,6 +51,11 @@ export const executionApi = {
 
   stop: (id: string) => http.post<Execution>(path(id, "/stop")).then((r) => r.data),
 
+  /** "Interrupt & hold" (FR-031) — 422 if any runtime cannot interrupt + resume */
+  pause: (id: string) => http.post<Execution>(path(id, "/pause")).then((r) => r.data),
+
+  resume: (id: string) => http.post<Execution>(path(id, "/resume")).then((r) => r.data),
+
   /** 404 until the execution reached `verifying` */
   verification: (id: string, opts: Opts = {}) =>
     http.get<Verification>(path(id, "/verification"), opts).then((r) => r.data),

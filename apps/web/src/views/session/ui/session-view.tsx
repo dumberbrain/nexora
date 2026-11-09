@@ -7,6 +7,7 @@ import { PageHeader } from "@/shared/ui/layout/page-header";
 import { ErrorState, LoadingState } from "@/shared/ui/state";
 
 import { SessionAgents } from "./components/session-agents";
+import { SessionControlsPanel } from "./components/session-controls-panel";
 import { SessionFacts } from "./components/session-facts";
 
 /** One session: header facts, its agents, and a live event timeline (session room). */
@@ -38,6 +39,7 @@ export function SessionView({ sessionId }: { sessionId: string }) {
         />
       ) : null}
       {session.data ? <SessionFacts session={session.data} /> : null}
+      {session.data ? <SessionControlsPanel session={session.data} /> : null}
       <div className="grid gap-6 xl:grid-cols-[1fr_2fr]">
         <section aria-labelledby="session-agents" className="flex flex-col gap-2">
           <h2 id="session-agents" className="text-sm tracking-widest">
