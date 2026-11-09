@@ -237,8 +237,8 @@ testable increment.
 
 - [X] T119 [P] [US4] Unit test `apps/server/tests/unit/task-manager/board-move.test.ts`: column derivation (Backlog=pending; Todo=queued; In Progress=planning/running/waiting_for_input/blocked; Review=reviewing; Completed; Failed=failed/cancelled); user move allowed only `pending⇄queued`, else CONFLICT with reason
 - [X] T120 [US4] Implement `PATCH /tasks/:id/status` in `apps/server/src/http/routes/tasks.ts` using `apps/server/src/modules/task-manager/board.ts` to pass T119
-- [ ] T121 [US4] Implement widget `apps/web/src/widgets/kanban-board/` (`@dnd-kit`, keyboard-accessible DnD, optimistic move with rollback + toast on 409, filters by execution) and feature `apps/web/src/features/move-task/`; route `apps/web/src/routes/tasks.tsx`
-- [ ] T122 [P] [US4] Component test `apps/web/src/widgets/kanban-board/kanban-board.test.tsx` and E2E `e2e/us4-board.spec.ts`
+- [X] T121 [US4] Implement widget `apps/web/src/widgets/kanban-board/` (`@dnd-kit`, keyboard-accessible DnD, optimistic move with rollback + toast on 409, filters by execution) and feature `apps/web/src/features/move-task/`; route `apps/web/src/routes/tasks.tsx`
+- [ ] T122 [P] [US4] Component test `apps/web/src/widgets/kanban-board/kanban-board.test.tsx` and E2E `e2e/us4-board.spec.ts` (component test done; E2E pending)
 
 **Checkpoint**: Board usable over any execution
 
