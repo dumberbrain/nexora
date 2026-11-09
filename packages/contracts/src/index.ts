@@ -21,4 +21,5 @@ export * from "./api/common";
 export * from "./api/monitoring";
 export * from "./api/executions";
 export * from "./api/controls";
+export * from "./api/board";
 export * from "./socket";

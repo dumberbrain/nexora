@@ -50,7 +50,8 @@ Pagination: cursor-based `?cursor=<ULID>&limit=1..200` → `{ items, nextCursor 
 | Method | Path | Purpose |
 |---|---|---|
 | GET | `/executions/:id/tasks` | list (board) |
-| PATCH | `/tasks/:id/status` | user move — only `pending⇄queued`, else 409 |
+| GET | `/tasks` | board across executions: `executionId?, projectId?, limit` → `{ items: Task[] }` |
+| PATCH | `/tasks/:id/status` | `{ status: "pending" | "queued" }` user move — only `pending⇄queued`, else 409 |
 | POST | `/tasks/:id/cancel` | `{ reason? }` |
 | POST | `/tasks/:id/retry` | new attempt linked to previous |
 | POST | `/executions/:id/tasks` | assign additional task |
