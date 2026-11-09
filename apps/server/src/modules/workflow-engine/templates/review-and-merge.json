@@ -1,0 +1,90 @@
+{
+  "name": "Review and merge",
+  "description": "Code and security review in parallel, a human approval, then prepare the branch for merge.",
+  "graph": {
+    "nodes": [
+      {
+        "id": "start",
+        "kind": "start",
+        "label": "Start",
+        "config": {},
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "fork",
+        "kind": "parallel_fork",
+        "label": "Reviews",
+        "config": {},
+        "position": { "x": 200, "y": 0 }
+      },
+      {
+        "id": "code-review",
+        "kind": "agent",
+        "label": "Code review",
+        "config": {
+          "role": "code-reviewer",
+          "prompt": "Review the branch's changes against the base branch for correctness, clarity and consistency. Report findings by severity.",
+          "ownedPaths": []
+        },
+        "position": { "x": 400, "y": -80 }
+      },
+      {
+        "id": "security-review",
+        "kind": "agent",
+        "label": "Security review",
+        "config": {
+          "role": "security-reviewer",
+          "prompt": "Review the branch's changes for injection, auth, secret handling and unsafe defaults. Report findings by severity.",
+          "ownedPaths": []
+        },
+        "position": { "x": 400, "y": 80 }
+      },
+      {
+        "id": "join",
+        "kind": "parallel_join",
+        "label": "Reviews done",
+        "config": {},
+        "position": { "x": 600, "y": 0 }
+      },
+      {
+        "id": "approve-merge",
+        "kind": "approval",
+        "label": "Approve merge",
+        "config": {
+          "message": "Read both reviews. Approve to prepare the branch for merge.",
+          "riskClass": "destructive"
+        },
+        "position": { "x": 800, "y": 0 }
+      },
+      {
+        "id": "prepare-merge",
+        "kind": "agent",
+        "label": "Prepare merge",
+        "config": {
+          "role": "devops-engineer",
+          "prompt": "Bring the branch up to date with its base, resolve conflicts, make sure the build and tests pass and commit the result. Do not push.",
+          "ownedPaths": []
+        },
+        "retry": { "maxAttempts": 2, "backoffMs": 10000 },
+        "position": { "x": 1000, "y": 0 }
+      },
+      {
+        "id": "end",
+        "kind": "end",
+        "label": "End",
+        "config": {},
+        "position": { "x": 1200, "y": 0 }
+      }
+    ],
+    "edges": [
+      { "id": "e1", "source": "start", "target": "fork" },
+      { "id": "e2", "source": "fork", "target": "code-review" },
+      { "id": "e3", "source": "fork", "target": "security-review" },
+      { "id": "e4", "source": "code-review", "target": "join" },
+      { "id": "e5", "source": "security-review", "target": "join" },
+      { "id": "e6", "source": "join", "target": "approve-merge" },
+      { "id": "e7", "source": "approve-merge", "target": "prepare-merge" },
+      { "id": "e8", "source": "prepare-merge", "target": "end" }
+    ]
+  }
+}

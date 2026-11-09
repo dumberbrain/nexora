@@ -138,4 +138,33 @@ describe("ApprovalService (ApprovalGate)", () => {
     expect(seen).toEqual(["T-2:approved"]);
     expect(approvals.approvedTaskIds(EXEC)).toEqual(new Set(["T-2"]));
   });
+
+  it("workflow approvals wait for a decision and can be expired one by one", async () => {
+    const one = approvals.requestWorkflowApproval({
+      executionId: EXEC,
+      nodeId: "ok",
+      label: "Approve merge",
+      message: "Ship it?",
+      riskClass: "destructive",
+    });
+    expect(one.approval).toMatchObject({
+      action: "workflow.approval",
+      status: "pending",
+      taskId: null,
+    });
+    approvals.decide(one.approval.id, { decision: "approve" }, "user");
+    await expect(one.decision).resolves.toBe("allow");
+
+    const two = approvals.requestWorkflowApproval({
+      executionId: EXEC,
+      nodeId: "ok",
+      label: "Approve merge",
+      message: "Ship it?",
+      riskClass: "normal",
+    });
+    expect(approvals.expireRequest(two.approval.id, "run cancelled")).toBe(true);
+    await expect(two.decision).resolves.toBe("deny");
+    expect(approvals.get(two.approval.id).status).toBe("expired_session");
+    expect(approvals.expireRequest(two.approval.id, "again")).toBe(false);
+  });
 });

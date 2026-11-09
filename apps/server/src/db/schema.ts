@@ -240,6 +240,8 @@ export const workflowDefinitions = sqliteTable("workflow_definitions", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description").notNull().default(""),
+  /** seeded built-in template (spec-driven, tdd-feature, review-and-merge) */
+  builtIn: bool("built_in").notNull().default(false),
   createdAt: ts("created_at").notNull(),
 });
 

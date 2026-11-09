@@ -1,0 +1,1 @@
+ALTER TABLE `workflow_definitions` ADD `built_in` integer DEFAULT false NOT NULL;
