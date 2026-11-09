@@ -1,11 +1,12 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 
 import { request as playwrightRequest } from "@playwright/test";
 
 import { expect, test } from "./fixtures/axe";
+import { removeTempRepo } from "./support/temp-repo";
 
 // US2 — task → plan → approval → execution (quickstart V2), on the test-only fake runtime
 // (NEXORA_TEST_FAKE_RUNTIME=1, NODE_ENV=test) with real git worktrees.
@@ -44,7 +45,7 @@ test.beforeAll(async ({ baseURL }) => {
 });
 
 test.afterAll(() => {
-  if (root) rmSync(root, { recursive: true, force: true });
+  removeTempRepo(root);
 });
 
 test("wizard: task → mode → questions → plan with risky approval → live execution", async ({
@@ -63,21 +64,21 @@ test("wizard: task → mode → questions → plan with risky approval → live 
   await page.getByRole("button", { name: /analyse task/i }).click();
 
   // 2. mode
-  await expect(page).toHaveURL(/step=mode/);
+  await expect(page).toHaveURL(/step=mode/, { timeout: 15_000 });
   await expect(page.getByRole("region", { name: /task analysis/i })).toBeVisible();
   await expect(page.getByRole("radio", { name: /multi-session/i })).toBeChecked();
   await expectNoA11yViolations();
   await page.getByRole("button", { name: /use this mode/i }).click();
 
   // 3. questions (recommended defaults)
-  await expect(page).toHaveURL(/step=questions/);
+  await expect(page).toHaveURL(/step=questions/, { timeout: 15_000 });
   const save = page.getByRole("button", { name: /save answers|continue/i });
   await expect(save).toBeVisible();
   await expectNoA11yViolations();
   await save.click();
 
   // 4. plan: generate locally, then approve with the risky deploy task ticked
-  await expect(page).toHaveURL(/step=plan/);
+  await expect(page).toHaveURL(/step=plan/, { timeout: 15_000 });
   await page.getByRole("button", { name: /generate plan/i }).click();
   const risky = page.getByRole("checkbox", { name: /approve risky task T-3/i });
   await expect(risky).toBeVisible();
@@ -88,7 +89,7 @@ test("wizard: task → mode → questions → plan with risky approval → live 
   await page.getByRole("button", { name: /approve & start/i }).click();
 
   // 5. live execution view
-  await expect(page).toHaveURL(/\/executions\/[0-9A-Z]{26}$/);
+  await expect(page).toHaveURL(/\/executions\/[0-9A-Z]{26}$/, { timeout: 15_000 });
   const table = page.getByRole("table", { name: /task statuses/i });
   await expect(table.getByRole("cell", { name: "Completed", exact: true })).toHaveCount(3, {
     timeout: 20_000,

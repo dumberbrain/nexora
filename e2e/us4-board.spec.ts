@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 
@@ -11,6 +11,7 @@ import {
 } from "@playwright/test";
 
 import { expect, test } from "./fixtures/axe";
+import { removeTempRepo } from "./support/temp-repo";
 
 // US4 — task board (quickstart V6) on the test-only fake runtime. One parallel slot plus the
 // hold marker keep T-1 running while T-2/T-3 wait in Todo.
@@ -82,7 +83,7 @@ test.afterAll(async () => {
       headers: { "x-nexora-csrf": csrf },
     });
   await api?.dispose();
-  if (root) rmSync(root, { recursive: true, force: true });
+  removeTempRepo(root);
 });
 
 test("board: Todo ⇄ Backlog by keyboard is saved; a running card cannot be moved", async ({

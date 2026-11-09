@@ -1,11 +1,12 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 
 import { type APIRequestContext, request as playwrightRequest } from "@playwright/test";
 
 import { expect, test } from "./fixtures/axe";
+import { removeTempRepo } from "./support/temp-repo";
 
 // US3 — control running executions (quickstart V5) on the test-only fake runtime. The hold
 // marker keeps fake task sessions running until a control ends them.
@@ -54,7 +55,7 @@ test.beforeAll(async ({ baseURL }) => {
 
 test.afterAll(async () => {
   await api?.dispose();
-  if (root) rmSync(root, { recursive: true, force: true });
+  removeTempRepo(root);
 });
 
 test("approvals inbox: approve one risky task, reject the other", async ({

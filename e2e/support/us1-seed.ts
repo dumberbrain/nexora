@@ -1,9 +1,11 @@
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { type APIRequestContext, expect } from "@playwright/test";
+
+import { removeTempRepo } from "./temp-repo";
 
 const FIXTURES = fileURLToPath(new URL("../../apps/server/tests/fixtures/hooks/", import.meta.url));
 
@@ -62,5 +64,5 @@ export async function seedObservedSession(
     });
     expect(res.status(), file).toBe(200);
   }
-  return { name, cleanup: () => rmSync(root, { recursive: true, force: true }) };
+  return { name, cleanup: () => removeTempRepo(root) };
 }

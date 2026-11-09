@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 
@@ -10,6 +10,7 @@ import {
 } from "@playwright/test";
 
 import { expect, test } from "./fixtures/axe";
+import { removeTempRepo } from "./support/temp-repo";
 
 // US5 — build and run a workflow (quickstart V7) on the test-only fake runtime.
 test.describe.configure({ mode: "serial" });
@@ -54,7 +55,7 @@ test.beforeAll(async ({ baseURL }) => {
 
 test.afterAll(async () => {
   await api?.dispose();
-  if (root) rmSync(root, { recursive: true, force: true });
+  removeTempRepo(root);
 });
 
 test("built-in templates are listed", async ({ page, expectNoA11yViolations }) => {
