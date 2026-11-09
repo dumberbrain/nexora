@@ -31,3 +31,20 @@ const STOPPABLE: ReadonlySet<ExecutionStatus> = new Set(["running", "paused", "v
 
 export const isLaunched = (status: ExecutionStatus): boolean => LAUNCHED.has(status);
 export const isStoppable = (status: ExecutionStatus): boolean => STOPPABLE.has(status);
+
+/** Steps of the new-execution wizard, in order (URL `?step=`). */
+export const SETUP_STEPS = ["task", "mode", "questions", "plan"] as const;
+export type SetupStep = (typeof SETUP_STEPS)[number];
+
+/** Wizard step an execution that is still being set up should resume at. */
+export function setupStepOf(status: ExecutionStatus): SetupStep {
+  switch (status) {
+    case "configuring":
+      return "questions";
+    case "plan_ready":
+    case "awaiting_approval":
+      return "plan";
+    default:
+      return "mode";
+  }
+}

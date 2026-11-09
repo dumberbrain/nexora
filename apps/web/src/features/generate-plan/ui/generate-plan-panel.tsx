@@ -44,8 +44,7 @@ export function GeneratePlanPanel({
       },
     });
 
-  const generate = () =>
-    run({ modelAssisted, consent: false, rememberConsentForProject: false });
+  const generate = () => run({ modelAssisted, consent: false, rememberConsentForProject: false });
   const confirm = (remember: boolean) =>
     run({ modelAssisted: true, consent: true, rememberConsentForProject: remember });
   const failed = plan.isError && !isConsentRequired(plan.error);
@@ -67,8 +66,8 @@ export function GeneratePlanPanel({
             Model-assisted planning
           </label>
           <p id={`${switchId}-hint`} className="text-xs text-muted-foreground">
-            Off: a local heuristic plan (no model usage). On: Claude drafts the plan — this
-            consumes model usage and asks for your consent first.
+            Off: a local heuristic plan (no model usage). On: Claude drafts the plan — this consumes
+            model usage and asks for your consent first.
           </p>
         </div>
       </div>

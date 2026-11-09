@@ -37,7 +37,11 @@ export function PlanRow({ task, conflicts, approveInput }: PlanRowProps) {
       <TableCell>{task.assignedAgentRole ?? <span className={MUTED}>unassigned</span>}</TableCell>
       <TableCell>{EXECUTION_MODE_LABEL[task.mode]}</TableCell>
       <TableCell>
-        {task.dependsOn.length > 0 ? task.dependsOn.join(", ") : <span className={MUTED}>none</span>}
+        {task.dependsOn.length > 0 ? (
+          task.dependsOn.join(", ")
+        ) : (
+          <span className={MUTED}>none</span>
+        )}
       </TableCell>
       <TableCell>
         <PriorityTag priority={task.priority} />
@@ -45,7 +49,7 @@ export function PlanRow({ task, conflicts, approveInput }: PlanRowProps) {
       <TableCell>
         <TaskStatusBadge status={task.status} />
       </TableCell>
-      <TableCell className="max-w-48 whitespace-normal break-all">
+      <TableCell className="max-w-48 break-all whitespace-normal">
         {task.ownedPaths.join(", ")}
       </TableCell>
       <TableCell>
@@ -56,12 +60,11 @@ export function PlanRow({ task, conflicts, approveInput }: PlanRowProps) {
               <input
                 type="checkbox"
                 value={task.id}
+                aria-label={`approve risky task ${task.id}`}
                 className="accent-(--phosphor)"
                 {...approveInput}
               />
-              <span>
-                approve<span className="sr-only"> risky task {task.id}</span>
-              </span>
+              <span aria-hidden="true">approve</span>
             </label>
           ) : null}
         </div>

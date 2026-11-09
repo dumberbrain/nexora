@@ -24,6 +24,14 @@ export function OverviewView() {
         index="01"
         title="Overview"
         description="What your Claude Code sessions and agents are doing right now."
+        actions={
+          <Link
+            to="/executions/new"
+            className="border border-phosphor/60 px-3 py-1.5 font-mono text-xs text-phosphor uppercase hover:bg-phosphor/10"
+          >
+            + new execution
+          </Link>
+        }
       />
       <OverviewStats />
       <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">

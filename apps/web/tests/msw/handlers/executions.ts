@@ -242,7 +242,10 @@ export const executionHandlers = [
     const body = (await request.json()) as { projectId: string; prompt: string };
     return HttpResponse.json<Execution>({ ...base, ...body }, { status: 201 });
   }),
-  http.get("*/api/v1/executions/:id", withExecution((e) => e)),
+  http.get(
+    "*/api/v1/executions/:id",
+    withExecution((e) => e),
+  ),
   http.get("*/api/v1/executions/:id/modes", () => HttpResponse.json({ items: modeFixtures })),
   http.put(
     "*/api/v1/executions/:id/mode",

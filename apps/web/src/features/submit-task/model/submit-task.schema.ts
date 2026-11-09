@@ -9,10 +9,7 @@ export const PROMPT_MAX = 20_000;
  * validates the final value (ULID project id, trimmed 1–20 000 char prompt).
  */
 export const SubmitTaskFormSchema = z.object({
-  projectId: z
-    .string()
-    .min(1, "Choose a project")
-    .pipe(CreateExecutionInputSchema.shape.projectId),
+  projectId: z.string().min(1, "Choose a project").pipe(CreateExecutionInputSchema.shape.projectId),
   prompt: z
     .string()
     .trim()

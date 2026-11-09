@@ -47,8 +47,8 @@ export function ModelUsageConsentDialog({
           <DialogTitle className="text-display text-lg">Use the model for {purpose}?</DialogTitle>
           <DialogDescription>
             This step sends your task and project context to Claude and{" "}
-            <strong className="text-foreground">will consume model usage</strong> on your
-            account. The default local analysis did not use the model.
+            <strong className="text-foreground">will consume model usage</strong> on your account.
+            The default local analysis did not use the model.
           </DialogDescription>
         </DialogHeader>
         <div className="flex items-start gap-2 border border-border p-3">

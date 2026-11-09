@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRightIcon } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useForm, type DefaultValues } from "react-hook-form";
 
 import { type Execution, type ModeOption } from "@/entities/execution";
 import { Button } from "@/shared/ui/button";
@@ -23,12 +23,14 @@ interface ModeFormProps {
 
 /** Radio cards for the mode + strategy select; PUT only on explicit submit. */
 export function ModeForm({ execution, options, onChosen }: ModeFormProps) {
+  const mode = initialMode(execution, options);
+  const defaultValues: DefaultValues<ChooseModeFormValues> = {
+    strategy: execution.strategy ?? DEFAULT_STRATEGY,
+    ...(mode ? { mode } : {}),
+  };
   const form = useForm<ChooseModeFormValues>({
     resolver: zodResolver(ChooseModeFormSchema),
-    defaultValues: {
-      ...(initialMode(execution, options) ? { mode: initialMode(execution, options) } : {}),
-      strategy: execution.strategy ?? DEFAULT_STRATEGY,
-    },
+    defaultValues,
   });
   const choose = useChooseMode(execution.id);
   const { errors, isSubmitting } = form.formState;

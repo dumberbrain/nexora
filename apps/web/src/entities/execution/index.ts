@@ -31,5 +31,13 @@ export {
   runtimeEnvironmentQuery,
   verificationQuery,
 } from "./api/execution.queries";
-export { EXECUTION_MODE_LABEL, isLaunched, isStoppable, STRATEGY_LABEL } from "./model/labels";
+export {
+  EXECUTION_MODE_LABEL,
+  isLaunched,
+  isStoppable,
+  SETUP_STEPS,
+  setupStepOf,
+  STRATEGY_LABEL,
+  type SetupStep,
+} from "./model/labels";
 export { ExecutionModeLabel } from "./ui/execution-mode-label";

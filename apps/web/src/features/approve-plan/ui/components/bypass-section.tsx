@@ -47,8 +47,7 @@ export function BypassSection({
       {enabled ? (
         <div className="flex flex-col gap-1">
           <label htmlFor={`${id}-phrase`} className="font-mono text-xs">
-            Type <span className="text-status-failed">{BYPASS_CONFIRMATION_PHRASE}</span> to
-            confirm
+            Type <span className="text-status-failed">{BYPASS_CONFIRMATION_PHRASE}</span> to confirm
           </label>
           <Input
             id={`${id}-phrase`}
