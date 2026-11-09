@@ -38,6 +38,7 @@ Pagination: cursor-based `?cursor=<ULID>&limit=1..200` → `{ items, nextCursor 
 | PUT | `/executions/:id/mode` | `{ mode, strategy }` |
 | GET | `/executions/:id/questions` | relevant follow-up `Question[]` with `recommendedDefault` |
 | PUT | `/executions/:id/config` | answers |
+| POST | `/executions/:id/analysis` | `{ consent, rememberConsentForProject }` model-backed refinement (FR-008) |
 | POST | `/executions/:id/plan` | generate plan → `plan_ready` |
 | POST | `/executions/:id/approve` | `{ approveRiskyTaskIds: string[], permissionBypass?: false }` → `running` |
 | POST | `/executions/:id/stop` | stop all runtimes (≤ 5 s) |
@@ -50,10 +51,12 @@ Pagination: cursor-based `?cursor=<ULID>&limit=1..200` → `{ items, nextCursor 
 |---|---|---|
 | GET | `/executions/:id/tasks` | list (board) |
 | PATCH | `/tasks/:id/status` | user move — only `pending⇄queued`, else 409 |
-| POST | `/tasks/:id/cancel` | |
+| POST | `/tasks/:id/cancel` | `{ reason? }` |
 | POST | `/tasks/:id/retry` | new attempt linked to previous |
 | POST | `/executions/:id/tasks` | assign additional task |
-| POST | `/tasks/:id/review` | request review by reviewer agent |
+| POST | `/tasks/:id/review` | `{ note? }` request review by reviewer agent |
+
+`/tasks/:id/…` is shorthand: task ids (`T-<n>`) are unique per execution, so the real paths are `/executions/:executionId/tasks/:taskId/{status,cancel,retry,review}`. `POST /executions/:id/tasks` takes `AssignTaskInput`. Each control returns the updated entity.
 
 ## Sessions & agents
 
@@ -66,6 +69,8 @@ Pagination: cursor-based `?cursor=<ULID>&limit=1..200` → `{ items, nextCursor 
 | GET | `/agents` | filter `sessionId, executionId, status` |
 | GET | `/agents/:id` | details incl. timeline cursor, files, usage (nullable) |
 | POST | `/agents/:id/messages` | send message (capability-gated) |
+| GET | `/messages` | Communication Center: `executionId?, taskId?, type?, limit, cursor` → `{ items: Message[], nextCursor }` |
+| GET/PUT | `/projects/:id/model-consent` | `{ alwaysAllow }` per-project model-usage consent; PUT false revokes (FR-008) |
 
 ## Approvals
 

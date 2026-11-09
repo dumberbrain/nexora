@@ -6,6 +6,7 @@ import {
   type ExecutionList,
   type ExecutionTasks,
   GeneratePlanInputSchema,
+  RefineAnalysisInputSchema,
   SetModeInputSchema,
   UlidSchema,
   UpdateConfigInputSchema,
@@ -17,12 +18,6 @@ import { z } from "zod";
 import { type Orchestration } from "../../modules/execution-orchestrator";
 import { type AppBindings } from "../context";
 import { readJson } from "../request";
-
-/** POST /executions/:id/analysis — model-backed refinement, consent required (FR-008). */
-export const RefineAnalysisInputSchema = z.object({
-  consent: z.boolean().default(false),
-  rememberConsentForProject: z.boolean().default(false),
-});
 
 const ListQuerySchema = z.object({ projectId: UlidSchema.optional() });
 

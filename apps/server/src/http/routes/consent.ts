@@ -1,19 +1,11 @@
-import { UlidSchema } from "@nexora/contracts";
+import { type ModelConsent, ModelConsentInputSchema, UlidSchema } from "@nexora/contracts";
 import { type Hono } from "hono";
-import { z } from "zod";
 
 import { type ConsentService } from "../../modules/execution-orchestrator";
 import { type ProjectService } from "../../modules/project-registry";
 import { type AppBindings } from "../context";
 import { AppError } from "../errors";
 import { readJson } from "../request";
-
-/** Body of PUT /projects/:id/model-consent (FR-008 per-project "always allow"). */
-export const ModelConsentInputSchema = z.object({ alwaysAllow: z.boolean() });
-export interface ModelConsent {
-  projectId: string;
-  alwaysAllow: boolean;
-}
 
 export interface ConsentRouteDeps {
   consent: ConsentService;
