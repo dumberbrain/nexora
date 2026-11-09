@@ -12,6 +12,7 @@ import { runtimeHandlers } from "./runtime";
 import { sessionHandlers } from "./sessions";
 import { statsHandlers } from "./stats";
 import { taskHandlers } from "./tasks";
+import { teamHandlers } from "./teams";
 import { workflowHandlers } from "./workflows";
 
 export { agentFixtures } from "./agents";
@@ -50,6 +51,16 @@ export {
 export { statsFixture } from "./stats";
 export { boardFixtures, resetTaskBoard } from "./tasks";
 export {
+  enableResultFixture,
+  hybridPlanFixture,
+  TEAM_LEAD_SESSION_ID,
+  teamAgentFixtures,
+  teamLeadDetailFixture,
+  teamLeadSessionFixture,
+  teamPtyCapabilities,
+  teamViewFixture,
+} from "./teams";
+export {
   resetWorkflows,
   validateGraphFixture,
   WORKFLOW_EXECUTION_ID,
@@ -58,7 +69,7 @@ export {
   workflowRunFixture,
 } from "./workflows";
 
-/** Default handlers (US1 monitoring + US2 orchestration + US3 controls + US4 board + US5 workflows + US7 integrations/GitHub); tests override per case with `server.use(...)`. */
+/** Default handlers (US1 monitoring + US2 orchestration + US3 controls + US4 board + US5 workflows + US6 teams + US7 integrations/GitHub); tests override per case with `server.use(...)`. */
 export const handlers: RequestHandler[] = [
   ...projectHandlers,
   ...sessionHandlers,
@@ -73,4 +84,5 @@ export const handlers: RequestHandler[] = [
   ...workflowHandlers,
   ...integrationHandlers,
   ...githubHandlers,
+  ...teamHandlers,
 ];

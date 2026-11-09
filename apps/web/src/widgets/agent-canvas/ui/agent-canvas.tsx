@@ -9,10 +9,12 @@ import { useThemeStore } from "@/features/toggle-theme";
 import { EmptyState, ErrorState, LoadingState } from "@/shared/ui/state";
 
 import { AgentNode } from "./components/agent-node";
+import { TeamGroup } from "./components/team-group";
+import { teamGroups } from "../lib/team-groups";
 import { toFlow } from "../lib/to-flow";
 import { useActivityPulse } from "../model/use-activity-pulse";
 
-const NODE_TYPES: NodeTypes = { agent: AgentNode };
+const NODE_TYPES: NodeTypes = { agent: AgentNode, teamGroup: TeamGroup };
 
 interface AgentCanvasProps {
   /** restrict to one session's agent tree; all observed agents otherwise */
@@ -47,7 +49,9 @@ export function AgentCanvas({ sessionId }: AgentCanvasProps) {
     );
   }
 
-  const { nodes, edges } = toFlow(agents.data.items, pulsing);
+  const flow = toFlow(agents.data.items, pulsing);
+  // team frames first so they render behind their members
+  const nodes = [...teamGroups(agents.data.items, flow.nodes), ...flow.nodes];
   return (
     <section
       aria-label="Agent canvas"
@@ -55,7 +59,7 @@ export function AgentCanvas({ sessionId }: AgentCanvasProps) {
     >
       <ReactFlow
         nodes={nodes}
-        edges={edges}
+        edges={flow.edges}
         nodeTypes={NODE_TYPES}
         colorMode={colorMode}
         nodesDraggable={false}
@@ -65,9 +69,11 @@ export function AgentCanvas({ sessionId }: AgentCanvasProps) {
         fitViewOptions={{ maxZoom: 1, padding: 0.3 }}
         minZoom={0.2}
         proOptions={{ hideAttribution: true }}
-        onNodeClick={(_, node) =>
-          void navigate({ to: "/agents/$agentId", params: { agentId: node.id } })
-        }
+        onNodeClick={(_, node) => {
+          if (node.type === "agent") {
+            void navigate({ to: "/agents/$agentId", params: { agentId: node.id } });
+          }
+        }}
       >
         <Background variant={BackgroundVariant.Dots} gap={24} size={1} />
         <Controls showInteractive={false} />

@@ -54,7 +54,11 @@ export function ApproveForm({ execution, plan, onApproved }: ApproveFormProps) {
       className="flex flex-col gap-4"
     >
       <ConflictList conflicts={plan.conflicts} />
-      <PlanTable plan={plan} approveInput={form.register("approveRiskyTaskIds")} />
+      <PlanTable
+        plan={plan}
+        hybrid={execution.mode === "hybrid"}
+        approveInput={form.register("approveRiskyTaskIds")}
+      />
       {waiting > 0 ? (
         <p className="font-mono text-xs text-status-waiting">
           {waiting} risky task{waiting === 1 ? "" : "s"} will wait in the approvals inbox until

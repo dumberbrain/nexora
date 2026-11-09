@@ -1,6 +1,7 @@
 import { PageHeader } from "@/shared/ui/layout/page-header";
 import { AgentCanvas } from "@/widgets/agent-canvas";
 import { AgentDetailsPanel } from "@/widgets/agent-details-panel";
+import { TeamLeadTerminal } from "@/widgets/terminal";
 
 interface AgentViewProps {
   agentId: string;
@@ -19,6 +20,7 @@ export function AgentView({ agentId, sessionId, onClose }: AgentViewProps) {
         agentId={agentId}
         open
         onOpenChange={(open) => (open ? undefined : onClose())}
+        leadTerminal={(session) => <TeamLeadTerminal session={session} />}
       />
     </div>
   );

@@ -9,6 +9,8 @@ import { TableCell, TableRow } from "@/shared/ui/table";
 interface PlanRowProps {
   task: Task;
   conflicts: PlanConflict[];
+  /** hybrid plan: add the planner's reason for this task's mechanism */
+  hybrid: boolean;
   /** register("approveRiskyTaskIds") — only rendered for risky tasks */
   approveInput: Omit<ComponentProps<"input">, "type" | "value">;
 }
@@ -16,7 +18,7 @@ interface PlanRowProps {
 const MUTED = "text-muted-foreground";
 
 /** One plan task (US2-AS4) with its conflict flag (FR-007) and risky-task approval (FR-033). */
-export function PlanRow({ task, conflicts, approveInput }: PlanRowProps) {
+export function PlanRow({ task, conflicts, hybrid, approveInput }: PlanRowProps) {
   const others = conflicts.flatMap((c) => c.taskIds.filter((id) => id !== task.id));
   const risky = task.riskClass !== "normal";
   return (
@@ -36,6 +38,11 @@ export function PlanRow({ task, conflicts, approveInput }: PlanRowProps) {
       </TableCell>
       <TableCell>{task.assignedAgentRole ?? <span className={MUTED}>unassigned</span>}</TableCell>
       <TableCell>{EXECUTION_MODE_LABEL[task.mode]}</TableCell>
+      {hybrid ? (
+        <TableCell className="max-w-56 whitespace-normal">
+          {task.mechanismReason ?? <span className={MUTED}>no reason given</span>}
+        </TableCell>
+      ) : null}
       <TableCell>
         {task.dependsOn.length > 0 ? (
           task.dependsOn.join(", ")
