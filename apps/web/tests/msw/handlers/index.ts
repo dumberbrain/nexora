@@ -4,6 +4,8 @@ import { agentHandlers } from "./agents";
 import { approvalHandlers } from "./approvals";
 import { eventHandlers } from "./events";
 import { executionHandlers } from "./executions";
+import { githubHandlers } from "./github";
+import { integrationHandlers } from "./integrations";
 import { messageHandlers } from "./messages";
 import { projectHandlers } from "./projects";
 import { runtimeHandlers } from "./runtime";
@@ -23,6 +25,19 @@ export {
   questionFixtures,
   verificationFixture,
 } from "./executions";
+export {
+  githubBranchFixtures,
+  githubCommitFixtures,
+  githubPullFilesFixture,
+  githubPullFixtures,
+  githubRepoFixtures,
+  githubStatusFixtures,
+} from "./github";
+export {
+  INTEGRATIONS_DISCOVERED_AT,
+  integrationFixtures,
+  refreshedIntegrationFixtures,
+} from "./integrations";
 export { messageFixtures } from "./messages";
 export { hookPreviewFixture, projectFixtures } from "./projects";
 export { runtimeEnvironmentFixture } from "./runtime";
@@ -43,7 +58,7 @@ export {
   workflowRunFixture,
 } from "./workflows";
 
-/** Default handlers (US1 monitoring + US2 orchestration + US3 controls + US4 board + US5 workflows); tests override per case with `server.use(...)`. */
+/** Default handlers (US1 monitoring + US2 orchestration + US3 controls + US4 board + US5 workflows + US7 integrations/GitHub); tests override per case with `server.use(...)`. */
 export const handlers: RequestHandler[] = [
   ...projectHandlers,
   ...sessionHandlers,
@@ -56,4 +71,6 @@ export const handlers: RequestHandler[] = [
   ...runtimeHandlers,
   ...taskHandlers,
   ...workflowHandlers,
+  ...integrationHandlers,
+  ...githubHandlers,
 ];
