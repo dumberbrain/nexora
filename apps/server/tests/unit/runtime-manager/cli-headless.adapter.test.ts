@@ -1,8 +1,9 @@
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve, sep } from "node:path";
 
 import { describe, expect, it, vi } from "vitest";
 
+import { PathGuardError } from "../../../src/lib/path-guard";
 import { type StreamingExit, type StreamingProcess } from "../../../src/lib/process";
 import { type EventInput } from "../../../src/modules/event-manager";
 import {
@@ -76,11 +77,13 @@ function stubProcess(): StubProcess {
   return p;
 }
 
+const REPO = resolve(sep, "work", "demo-repo");
+
 const input: StartSessionInput = {
   executionId: "01EXEC",
   taskId: "T-1",
-  projectRoot: "C:\\work\\demo-repo",
-  cwd: "C:\\work\\demo-repo",
+  projectRoot: REPO,
+  cwd: REPO,
   prompt: "delegate",
   ownedPaths: [],
   permissionMode: "default",
@@ -115,7 +118,14 @@ describe("CliHeadlessAdapter", () => {
       "--verbose",
     ]);
     expect(args).toEqual(
-      expect.arrayContaining(["--permission-mode", "default", "--model", "haiku", "--max-turns", "4"]),
+      expect.arrayContaining([
+        "--permission-mode",
+        "default",
+        "--model",
+        "haiku",
+        "--max-turns",
+        "4",
+      ]),
     );
     expect(args[args.indexOf("--resume") + 1]).toBe("abc");
     expect(args[args.indexOf("--disallowedTools") + 1]).toContain("Bash");
@@ -142,7 +152,12 @@ describe("CliHeadlessAdapter", () => {
     await expect(handle.done).resolves.toMatchObject({ outcome: "completed", resultText: "DONE" });
     expect(t.events.every((e) => e.source === "stream_json")).toBe(true);
     expect(t.events.map((e) => e.type)).toEqual(
-      expect.arrayContaining(["session.started", "agent.spawned", "file.modified", "agent.completed"]),
+      expect.arrayContaining([
+        "session.started",
+        "agent.spawned",
+        "file.modified",
+        "agent.completed",
+      ]),
     );
     expect(t.adapter.capabilities()).toEqual(CLI_HEADLESS_CAPABILITIES);
 
@@ -174,6 +189,25 @@ describe("CliHeadlessAdapter", () => {
     expect(t.events.some((e) => e.type === "error" && e.summary.includes("outside scope"))).toBe(
       true,
     );
+  });
+
+  it("refuses a cwd outside the project root without spawning", async () => {
+    const t = setup();
+    await expect(
+      t.adapter.start({ ...input, cwd: resolve(sep, "elsewhere") }, t.deps),
+    ).rejects.toBeInstanceOf(PathGuardError);
+    expect(t.spawn).not.toHaveBeenCalled();
+  });
+
+  it("detect() reports the CLI version, or unavailable with a reason", async () => {
+    const ok = new CliHeadlessAdapter({ version: () => Promise.resolve("2.1.0 (Claude Code)\n") });
+    await expect(ok.detect()).resolves.toEqual({
+      available: true,
+      version: "2.1.0 (Claude Code)",
+      reason: null,
+    });
+    const missing = new CliHeadlessAdapter({ version: () => Promise.reject(new Error("ENOENT")) });
+    await expect(missing.detect()).resolves.toMatchObject({ available: false, version: null });
   });
 
   it("a process that exits without a result fails the turn", async () => {

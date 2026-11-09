@@ -3,11 +3,7 @@ import { z } from "zod";
 
 import { type EventInput } from "../../../event-manager";
 import { displayPath, toolSummary } from "../../../event-manager/normalizers/hook-normalizer";
-import {
-  type EventSink,
-  FILE_WRITE_TOOLS,
-  type SessionResult,
-} from "../../runtime-adapter";
+import { type EventSink, FILE_WRITE_TOOLS, type SessionResult } from "../../runtime-adapter";
 
 /**
  * SDK / stream-json message → NexoraEvent mapper (T085, research S3). Shared by the Agent SDK and
@@ -178,7 +174,11 @@ export class MessageMapper {
         severity: "info",
         agentId: null,
         summary: `Session started${model ? ` (${model})` : ""}`,
-        payload: { model, cwd, permissionMode: (raw as { permissionMode?: unknown }).permissionMode },
+        payload: {
+          model,
+          cwd,
+          permissionMode: (raw as { permissionMode?: unknown }).permissionMode,
+        },
       });
     }
     return { kind: "init", sessionId, model, cwd, first };
@@ -217,8 +217,10 @@ export class MessageMapper {
       payload: { toolUseId: block.id, toolName: block.name, input: block.input },
     });
     if (SPAWN_TOOLS.has(block.name)) {
-      const subagentType = typeof block.input.subagent_type === "string" ? block.input.subagent_type : null;
-      const description = typeof block.input.description === "string" ? block.input.description : null;
+      const subagentType =
+        typeof block.input.subagent_type === "string" ? block.input.subagent_type : null;
+      const description =
+        typeof block.input.description === "string" ? block.input.description : null;
       this.emit({
         type: "agent.spawned",
         reliability: "authoritative",
@@ -286,7 +288,7 @@ export class MessageMapper {
     this.lastText = null;
     const error =
       outcome === "failed"
-        ? (r.errors?.filter((e): e is string => typeof e === "string").join("; ") || r.subtype)
+        ? r.errors?.filter((e): e is string => typeof e === "string").join("; ") || r.subtype
         : null;
     const payload = {
       outcome,

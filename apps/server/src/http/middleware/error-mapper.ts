@@ -3,6 +3,7 @@ import { HTTPException } from "hono/http-exception";
 import { ZodError } from "zod";
 
 import { type Logger } from "../../lib/logger";
+import { CapabilityUnsupportedError } from "../../modules/runtime-manager/errors";
 import { AppError, errorBody } from "../errors";
 
 /** Map every thrown error to the single API error shape (contracts/rest-api.md). */
@@ -10,6 +11,10 @@ export function errorMapper(log: Logger): ErrorHandler {
   return (err: Error, c: Context) => {
     if (err instanceof AppError) {
       return c.json(errorBody(err.code, err.message, err.details), err.status);
+    }
+    if (err instanceof CapabilityUnsupportedError) {
+      const details = [{ runtime: err.runtime, capability: err.capability }];
+      return c.json(errorBody(err.code, err.message, details), err.status);
     }
     if (err instanceof ZodError) {
       const issues = err.issues.map((i) => ({ path: i.path.join("."), message: i.message }));

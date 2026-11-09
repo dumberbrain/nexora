@@ -20,6 +20,7 @@ import {
   type SessionHandle,
   type StartSessionInput,
 } from "../../runtime-adapter";
+import { assertSessionCwd } from "../session-cwd";
 import { deferred, TurnTracker } from "../turn-tracker";
 
 /** The part of the SDK's Query object the adapter uses (lets tests inject a fake). */
@@ -86,6 +87,11 @@ export class AgentSdkAdapter implements RuntimeAdapter {
   }
 
   start(input: StartSessionInput, deps: RuntimeDeps): Promise<SessionHandle> {
+    try {
+      assertSessionCwd(input);
+    } catch (err) {
+      return Promise.reject(err instanceof Error ? err : new Error(String(err)));
+    }
     const mapper = new MessageMapper(
       { executionId: input.executionId, taskId: input.taskId, source: "agent_sdk" },
       deps.sink,

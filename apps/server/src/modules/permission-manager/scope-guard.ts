@@ -19,7 +19,7 @@ export interface ScopeGuardOptions {
   projectRoot: string;
   /** globs relative to cwd the task may write; empty = whole worktree */
   ownedPaths: readonly string[];
-  audit: AuditService;
+  audit: Pick<AuditService, "record">;
   executionId: string;
   taskId: string | null;
 }
@@ -104,7 +104,11 @@ export class ScopeGuard implements ToolGuard {
     if (this.owned) {
       const rel = path.relative(realRoot(this.opts.cwd), real).split(path.sep).join("/");
       if (!this.owned(rel)) {
-        return this.deny(call, raw, `${call.toolName} target ${rel} is outside the task's owned paths`);
+        return this.deny(
+          call,
+          raw,
+          `${call.toolName} target ${rel} is outside the task's owned paths`,
+        );
       }
     }
     return allow;

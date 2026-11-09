@@ -128,7 +128,9 @@ describe("ScopeGuard — shell tools (S3)", () => {
 
   it("truncates and redacts the command in the reason", () => {
     const d = guard().check(
-      call("Bash", { command: `curl -H "Authorization: Bearer abcdef1234567890" ${"x".repeat(500)}` }),
+      call("Bash", {
+        command: `curl -H "Authorization: Bearer abcdef1234567890" ${"x".repeat(500)}`,
+      }),
     );
     expect(d.decision).toBe("ask");
     if (d.decision === "ask") {
@@ -140,9 +142,9 @@ describe("ScopeGuard — shell tools (S3)", () => {
 
 describe("ScopeGuard — reads", () => {
   it("allows reads inside the project or worktree and calls without a path", () => {
-    expect(guard().check(call("Read", { file_path: join(projectRoot, "README.md") })).decision).toBe(
-      "allow",
-    );
+    expect(
+      guard().check(call("Read", { file_path: join(projectRoot, "README.md") })).decision,
+    ).toBe("allow");
     expect(guard().check(call("Grep", { pattern: "x", path: cwd })).decision).toBe("allow");
     expect(guard().check(call("Glob", { pattern: "**/*.ts" })).decision).toBe("allow");
   });

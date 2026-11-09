@@ -1,8 +1,9 @@
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve, sep } from "node:path";
 
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, type Mock, vi } from "vitest";
 
+import { PathGuardError } from "../../src/lib/path-guard";
 import { type EventInput } from "../../src/modules/event-manager";
 import {
   AgentSdkAdapter,
@@ -153,6 +154,7 @@ interface FakeQuery extends SdkQuery {
   end(): void;
   interrupt: ReturnType<typeof vi.fn<() => Promise<unknown>>>;
   close: ReturnType<typeof vi.fn<() => void>>;
+  setPermissionMode: Mock<SdkQuery["setPermissionMode"]>;
 }
 
 function fakeQuery(): FakeQuery {
@@ -180,14 +182,16 @@ function fakeQuery(): FakeQuery {
       }
     },
   };
-  return q as unknown as FakeQuery;
+  return q;
 }
+
+const REPO = resolve(sep, "work", "demo-repo");
 
 const input: StartSessionInput = {
   executionId: "01EXEC",
   taskId: "T-1",
-  projectRoot: "C:\\work\\demo-repo",
-  cwd: "C:\\work\\demo-repo",
+  projectRoot: REPO,
+  cwd: REPO,
   prompt: "do it",
   ownedPaths: [],
   permissionMode: "default",
@@ -202,8 +206,10 @@ function setup(decision: ToolDecision, approval: "allow" | "deny" = "allow") {
     return q;
   };
   const events: EventInput[] = [];
-  const guard: ToolGuard = { check: vi.fn(() => decision) };
-  const approvals: ApprovalGate = { request: vi.fn(() => Promise.resolve(approval)) };
+  const guard: { check: Mock<ToolGuard["check"]> } = { check: vi.fn(() => decision) };
+  const approvals: { request: Mock<ApprovalGate["request"]> } = {
+    request: vi.fn(() => Promise.resolve(approval)),
+  };
   const onSessionId = vi.fn();
   const adapter = new AgentSdkAdapter({ queryFn });
   return {
@@ -355,18 +361,33 @@ describe("AgentSdkAdapter", () => {
     expect(t.events.at(-1)?.type).toBe("session.stopped");
   });
 
-  it("resolves the turn as failed when the SDK stream throws", async () => {
-    const queryFn: QueryFn = () =>
-      ({
-        interrupt: () => Promise.resolve(undefined),
-        close: () => undefined,
-        setPermissionMode: () => Promise.resolve(),
-        // eslint-disable-next-line require-yield
-        async *[Symbol.asyncIterator]() {
-          await Promise.resolve();
-          throw new Error("spawn failed");
+  it("refuses a cwd outside the project root (path guard) before querying", async () => {
+    const queryFn = vi.fn(() => fakeQuery());
+    const adapter = new AgentSdkAdapter({ queryFn });
+    await expect(
+      adapter.start(
+        { ...input, cwd: resolve(sep, "elsewhere") },
+        {
+          sink: { emit: () => undefined },
+          guard: { check: () => ({ decision: "allow" }) },
+          approvals: { request: () => Promise.resolve("deny") },
         },
-      }) as SdkQuery;
+      ),
+    ).rejects.toBeInstanceOf(PathGuardError);
+    expect(queryFn).not.toHaveBeenCalled();
+  });
+
+  it("resolves the turn as failed when the SDK stream throws", async () => {
+    const queryFn: QueryFn = () => ({
+      interrupt: () => Promise.resolve(undefined),
+      close: () => undefined,
+      setPermissionMode: () => Promise.resolve(),
+
+      async *[Symbol.asyncIterator]() {
+        await Promise.resolve();
+        throw new Error("spawn failed");
+      },
+    });
     const adapter = new AgentSdkAdapter({ queryFn });
     const handle = await adapter.start(input, {
       sink: { emit: () => undefined },
