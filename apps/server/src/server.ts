@@ -14,6 +14,7 @@ import { registerApiRoutes, registerPublicApiRoutes } from "./http/routes";
 import { logger as defaultLogger, type Logger } from "./lib/logger";
 import { EventBus, EventStore } from "./modules/event-manager";
 import { AuditService } from "./modules/permission-manager/audit.service";
+import { createOrchestrationLayer, type OrchestrationLayer } from "./orchestration";
 import { createGateway, type Gateway } from "./realtime/gateway";
 import { createServices, type Services } from "./services";
 
@@ -35,6 +36,8 @@ export interface NexoraServer {
   audit: AuditService;
   gateway: Gateway;
   services: Services;
+  /** US2 runtimes + orchestration */
+  us2: OrchestrationLayer;
   /** graceful stop: runtimes → realtime → HTTP → flush events → DB */
   close(): Promise<void>;
 }
@@ -68,6 +71,7 @@ export async function createNexoraServer(opts: CreateServerOptions): Promise<Nex
     logger: log,
     publishStats: (stats) => live.gateway?.publishStats(stats),
   });
+  const us2 = createOrchestrationLayer({ db, env, bus, store, audit, logger: log, services });
   const ports = [...new Set([env.port, WEB_PORT])];
 
   const serveSpa = env.nodeEnv !== "development" && opts.webDistDir !== null;
@@ -83,7 +87,10 @@ export async function createNexoraServer(opts: CreateServerOptions): Promise<Nex
     logger: log,
     keys,
     registerPublicRoutes: (api) => registerPublicApiRoutes(api, services),
-    registerRoutes: (api) => registerApiRoutes(api, services),
+    registerRoutes: (api) => {
+      registerApiRoutes(api, services);
+      us2.registerRoutes(api);
+    },
     ...(serveSpa ? { webDistDir } : {}),
   });
 
@@ -121,10 +128,11 @@ export async function createNexoraServer(opts: CreateServerOptions): Promise<Nex
     audit,
     gateway,
     services,
+    us2,
     close: async () => {
       if (closed) return;
       closed = true;
-      // runtime adapters are stopped here once they exist (Phase 4)
+      await us2.close();
       services.close();
       await gateway.close();
       await new Promise<void>((r) => http.close(() => r()));

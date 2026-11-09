@@ -169,7 +169,7 @@ testable increment.
 - [X] T080 [P] [US2] Unit test `apps/server/tests/unit/execution-orchestrator/analysis-consent.test.ts`: default analysis performs only local inspection (no runtime started); model-backed analysis/planning refused with APPROVAL_REQUIRED until `modelAnalysisConsent` is true or a per-project always-allow preference exists (FR-008)
 - [X] T081 [P] [US2] Contract test `apps/server/tests/contract/agent-sdk-adapter.test.ts` replaying S3 fixtures: `system:init` → session.started with model, `parent_tool_use_id` → subagent agent tree, `result` → usage with `reportsUsage: 'estimate'`, `canUseTool` routed to ApprovalGate
 - [X] T082 [P] [US2] Integration test `apps/server/tests/integration/executions-flow.test.ts` with `FakeRuntimeAdapter` (`apps/server/tests/fakes/fake-runtime-adapter.ts`, test-only): POST /executions → modes → mode → questions → config → plan → approve → tasks run → verification
-- [ ] T083 [P] [US2] E2E `e2e/us2-task-to-execution.spec.ts` (served by `start:e2e`; fake adapter enabled via `NEXORA_TEST_FAKE_RUNTIME=1` only when `NODE_ENV=test` — server refuses to start with the flag in any other environment): wizard flow, risky task approval checkbox, status board updates, axe clean
+- [X] T083 [P] [US2] E2E `e2e/us2-task-to-execution.spec.ts` (served by `start:e2e`; fake adapter enabled via `NEXORA_TEST_FAKE_RUNTIME=1` only when `NODE_ENV=test` — server refuses to start with the flag in any other environment): wizard flow, risky task approval checkbox, status board updates, axe clean
 
 ### Implementation for User Story 2
 
