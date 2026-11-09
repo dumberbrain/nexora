@@ -1,6 +1,6 @@
 import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { type APIRequestContext, expect } from "@playwright/test";
@@ -27,14 +27,18 @@ async function login(api: APIRequestContext): Promise<string> {
  * Register a throw-away project, install hooks with explicit confirmation, then replay the
  * recorded Claude Code hook payloads through the public ingest endpoint with the real token.
  */
-export async function seedObservedSession(api: APIRequestContext): Promise<() => void> {
+export async function seedObservedSession(
+  api: APIRequestContext,
+): Promise<{ name: string; cleanup: () => void }> {
   const csrf = await login(api);
   const root = mkdtempSync(join(tmpdir(), "nexora-e2e-project-"));
   const headers = { "x-nexora-csrf": csrf };
+  const name = basename(root);
 
   const project = await api.post("/api/v1/projects", {
     headers,
-    data: { rootPath: root, name: "e2e-demo" },
+    // unique per run: CI runs every browser project (and retries) against one server
+    data: { rootPath: root, name },
   });
   expect(project.status()).toBe(201);
   const { id } = (await project.json()) as { id: string };
@@ -58,5 +62,5 @@ export async function seedObservedSession(api: APIRequestContext): Promise<() =>
     });
     expect(res.status(), file).toBe(200);
   }
-  return () => rmSync(root, { recursive: true, force: true });
+  return { name, cleanup: () => rmSync(root, { recursive: true, force: true }) };
 }

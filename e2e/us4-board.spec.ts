@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 
 import {
   type APIRequestContext,
@@ -62,7 +62,7 @@ test.beforeAll(async ({ baseURL }) => {
   api = await playwrightRequest.newContext({ baseURL: baseURL! });
   expect((await api.get("/api/v1/auth/session")).ok()).toBeTruthy();
   csrf = (await api.storageState()).cookies.find((c) => c.name === "nexora_csrf")!.value;
-  const project = await call("post", "/projects", { rootPath: root, name: "e2e-us4" });
+  const project = await call("post", "/projects", { rootPath: root, name: basename(root) });
   const execution = await call("post", "/executions", { projectId: project.id, prompt: PROMPT });
   executionId = execution.id as string;
   await call("put", `/executions/${executionId}/mode`, {

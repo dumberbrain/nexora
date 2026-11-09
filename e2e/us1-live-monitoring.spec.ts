@@ -7,10 +7,11 @@ import { S1, seedObservedSession } from "./support/us1-seed";
 test.describe.configure({ mode: "serial" });
 
 let cleanup: (() => void) | undefined;
+let projectName = "";
 
 test.beforeAll(async ({ baseURL }) => {
   const api = await playwrightRequest.newContext({ baseURL: baseURL! });
-  cleanup = await seedObservedSession(api);
+  ({ name: projectName, cleanup } = await seedObservedSession(api));
   await api.dispose();
 });
 
@@ -22,7 +23,7 @@ test("overview shows live counters and the registered project", async ({
 }) => {
   await page.goto("/");
   await expect(page.getByLabel("Active sessions")).toBeVisible();
-  await expect(page.getByText("e2e-demo")).toBeVisible();
+  await expect(page.getByText(projectName, { exact: true })).toBeVisible();
   await expect(page.getByRole("status", { name: /realtime connected/i })).toBeVisible();
   await expectNoA11yViolations();
 });
@@ -69,7 +70,8 @@ test("live logs search, and export the filtered result as CSV", async ({
 
   await page.getByLabel(/search text/i).fill(`Modified ${S1.writtenFile}`);
   await page.getByRole("button", { name: "Apply" }).click();
-  await expect(page.getByText(`Modified ${S1.writtenFile}`)).toBeVisible();
+  // every browser project replays the same recorded session, so the row may appear more than once
+  await expect(page.getByText(`Modified ${S1.writtenFile}`).first()).toBeVisible();
   await expect(page.getByText(`Read ${S1.writtenFile}`)).toHaveCount(0);
 
   const csv = page.getByRole("link", { name: /csv/i });

@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 
 import { request as playwrightRequest } from "@playwright/test";
 
@@ -11,7 +11,7 @@ import { expect, test } from "./fixtures/axe";
 // (NEXORA_TEST_FAKE_RUNTIME=1, NODE_ENV=test) with real git worktrees.
 test.describe.configure({ mode: "serial" });
 
-const PROJECT = "e2e-us2";
+let PROJECT = "";
 const PROMPT = [
   "1. Add a users endpoint in src/api/users.ts",
   "2. Build the users page in src/web/users.tsx",
@@ -22,6 +22,8 @@ let root = "";
 
 test.beforeAll(async ({ baseURL }) => {
   root = mkdtempSync(join(tmpdir(), "nexora-e2e-us2-"));
+  // unique per run: CI runs every browser project (and retries) against one server
+  PROJECT = basename(root);
   const git = (...args: string[]) => execFileSync("git", args, { cwd: root });
   git("init", "-q", "-b", "main");
   git("config", "user.email", "e2e@nexora.local");
