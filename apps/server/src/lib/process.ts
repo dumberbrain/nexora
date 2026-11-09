@@ -2,6 +2,7 @@ import { execFile, spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
+import { createInterface } from "node:readline";
 
 /** The only executables Nexora may start (FR-051). Exact names — no paths, no shells. */
 export const ALLOWED_COMMANDS = new Set(["claude", "git", "gh"] as const);
@@ -167,4 +168,93 @@ export async function runCommand(
       resolve(result);
     });
   });
+}
+
+export interface StreamingOptions {
+  cwd?: string;
+  env?: Record<string, string>;
+  /** cap for the collected stderr, default 64 KB */
+  maxStderrBytes?: number;
+}
+
+export interface StreamingExit {
+  exitCode: number;
+  stderr: string;
+  /** spawn error (e.g. ENOENT), if any */
+  error: string | null;
+}
+
+/** A long-running allowlisted process with line-oriented stdout and writable stdin. */
+export interface StreamingProcess {
+  readonly pid: number | undefined;
+  /** stdout split into lines */
+  readonly lines: AsyncIterable<string>;
+  /** resolves once the process has exited (never rejects) */
+  readonly exited: Promise<StreamingExit>;
+  /** write one line (a trailing newline is added) */
+  writeLine(line: string): void;
+  endInput(): void;
+  /** kill the process and its children */
+  kill(): void;
+}
+
+/**
+ * Spawn an allowlisted command for streaming I/O (`claude -p --input-format stream-json`): same
+ * guarantees as runCommand — exact executable names, argument arrays, `shell: false`.
+ */
+export function spawnStreaming(
+  cmd: AllowedCommand,
+  args: readonly string[],
+  opts: StreamingOptions = {},
+): StreamingProcess {
+  if (!ALLOWED_COMMANDS.has(cmd)) {
+    throw new ProcessNotAllowedError(`Command not allowed: ${String(cmd)}`);
+  }
+  for (const a of args) {
+    if (typeof a !== "string") throw new TypeError("All process arguments must be strings");
+  }
+  const exe = resolveExecutable(cmd);
+  const cap = opts.maxStderrBytes ?? 64 * 1024;
+  const child = spawn(exe, [...args], {
+    cwd: opts.cwd,
+    env: { ...process.env, ...opts.env },
+    shell: false,
+    windowsHide: true,
+    detached: !isWin,
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+
+  let stderr = "";
+  child.stderr.on("data", (chunk: Buffer) => {
+    if (stderr.length < cap) stderr = (stderr + chunk.toString("utf8")).slice(0, cap);
+  });
+  child.stdin.on("error", () => {
+    /* the process went away; its exit is reported through `exited` */
+  });
+
+  const exited = new Promise<StreamingExit>((resolve) => {
+    let spawnError: string | null = null;
+    child.on("error", (err) => {
+      spawnError = err.message;
+      // a failed spawn never emits "close" with a pid
+      if (child.pid === undefined) resolve({ exitCode: -1, stderr, error: spawnError });
+    });
+    child.on("close", (code) => resolve({ exitCode: code ?? -1, stderr, error: spawnError }));
+  });
+
+  const lines = createInterface({ input: child.stdout, crlfDelay: Infinity });
+  return {
+    pid: child.pid,
+    lines,
+    exited,
+    writeLine(line) {
+      if (child.stdin.writable) child.stdin.write(`${line}\n`);
+    },
+    endInput() {
+      if (child.stdin.writable) child.stdin.end();
+    },
+    kill() {
+      if (child.pid && child.exitCode === null) killTree(child.pid);
+    },
+  };
 }

@@ -5,6 +5,7 @@ import {
   ProcessNotAllowedError,
   ProcessTimeoutError,
   runCommand,
+  spawnStreaming,
 } from "../../../src/lib/process";
 
 describe("runCommand", () => {
@@ -46,5 +47,29 @@ describe("runCommand", () => {
     await expect(
       runCommand("git", ["hash-object", "--stdin"], { timeoutMs: 300, keepStdinOpen: true }),
     ).rejects.toThrow(ProcessTimeoutError);
+  });
+});
+
+describe("spawnStreaming", () => {
+  it("rejects commands outside the allowlist", () => {
+    expect(() => spawnStreaming("node" as never, [])).toThrow(ProcessNotAllowedError);
+  });
+
+  it("streams stdin lines through the process and yields stdout lines", async () => {
+    // `git hash-object --stdin` reads stdin until EOF and prints one line
+    const p = spawnStreaming("git", ["hash-object", "--stdin"]);
+    p.writeLine("hello");
+    p.endInput();
+    const out: string[] = [];
+    for await (const line of p.lines) out.push(line);
+    expect(out).toEqual(["ce013625030ba8dba906f756967f9e9ca394464a"]);
+    await expect(p.exited).resolves.toMatchObject({ exitCode: 0, error: null });
+  });
+
+  it("kills a blocked process", async () => {
+    const p = spawnStreaming("git", ["hash-object", "--stdin"]);
+    p.kill();
+    const exit = await p.exited;
+    expect(exit.exitCode).not.toBe(0);
   });
 });

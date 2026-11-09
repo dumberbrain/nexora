@@ -1,3 +1,4 @@
+import { realpathSync } from "node:fs";
 import { realpath } from "node:fs/promises";
 import path from "node:path";
 
@@ -60,6 +61,39 @@ export async function resolveInsideRoot(root: string, target: string): Promise<s
   }
   const realRoot = await realpath(root);
   const realTarget = await realpathAllowMissing(target);
+  if (!isInsideRoot(realRoot, realTarget)) {
+    throw new PathGuardError(`Path escapes the allowed root via a link: ${target}`);
+  }
+  return realTarget;
+}
+
+function realpathAllowMissingSync(target: string): string {
+  const missing: string[] = [];
+  let current = path.resolve(target);
+  for (;;) {
+    try {
+      const real = realpathSync(current);
+      return missing.length ? path.join(real, ...missing.reverse()) : real;
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
+      const parent = path.dirname(current);
+      if (parent === current) throw err;
+      missing.push(path.basename(current));
+      current = parent;
+    }
+  }
+}
+
+/**
+ * Synchronous variant of {@link resolveInsideRoot} for callers that must decide inline (the scope
+ * guard runs inside SDK permission callbacks). Same rules: lexical check, then symlink-safe check.
+ */
+export function resolveInsideRootSync(root: string, target: string): string {
+  if (!isInsideRoot(root, target)) {
+    throw new PathGuardError(`Path is outside the allowed root: ${target}`);
+  }
+  const realRoot = realpathSync(root);
+  const realTarget = realpathAllowMissingSync(target);
   if (!isInsideRoot(realRoot, realTarget)) {
     throw new PathGuardError(`Path escapes the allowed root via a link: ${target}`);
   }
