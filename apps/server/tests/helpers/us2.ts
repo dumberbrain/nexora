@@ -10,6 +10,7 @@ import { registerApprovalRoutes } from "../../src/http/routes/approvals";
 import { registerConsentRoutes } from "../../src/http/routes/consent";
 import { registerControlRoutes, registerMessageRoutes } from "../../src/http/routes/controls";
 import { registerExecutionRoutes } from "../../src/http/routes/executions";
+import { registerTaskRoutes } from "../../src/http/routes/tasks";
 import { createLogger } from "../../src/lib/logger";
 import { EventBus, EventStore } from "../../src/modules/event-manager";
 import { createOrchestration, type Orchestration } from "../../src/modules/execution-orchestrator";
@@ -18,6 +19,7 @@ import {
   createControls,
 } from "../../src/modules/execution-orchestrator/controls";
 import { AuditService } from "../../src/modules/permission-manager/audit.service";
+import { type BoardService, createBoard } from "../../src/modules/task-manager/board";
 import { createServices, type Services } from "../../src/services";
 import { FakeManagedRuntime } from "../fakes/fake-managed-runtime";
 import { FakeWorktrees } from "../fakes/fake-worktrees";
@@ -30,6 +32,7 @@ export interface Us2Harness {
   services: Services;
   orchestration: Orchestration;
   controls: ControlService;
+  board: BoardService;
   runtime: FakeManagedRuntime;
   worktrees: FakeWorktrees;
   app: ReturnType<typeof createApp>;
@@ -127,6 +130,12 @@ export async function createUs2Harness(opts: Us2HarnessOptions = {}): Promise<Us
     sessions: services.sessions,
     agents: services.agents,
   });
+  const board = createBoard({
+    orchestrator: orchestration.orchestrator,
+    tasks: orchestration.tasks,
+    approvals: orchestration.approvals,
+    audit,
+  });
   const app = createApp({
     env: testEnv,
     db,
@@ -139,6 +148,7 @@ export async function createUs2Harness(opts: Us2HarnessOptions = {}): Promise<Us
       registerConsentRoutes(api, { consent: orchestration.consent, projects: services.projects });
       registerControlRoutes(api, { controls });
       registerMessageRoutes(api, { communication: orchestration.communication });
+      registerTaskRoutes(api, { board });
     },
   });
   await Promise.resolve();
@@ -150,6 +160,7 @@ export async function createUs2Harness(opts: Us2HarnessOptions = {}): Promise<Us
     services,
     orchestration,
     controls,
+    board,
     runtime,
     worktrees,
     app,
