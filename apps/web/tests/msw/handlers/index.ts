@@ -10,6 +10,7 @@ import { runtimeHandlers } from "./runtime";
 import { sessionHandlers } from "./sessions";
 import { statsHandlers } from "./stats";
 import { taskHandlers } from "./tasks";
+import { workflowHandlers } from "./workflows";
 
 export { agentFixtures } from "./agents";
 export { approvalFixtures } from "./approvals";
@@ -33,8 +34,16 @@ export {
 } from "./sessions";
 export { statsFixture } from "./stats";
 export { boardFixtures, resetTaskBoard } from "./tasks";
+export {
+  resetWorkflows,
+  validateGraphFixture,
+  WORKFLOW_EXECUTION_ID,
+  workflowFixtures,
+  workflowGraphFixture,
+  workflowRunFixture,
+} from "./workflows";
 
-/** Default handlers (US1 monitoring + US2 orchestration + US3 controls + US4 board); tests override per case with `server.use(...)`. */
+/** Default handlers (US1 monitoring + US2 orchestration + US3 controls + US4 board + US5 workflows); tests override per case with `server.use(...)`. */
 export const handlers: RequestHandler[] = [
   ...projectHandlers,
   ...sessionHandlers,
@@ -46,4 +55,5 @@ export const handlers: RequestHandler[] = [
   ...messageHandlers,
   ...runtimeHandlers,
   ...taskHandlers,
+  ...workflowHandlers,
 ];

@@ -1,8 +1,10 @@
 import { screen, within } from "@testing-library/react";
+import { http, HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
 
 import { ExecutionView } from "./execution-view";
-import { executionFixtures } from "../../../../tests/msw/handlers";
+import { executionFixtures, WORKFLOW_EXECUTION_ID } from "../../../../tests/msw/handlers";
+import { server } from "../../../../tests/msw/server";
 import { renderWithProviders } from "../../../../tests/render";
 
 const [setup, running, completed] = executionFixtures as [
@@ -88,5 +90,27 @@ describe("ExecutionView", () => {
   it("shows an error for an unknown execution", async () => {
     renderWithProviders(<ExecutionView executionId="01JCXK0000000000000000X404" />);
     expect(await screen.findByText(/execution not found/i)).toBeInTheDocument();
+  });
+
+  it("overlays the workflow run (read-only editor) for an execution in workflow mode", async () => {
+    server.use(
+      http.get("*/api/v1/executions/:id", () =>
+        HttpResponse.json({ ...running, id: WORKFLOW_EXECUTION_ID, mode: "workflow" }),
+      ),
+    );
+    renderWithProviders(<ExecutionView executionId={WORKFLOW_EXECUTION_ID} />);
+    const run = await screen.findByRole("region", { name: "Workflow run" });
+    expect(within(run).getByText("Run Waiting for approval")).toBeInTheDocument();
+    expect(await within(run).findByTestId("wf-node-approval-1")).toHaveAttribute(
+      "data-run-status",
+      "waiting_for_approval",
+    );
+    expect(within(run).queryByRole("button", { name: /^Add .* node$/ })).not.toBeInTheDocument();
+  });
+
+  it("shows no workflow overlay for other modes", async () => {
+    renderWithProviders(<ExecutionView executionId={running.id} />);
+    await screen.findByText(running.prompt);
+    expect(screen.queryByRole("region", { name: "Workflow run" })).not.toBeInTheDocument();
   });
 });
