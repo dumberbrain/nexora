@@ -9,7 +9,10 @@ import {
 import { splitSubGoals } from "./subgoals";
 
 /** Modes Nexora can actually execute today; the rest are shown unavailable with a reason. */
-export const IMPLEMENTED_MODES: ReadonlySet<ExecutionMode> = new Set(["multi_session", "subagents"]);
+export const IMPLEMENTED_MODES: ReadonlySet<ExecutionMode> = new Set([
+  "multi_session",
+  "subagents",
+]);
 
 export const AGENT_TEAMS_HOW_TO_ENABLE =
   'Set CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 in your environment or in the "env" block of ~/.claude/settings.json, then restart Nexora.';
@@ -23,7 +26,8 @@ const MODE_ORDER: ExecutionMode[] = [
 ];
 
 const NOT_YET: Partial<Record<ExecutionMode, string>> = {
-  agent_teams: "Agent Teams execution arrives in US6; Nexora does not emulate teams with subagents.",
+  agent_teams:
+    "Agent Teams execution arrives in US6; Nexora does not emulate teams with subagents.",
   workflow: "Workflow mode arrives in US5 (workflow builder and engine).",
   hybrid: "Hybrid mode arrives in US6 (combines teams, sessions, workflows, skills and MCP).",
 };

@@ -34,7 +34,9 @@ const PRIORITY_RANK: Record<Priority, number> = { p1: 0, p2: 1, p3: 2 };
 const taskNumber = (id: string) => Number(id.slice(2)) || 0;
 
 function byPriority(a: Task, b: Task): number {
-  return PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority] || taskNumber(a.id) - taskNumber(b.id);
+  return (
+    PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority] || taskNumber(a.id) - taskNumber(b.id)
+  );
 }
 
 /**
@@ -45,7 +47,9 @@ function byPriority(a: Task, b: Task): number {
 export function nextStarts(input: ScheduleInput): ScheduledStart[] {
   const limit = input.sequential ? 1 : clampParallel(input.maxParallelSessions);
   const status = new Map(input.tasks.map((t) => [t.id, t.status]));
-  const busy = new Set(input.tasks.filter((t) => ACTIVE_TASK_STATUSES.has(t.status)).map((t) => t.id));
+  const busy = new Set(
+    input.tasks.filter((t) => ACTIVE_TASK_STATUSES.has(t.status)).map((t) => t.id),
+  );
   let free = limit - busy.size;
   const serialisedWith = new Map<string, string[]>();
   const ownWorktree = new Set<string>();

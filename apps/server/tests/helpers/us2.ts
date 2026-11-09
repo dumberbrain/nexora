@@ -2,6 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
+import { testEnv } from "./us1";
 import { closeDb, openDb, type Db } from "../../src/db/client";
 import { createApp } from "../../src/http/app";
 import { registerApiRoutes } from "../../src/http/routes";
@@ -10,15 +11,11 @@ import { registerConsentRoutes } from "../../src/http/routes/consent";
 import { registerExecutionRoutes } from "../../src/http/routes/executions";
 import { createLogger } from "../../src/lib/logger";
 import { EventBus, EventStore } from "../../src/modules/event-manager";
-import {
-  createOrchestration,
-  type Orchestration,
-} from "../../src/modules/execution-orchestrator";
+import { createOrchestration, type Orchestration } from "../../src/modules/execution-orchestrator";
 import { AuditService } from "../../src/modules/permission-manager/audit.service";
 import { createServices, type Services } from "../../src/services";
 import { FakeManagedRuntime } from "../fakes/fake-managed-runtime";
 import { FakeWorktrees } from "../fakes/fake-worktrees";
-import { testEnv } from "./us1";
 
 export interface Us2Harness {
   db: Db;
@@ -41,7 +38,10 @@ export interface Us2Harness {
 export function seedProject(root: string): void {
   writeFileSync(
     join(root, "package.json"),
-    JSON.stringify({ devDependencies: { typescript: "5", vitest: "4" }, dependencies: { react: "19" } }),
+    JSON.stringify({
+      devDependencies: { typescript: "5", vitest: "4" },
+      dependencies: { react: "19" },
+    }),
   );
   writeFileSync(join(root, "CLAUDE.md"), "# Rules\nUse strict TypeScript.");
   mkdirSync(join(root, ".claude", "skills", "release-notes"), { recursive: true });

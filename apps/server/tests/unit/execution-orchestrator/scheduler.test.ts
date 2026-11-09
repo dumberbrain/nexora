@@ -80,9 +80,9 @@ describe("scheduler", () => {
   it("never starts a risky task without an approved approval request", () => {
     const tasks = [task("T-1", { riskClass: "destructive" }), task("T-2", { riskClass: "deploy" })];
     expect(nextStarts({ tasks, conflicts: [], approvedRiskyTaskIds: none })).toEqual([]);
-    expect(ids(nextStarts({ tasks, conflicts: [], approvedRiskyTaskIds: new Set(["T-2"]) }))).toEqual(
-      ["T-2"],
-    );
+    expect(
+      ids(nextStarts({ tasks, conflicts: [], approvedRiskyTaskIds: new Set(["T-2"]) })),
+    ).toEqual(["T-2"]);
   });
 
   it("serialises conflicting tasks", () => {
@@ -94,7 +94,11 @@ describe("scheduler", () => {
       "T-1",
       "T-3",
     ]);
-    const later = [task("T-1", { status: "running" }), task("T-2"), task("T-3", { status: "running" })];
+    const later = [
+      task("T-1", { status: "running" }),
+      task("T-2"),
+      task("T-3", { status: "running" }),
+    ];
     expect(nextStarts({ tasks: later, conflicts, approvedRiskyTaskIds: none })).toEqual([]);
     const done = [task("T-1", { status: "completed" }), task("T-2"), task("T-3")];
     expect(ids(nextStarts({ tasks: done, conflicts, approvedRiskyTaskIds: none }))).toEqual([

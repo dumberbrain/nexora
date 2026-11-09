@@ -5,7 +5,10 @@ import { adviseModes } from "../../../src/modules/execution-orchestrator/mode-ad
 import { buildQuestions } from "../../../src/modules/execution-orchestrator/questions";
 import { fakeEnvironment } from "../../fakes/fake-managed-runtime";
 
-function analysis(complexity: TaskAnalysis["complexity"], testRunners: string[] = []): TaskAnalysis {
+function analysis(
+  complexity: TaskAnalysis["complexity"],
+  testRunners: string[] = [],
+): TaskAnalysis {
   return {
     stack: { languages: ["TypeScript"], frameworks: ["React"], testRunners },
     instructionFiles: ["CLAUDE.md"],

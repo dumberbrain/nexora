@@ -57,7 +57,10 @@ describe("task transitions (data-model)", () => {
       for (const to of TASK_STATUSES.values) {
         if (allowed.has(`${from}>${to}`)) continue;
         if (to === "cancelled" && !TERMINAL.includes(from)) continue;
-        expect(code(() => assertTaskTransition(from, to)), `${from} → ${to}`).toBe("CONFLICT");
+        expect(
+          code(() => assertTaskTransition(from, to)),
+          `${from} → ${to}`,
+        ).toBe("CONFLICT");
       }
     }
   });

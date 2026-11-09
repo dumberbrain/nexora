@@ -1,7 +1,10 @@
 import { PlannedTaskSchema } from "@nexora/contracts";
 import { describe, expect, it } from "vitest";
 
-import { heuristicPlan, parsePlanOutput } from "../../../src/modules/execution-orchestrator/planner/planner";
+import {
+  heuristicPlan,
+  parsePlanOutput,
+} from "../../../src/modules/execution-orchestrator/planner/planner";
 import { splitSubGoals } from "../../../src/modules/execution-orchestrator/subgoals";
 
 describe("splitSubGoals", () => {
@@ -86,6 +89,8 @@ describe("parsePlanOutput (untrusted model output)", () => {
       }),
     ],
   ])("rejects invalid output %#", (text) => {
-    expect(() => parsePlanOutput(text)).toThrow(expect.objectContaining({ code: "VALIDATION_FAILED" }));
+    expect(() => parsePlanOutput(text)).toThrow(
+      expect.objectContaining({ code: "VALIDATION_FAILED" }),
+    );
   });
 });

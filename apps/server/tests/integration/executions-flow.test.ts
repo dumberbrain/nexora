@@ -40,7 +40,7 @@ const send = (method: string, path: string, body?: unknown) =>
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
-const json = async (res: Response) => (await res.json()) as unknown;
+const json = async (res: Response) => await res.json();
 const errorCode = async (res: Response) =>
   ((await res.json()) as { error: { code: string } }).error.code;
 
@@ -64,9 +64,9 @@ async function planned(mode: "multi_session" | "subagents", prompt = PROMPT): Pr
   expect(created.status).toBe(201);
   const e = ExecutionSchema.parse(await json(created));
   expect(e.status).toBe("awaiting_mode");
-  expect((await send("PUT", `/executions/${e.id}/mode`, { mode, strategy: "plan_first" })).status).toBe(
-    200,
-  );
+  expect(
+    (await send("PUT", `/executions/${e.id}/mode`, { mode, strategy: "plan_first" })).status,
+  ).toBe(200);
   const plan = await send("POST", `/executions/${e.id}/plan`, {});
   expect(plan.status).toBe(200);
   return e.id;
@@ -106,7 +106,9 @@ describe("executions flow (fake ManagedRuntime)", () => {
     expect(ExecutionSchema.parse(await json(setMode)).status).toBe("configuring");
 
     // questions + config
-    const questions = QuestionListSchema.parse(await json(await get(`/executions/${e.id}/questions`)));
+    const questions = QuestionListSchema.parse(
+      await json(await get(`/executions/${e.id}/questions`)),
+    );
     expect(questions.items.map((q) => q.key)).toContain("maxParallelSessions");
     const tooMany = await send("PUT", `/executions/${e.id}/config`, {
       config: { maxParallelSessions: 9 },
@@ -121,7 +123,9 @@ describe("executions flow (fake ManagedRuntime)", () => {
     expect(
       await errorCode(await send("POST", `/executions/${e.id}/plan`, { modelAssisted: true })),
     ).toBe("APPROVAL_REQUIRED");
-    const plan = ExecutionTasksSchema.parse(await json(await send("POST", `/executions/${e.id}/plan`, {})));
+    const plan = ExecutionTasksSchema.parse(
+      await json(await send("POST", `/executions/${e.id}/plan`, {})),
+    );
     expect(plan.items.map((t) => t.id)).toEqual(["T-1", "T-2", "T-3"]);
     expect(plan.items.map((t) => t.status)).toEqual(["pending", "pending", "pending"]);
     expect(plan.items[0]?.ownedPaths).toEqual(["src/api/users.ts"]);
@@ -151,7 +155,11 @@ describe("executions flow (fake ManagedRuntime)", () => {
     expect(h.runtime.sessions.map((s) => s.input.taskId).sort()).toEqual(["T-1", "T-2"]);
     const inbox = ApprovalListSchema.parse(await json(await get("/approvals?status=pending")));
     expect(inbox.items).toHaveLength(1);
-    expect(inbox.items[0]).toMatchObject({ taskId: "T-3", riskClass: "deploy", action: "task.start" });
+    expect(inbox.items[0]).toMatchObject({
+      taskId: "T-3",
+      riskClass: "deploy",
+      action: "task.start",
+    });
     await vi.waitFor(async () =>
       expect((await tasksOf(e.id)).items.map((t) => t.status)).toEqual([
         "running",
@@ -194,7 +202,13 @@ describe("executions flow (fake ManagedRuntime)", () => {
       expect(actions).toContain(a);
     }
     const types = new Set(h.store.list({ limit: 200 }).items.map((ev) => ev.type));
-    for (const t of ["task.created", "task.assigned", "task.started", "task.completed", "task.failed"]) {
+    for (const t of [
+      "task.created",
+      "task.assigned",
+      "task.started",
+      "task.completed",
+      "task.failed",
+    ]) {
       expect(types.has(t as never)).toBe(true);
     }
   });
@@ -202,7 +216,9 @@ describe("executions flow (fake ManagedRuntime)", () => {
   it("rejecting a risky task cancels it; the rest completes", async () => {
     const id = await planned("multi_session");
     await send("POST", `/executions/${id}/approve`, {});
-    const [pending] = ApprovalListSchema.parse(await json(await get("/approvals?status=pending"))).items;
+    const [pending] = ApprovalListSchema.parse(
+      await json(await get("/approvals?status=pending")),
+    ).items;
     await send("POST", `/approvals/${pending?.id}/decision`, { decision: "reject", note: "no" });
     await vi.waitFor(() => expect(h.runtime.sessions).toHaveLength(2));
     for (const s of h.runtime.sessions) s.finish("completed");
@@ -218,12 +234,14 @@ describe("executions flow (fake ManagedRuntime)", () => {
     const id = await planned("multi_session");
     const res = await send("POST", `/executions/${id}/approve`, { approveRiskyTaskIds: ["T-3"] });
     expect(res.status).toBe(200);
-    expect(ApprovalListSchema.parse(await json(await get("/approvals?status=pending"))).items).toEqual(
-      [],
-    );
+    expect(
+      ApprovalListSchema.parse(await json(await get("/approvals?status=pending"))).items,
+    ).toEqual([]);
     await vi.waitFor(() => expect(h.runtime.sessions).toHaveLength(3));
     const bad = await planned("multi_session");
-    const notRisky = await send("POST", `/executions/${bad}/approve`, { approveRiskyTaskIds: ["T-1"] });
+    const notRisky = await send("POST", `/executions/${bad}/approve`, {
+      approveRiskyTaskIds: ["T-1"],
+    });
     expect(notRisky.status).toBe(400);
   });
 
@@ -242,7 +260,9 @@ describe("executions flow (fake ManagedRuntime)", () => {
     const created = ExecutionSchema.parse(
       await json(await send("POST", "/executions", { projectId, prompt: "Fix it" })),
     );
-    expect(await errorCode(await send("POST", `/executions/${created.id}/plan`, {}))).toBe("CONFLICT");
+    expect(await errorCode(await send("POST", `/executions/${created.id}/plan`, {}))).toBe(
+      "CONFLICT",
+    );
     expect(await errorCode(await send("POST", `/executions/${created.id}/approve`, {}))).toBe(
       "CONFLICT",
     );
@@ -284,7 +304,9 @@ describe("executions flow (fake ManagedRuntime)", () => {
     await send("POST", `/executions/${id}/approve`, {});
     await new Promise((r) => setTimeout(r, 20));
     expect(h.runtime.sessions).toHaveLength(0);
-    const [pending] = ApprovalListSchema.parse(await json(await get("/approvals?status=pending"))).items;
+    const [pending] = ApprovalListSchema.parse(
+      await json(await get("/approvals?status=pending")),
+    ).items;
     await send("POST", `/approvals/${pending?.id}/decision`, { decision: "approve" });
     await vi.waitFor(() => expect(h.runtime.sessions).toHaveLength(1));
   });

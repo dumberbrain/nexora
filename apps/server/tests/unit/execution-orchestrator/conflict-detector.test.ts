@@ -43,7 +43,11 @@ describe("detectConflicts", () => {
       "serialised",
     );
     expect(conflicts).toEqual([
-      { taskIds: ["T-1", "T-2"], paths: ["src/api/**", "src/api/users.ts"], resolution: "serialised" },
+      {
+        taskIds: ["T-1", "T-2"],
+        paths: ["src/api/**", "src/api/users.ts"],
+        resolution: "serialised",
+      },
     ]);
   });
 

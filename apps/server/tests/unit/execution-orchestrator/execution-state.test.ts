@@ -70,7 +70,8 @@ describe("execution state machine", () => {
       expect(isTerminalExecution(s)).toBe(TERMINAL.includes(s));
     }
     for (const from of TERMINAL) {
-      for (const to of EXECUTION_STATUSES.values) expect(canTransitionExecution(from, to)).toBe(false);
+      for (const to of EXECUTION_STATUSES.values)
+        expect(canTransitionExecution(from, to)).toBe(false);
     }
   });
 });

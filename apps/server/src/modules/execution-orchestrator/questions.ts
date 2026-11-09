@@ -42,7 +42,11 @@ export function buildQuestions(input: QuestionInput): Question[] {
         label: "Run independent tasks in parallel?",
         help: "Parallel tasks run in separate sessions; tasks touching the same files are serialised or isolated in their own worktree.",
         options: [
-          { value: "parallel", label: "Parallel", description: "Faster; one session per ready task" },
+          {
+            value: "parallel",
+            label: "Parallel",
+            description: "Faster; one session per ready task",
+          },
           { value: "sequential", label: "Sequential", description: "One task at a time" },
         ],
         recommendedDefault: goals >= 2 ? "parallel" : "sequential",

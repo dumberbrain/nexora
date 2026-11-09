@@ -54,7 +54,9 @@ describe("discoverSkills", () => {
         version: 2,
         plugins: {
           "tools@acme": [{ scope: "user", installPath: pluginDir }],
-          "off@acme": [{ scope: "user", installPath: join(home, ".claude/plugins/cache/acme/off/1") }],
+          "off@acme": [
+            { scope: "user", installPath: join(home, ".claude/plugins/cache/acme/off/1") },
+          ],
         },
       }),
     );
@@ -94,7 +96,11 @@ describe("discoverMcpServers", () => {
         mcpServers: {
           db: {
             command: "npx",
-            args: ["pg", "postgres://admin:hunter2@host/db", "--api-key=sk-ant-abcdefghijklmnopqrstu"],
+            args: [
+              "pg",
+              "postgres://admin:hunter2@host/db",
+              "--api-key=sk-ant-abcdefghijklmnopqrstu",
+            ],
             env: { PGPASSWORD: "hunter2" },
           },
         },
@@ -104,7 +110,11 @@ describe("discoverMcpServers", () => {
       join(home, ".claude.json"),
       JSON.stringify({
         mcpServers: {
-          remote: { type: "http", url: "https://mcp.example.com/x", headers: { Authorization: "Bearer abcdefgh123" } },
+          remote: {
+            type: "http",
+            url: "https://mcp.example.com/x",
+            headers: { Authorization: "Bearer abcdefgh123" },
+          },
         },
         projects: { [root]: { mcpServers: { local: { command: "node", args: ["srv.js"] } } } },
       }),
