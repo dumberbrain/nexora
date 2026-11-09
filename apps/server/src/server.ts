@@ -16,6 +16,7 @@ import { EventBus, EventStore } from "./modules/event-manager";
 import { AuditService } from "./modules/permission-manager/audit.service";
 import { createOrchestrationLayer, type OrchestrationLayer } from "./orchestration";
 import { createGateway, type Gateway } from "./realtime/gateway";
+import { createTerminalGateway } from "./realtime/terminal-gateway";
 import { createServices, type Services } from "./services";
 
 const WEB_PORT = 3022;
@@ -104,6 +105,16 @@ export async function createNexoraServer(opts: CreateServerOptions): Promise<Nex
     envToken: env.token,
   });
   live.gateway = gateway;
+  // US6: /terminal namespace for Nexora-started Agent Teams leads (same io, auth and origin check)
+  const terminal = us2.agentTeams
+    ? createTerminalGateway({
+        io: gateway.io,
+        auth: { keys, envToken: env.token },
+        terminals: us2.agentTeams,
+        sessions: services.sessions,
+        audit,
+      })
+    : null;
 
   await new Promise<void>((resolveListen, reject) => {
     http.once("error", reject);
@@ -134,6 +145,7 @@ export async function createNexoraServer(opts: CreateServerOptions): Promise<Nex
       closed = true;
       await us2.close();
       services.close();
+      terminal?.close();
       await gateway.close();
       await new Promise<void>((r) => http.close(() => r()));
       await services.sessionProjection.settled();

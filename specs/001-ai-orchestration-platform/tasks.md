@@ -291,7 +291,7 @@ testable increment.
 - [X] T140 [US6] Implement mode executors `apps/server/src/modules/execution-orchestrator/modes/{agent-teams.ts,hybrid.ts}` and hybrid planning rules in `apps/server/src/modules/execution-orchestrator/planner/hybrid-planner.ts` to pass T136
 - [X] T141 [P] [US6] Implement widget `apps/web/src/widgets/terminal/` (`@xterm/xterm` bound to `/terminal` socket; `useEffect` allowed — external system: xterm + socket) embedded in agent-details-panel for team leads
 - [X] T142 [P] [US6] Show team task list + teammate statuses on canvas and agent details (`apps/web/src/widgets/agent-canvas/components/team-group.tsx`), and hybrid mechanism/reason column in `apps/web/src/features/approve-plan/`
-- [ ] T143 [P] [US6] E2E `e2e/us6-agent-teams.spec.ts` (fixture-driven): disabled mode with enable instructions; team visualisation from fixtures
+- [X] T143 [P] [US6] E2E `e2e/us6-agent-teams.spec.ts` (fixture-driven): disabled mode with enable instructions; team visualisation from fixtures
 
 **Checkpoint**: All five execution modes available (Agent Teams where supported)
 

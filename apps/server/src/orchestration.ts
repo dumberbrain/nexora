@@ -21,7 +21,14 @@ import {
 import { type ControlService, createControls } from "./modules/execution-orchestrator/controls";
 import { DiffService, WorktreeService } from "./modules/git-workspace";
 import { type AuditService } from "./modules/permission-manager/audit.service";
-import { AgentSdkAdapter, CliHeadlessAdapter, RuntimeManager } from "./modules/runtime-manager";
+import {
+  AgentSdkAdapter,
+  type AgentTeamPtyAdapter,
+  agentRegistryTeamSink,
+  CliHeadlessAdapter,
+  createAgentTeamPtyAdapter,
+  RuntimeManager,
+} from "./modules/runtime-manager";
 import { ScriptedFakeAdapter } from "./modules/runtime-manager/adapters/fake/scripted-fake.adapter";
 import { type ClaudeProbe } from "./modules/runtime-manager/environment";
 import { gitBranchOf } from "./modules/session-manager";
@@ -88,6 +95,8 @@ export interface OrchestrationLayer {
   controls: ControlService;
   board: BoardService;
   workflows: WorkflowEngine;
+  /** US6 Agent Teams lead runtime (null with the test-only fake runtime) */
+  agentTeams: AgentTeamPtyAdapter | null;
   registerRoutes(api: Hono<AppBindings>): void;
   /** stop scheduling, then every managed runtime, then liveness timers */
   close(): Promise<void>;
@@ -96,10 +105,15 @@ export interface OrchestrationLayer {
 export function createOrchestrationLayer(deps: OrchestrationLayerDeps): OrchestrationLayer {
   const { db, env, bus, store, audit, logger, services } = deps;
   const fake = env.testFakeRuntime;
+  // US6: interactive Agent Teams lead in a PTY; node-pty loads lazily (observe-only if it cannot)
+  const agentTeams = fake
+    ? null
+    : createAgentTeamPtyAdapter({ agents: agentRegistryTeamSink(services.agents, bus) });
   const runtime = new RuntimeManager({
     adapters: fake
       ? [new ScriptedFakeAdapter()]
-      : [new AgentSdkAdapter(), new CliHeadlessAdapter()],
+      : // agent_sdk first: the first adapter is the default runtime
+        [new AgentSdkAdapter(), new CliHeadlessAdapter(), ...(agentTeams ? [agentTeams] : [])],
     sessions: services.sessions,
     projects: services.projectRepo,
     store,
@@ -110,6 +124,9 @@ export function createOrchestrationLayer(deps: OrchestrationLayerDeps): Orchestr
     projectRoots: () => services.projectRepo.list().map((p) => p.rootPath),
     ...(fake ? { claude: fakeClaudeProbe } : {}),
   });
+  // team hooks (TeammateIdle, TaskCreated, …) reach the lead adapter
+  const offHooks = agentTeams ? services.ingest.addObserver((p) => agentTeams.ingestHook(p)) : null;
+
   const orchestration = createOrchestration({
     db,
     bus,
@@ -156,8 +173,13 @@ export function createOrchestrationLayer(deps: OrchestrationLayerDeps): Orchestr
     controls,
     board,
     workflows,
+    agentTeams,
     registerRoutes: (api) => {
-      registerRuntimeRoutes(api, { runtime });
+      registerRuntimeRoutes(api, {
+        runtime,
+        agentTeams: { projects: services.projects, audit },
+        ...(agentTeams ? { teams: agentTeams } : {}),
+      });
       registerExecutionRoutes(api, orchestration);
       registerApprovalRoutes(api, orchestration);
       registerConsentRoutes(api, { consent: orchestration.consent, projects: services.projects });
@@ -167,6 +189,7 @@ export function createOrchestrationLayer(deps: OrchestrationLayerDeps): Orchestr
       registerWorkflowRoutes(api, { workflows: workflows.service });
     },
     close: async () => {
+      offHooks?.();
       await orchestration.close();
       await runtime.stopAll();
       runtime.close();
