@@ -13,6 +13,7 @@ import { formatDateTime } from "@/shared/lib/format-time";
 import { useLiveSubscription } from "@/shared/socket/use-live-subscription";
 import { PageHeader } from "@/shared/ui/layout/page-header";
 import { ErrorState, LoadingState } from "@/shared/ui/state";
+import { WorkflowRunOverlay } from "@/widgets/workflow-editor";
 
 import { ExecutionOperations } from "./components/execution-operations";
 import { TaskStatusTable } from "./components/task-status-table";
@@ -81,6 +82,7 @@ export function ExecutionView({ executionId }: { executionId: string }) {
           </dd>
         </dl>
       ) : null}
+      {e?.mode === "workflow" ? <WorkflowRunOverlay executionId={executionId} /> : null}
       <section aria-labelledby="execution-tasks" className="flex min-w-0 flex-col gap-2">
         <div className="flex items-baseline justify-between gap-3">
           <h2 id="execution-tasks" className="text-sm tracking-widest">

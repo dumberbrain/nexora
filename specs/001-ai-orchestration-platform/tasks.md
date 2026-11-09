@@ -263,8 +263,8 @@ testable increment.
 - [ ] T128 [US5] Implement executor `apps/server/src/modules/workflow-engine/{executor.ts,node-executors/{agent.ts,skill.ts,mcp-tool.ts,approval.ts}}` (agent → SDK session; skill → SDK session prompted with skill slash command; mcp_tool → SDK session with that MCP server enabled; approval → ApprovalGate) emitting `workflow.started|node_changed|completed` to pass T124
 - [ ] T129 [US5] Implement workflow mode executor `apps/server/src/modules/execution-orchestrator/modes/workflow.ts` and routes `apps/server/src/http/routes/workflows.ts` (`GET/POST /workflows`, `GET/POST /workflows/:id/versions`, `POST /workflows/:id/versions/:v/run`)
 - [ ] T130 [P] [US5] Add built-in templates `apps/server/src/modules/workflow-engine/templates/{spec-driven.json,tdd-feature.json,review-and-merge.json}` seeded on first run
-- [ ] T131 [P] [US5] Implement entity `apps/web/src/entities/workflow/` (api, keys, types)
-- [ ] T132 [US5] Implement widget `apps/web/src/widgets/workflow-editor/` (`@xyflow/react`; node palette for agent, skill, MCP tool, condition, approval, parallel fork/join; property panel per node with RHF + zod; live run state overlay per node) and feature `apps/web/src/features/edit-workflow/` (save as new version, run); route `apps/web/src/routes/workflows/index.tsx`, `apps/web/src/routes/workflows/$workflowId.tsx`
+- [X] T131 [P] [US5] Implement entity `apps/web/src/entities/workflow/` (api, keys, types)
+- [X] T132 [US5] Implement widget `apps/web/src/widgets/workflow-editor/` (`@xyflow/react`; node palette for agent, skill, MCP tool, condition, approval, parallel fork/join; property panel per node with RHF + zod; live run state overlay per node) and feature `apps/web/src/features/edit-workflow/` (save as new version, run); route `apps/web/src/routes/workflows/index.tsx`, `apps/web/src/routes/workflows/$workflowId.tsx`
 - [ ] T133 [P] [US5] Component tests for workflow-editor and E2E `e2e/us5-workflows.spec.ts`
 
 **Checkpoint**: Workflow mode works end-to-end

@@ -4,6 +4,7 @@ import { type QueryClient } from "@tanstack/react-query";
 import { executionDetailQuery, executionKeys } from "@/entities/execution";
 import { sessionKeys, sessionListQuery } from "@/entities/session";
 import { executionTasksQuery, taskKeys } from "@/entities/task";
+import { applyWorkflowEvents } from "@/entities/workflow";
 
 /**
  * Route loader: the execution, its tasks and its sessions (whose capabilities drive the controls)
@@ -33,5 +34,7 @@ export function refreshOnEvents(qc: QueryClient, executionId: string, events: Ne
   if (events.some((e) => e.type.startsWith("session."))) {
     jobs.push(qc.invalidateQueries({ queryKey: sessionKeys.list({ executionId }) }));
   }
+  // workflow mode: node_changed patches the run overlay in place; start/end refetch it
+  jobs.push(applyWorkflowEvents(qc, executionId, events));
   return Promise.all(jobs);
 }
