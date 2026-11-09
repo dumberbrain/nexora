@@ -6,11 +6,20 @@ import { executionTasksQuery, PriorityTag, RiskClassTag } from "@/entities/task"
 import { EmptyState, ErrorState, LoadingState } from "@/shared/ui/state";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/shared/ui/table";
 
+import { TaskActions } from "./task-actions";
+
 const COLUMNS = ["ID", "Task", "Agent", "Mode", "Priority", "Risk", "Status", "Attempt"];
 
+interface TaskStatusTableProps {
+  executionId: string;
+  /** show per-task cancel / retry / review (launched executions only) */
+  withControls?: boolean;
+}
+
 /** Live task statuses of one execution (US2-AS6) — refreshed by the view on `task.*` events. */
-export function TaskStatusTable({ executionId }: { executionId: string }) {
+export function TaskStatusTable({ executionId, withControls = false }: TaskStatusTableProps) {
   const tasks = useQuery(executionTasksQuery(executionId));
+  const columns = withControls ? [...COLUMNS, "Actions"] : COLUMNS;
 
   if (tasks.isPending) return <LoadingState label="Loading tasks" rows={4} />;
   if (tasks.isError) {
@@ -31,7 +40,7 @@ export function TaskStatusTable({ executionId }: { executionId: string }) {
         <caption className="sr-only">Task statuses</caption>
         <TableHeader>
           <TableRow>
-            {COLUMNS.map((c) => (
+            {columns.map((c) => (
               <TableHead key={c} className="font-mono text-[10px] tracking-widest uppercase">
                 {c}
               </TableHead>
@@ -55,6 +64,11 @@ export function TaskStatusTable({ executionId }: { executionId: string }) {
                 <TaskStatusBadge status={t.status} />
               </TableCell>
               <TableCell className="tabular-nums">#{t.attempt}</TableCell>
+              {withControls ? (
+                <TableCell>
+                  <TaskActions task={t} />
+                </TableCell>
+              ) : null}
             </TableRow>
           ))}
         </TableBody>

@@ -1,5 +1,7 @@
 export type {
+  RuntimeCapabilityProfile,
   Session,
+  SessionControlAction,
   SessionDetail,
   SessionList,
   SessionListFilters,

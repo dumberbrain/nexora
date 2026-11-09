@@ -1,6 +1,7 @@
 import {
   type ApiErrorBody,
   type ApproveExecutionInput,
+  type AssignTaskInput,
   type Execution,
   type ExecutionConfig,
   type ExecutionList,
@@ -224,6 +225,14 @@ const consentRequired: ApiErrorBody = {
   error: { code: "APPROVAL_REQUIRED", message: "model-assisted planning consumes model usage" },
 };
 
+const taskNotFound: ApiErrorBody = { error: { code: "NOT_FOUND", message: "task not found" } };
+
+const TASK_CONTROL: Record<string, (t: Task) => Task> = {
+  cancel: (t) => ({ ...t, status: "cancelled" }),
+  retry: (t) => ({ ...t, status: "queued", attempt: t.attempt + 1, previousAttemptId: t.id }),
+  review: (t) => ({ ...t, status: "reviewing" }),
+};
+
 const byId = (id: unknown) => executionFixtures.find((e) => e.id === id);
 const withExecution =
   (fn: (e: Execution, body: unknown) => Execution) =>
@@ -278,6 +287,31 @@ export const executionHandlers = [
     "*/api/v1/executions/:id/stop",
     withExecution((e) => ({ ...e, status: "cancelled" })),
   ),
+  http.post(
+    "*/api/v1/executions/:id/pause",
+    withExecution((e) => ({ ...e, status: "paused" })),
+  ),
+  http.post(
+    "*/api/v1/executions/:id/resume",
+    withExecution((e) => ({ ...e, status: "running" })),
+  ),
+  // US3: assign an additional task → the created Task
+  http.post("*/api/v1/executions/:id/tasks", async ({ params, request }) => {
+    if (!byId(params.id)) return HttpResponse.json(notFound, { status: 404 });
+    const body = (await request.json()) as AssignTaskInput;
+    return HttpResponse.json<Task>(
+      task({ ...body, id: "T-4", executionId: String(params.id), status: "queued" }),
+      { status: 201 },
+    );
+  }),
+  // US3: task controls → the updated Task (retry → a new attempt linked to the previous one)
+  http.post("*/api/v1/executions/:id/tasks/:taskId/:control", ({ params }) => {
+    const found = planFixture.items.find((t) => t.id === params.taskId);
+    if (!found) return HttpResponse.json(taskNotFound, { status: 404 });
+    const next = TASK_CONTROL[String(params.control)]?.(found);
+    if (!next) return HttpResponse.json(taskNotFound, { status: 404 });
+    return HttpResponse.json<Task>(next);
+  }),
   http.get("*/api/v1/executions/:id/verification", ({ params }) => {
     const v = byId(params.id)?.verification;
     if (!v) return HttpResponse.json(notFound, { status: 404 });

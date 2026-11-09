@@ -10,6 +10,13 @@ export const projectListQuery = () =>
     ...PROJECT_CACHE,
   });
 
+export const modelConsentQuery = (projectId: string) =>
+  queryOptions({
+    queryKey: projectKeys.modelConsent(projectId),
+    queryFn: ({ signal }) => projectApi.modelConsent(projectId, { signal }),
+    ...PROJECT_CACHE,
+  });
+
 /** The preview must reflect the file on disk right now — never served from cache. */
 export const hookPreviewQuery = (projectId: string) =>
   queryOptions({

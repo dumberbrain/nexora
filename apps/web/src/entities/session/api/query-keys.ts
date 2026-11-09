@@ -8,7 +8,8 @@ import { type SessionListFilters } from "../model/types";
  * keys:         sessionKeys.* (["sessions", ...]) — all/lists()/detail(id) follow the
  *               shared/api/entity-keys convention so app/socket-bridge patches them
  * staleTime:    30 s   gcTime: 10 min
- * invalidation: none from the web (sessions are observed, not mutated in US1)
+ * invalidation: US3 controls (stop/interrupt/resume/restart) → setQueryData(detail(id)) +
+ *               invalidate lists() (execution controls read lists({ executionId }))
  * realtime:     socket `entity.changed` kind=session → patch detail(id) (holds a Session,
  *               never the {session, agents} wrapper) + invalidate lists()
  */

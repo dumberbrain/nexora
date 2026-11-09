@@ -1,1 +1,8 @@
-export type { HookPreview, Project, ProjectList, RegisterProjectInput } from "@nexora/contracts";
+export type {
+  HookPreview,
+  ModelConsent,
+  ModelConsentInput,
+  Project,
+  ProjectList,
+  RegisterProjectInput,
+} from "@nexora/contracts";

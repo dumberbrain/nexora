@@ -1,6 +1,8 @@
 import {
   type ApiErrorBody,
   type HookPreview,
+  type ModelConsent,
+  type ModelConsentInput,
   type Project,
   type ProjectList,
 } from "@nexora/contracts";
@@ -93,6 +95,20 @@ export const projectHandlers = [
   http.delete("*/api/v1/projects/:id/hooks", ({ params }) =>
     HttpResponse.json<Project>({ ...projectById(params.id), hooksInstalled: false }),
   ),
+  // FR-008: "nexora" (P001) has "always allow model usage" on; every other project is off
+  http.get("*/api/v1/projects/:id/model-consent", ({ params }) =>
+    HttpResponse.json<ModelConsent>({
+      projectId: String(params.id),
+      alwaysAllow: params.id === projectFixtures[0]!.id,
+    }),
+  ),
+  http.put("*/api/v1/projects/:id/model-consent", async ({ params, request }) => {
+    const body = (await request.json()) as ModelConsentInput;
+    return HttpResponse.json<ModelConsent>({
+      projectId: String(params.id),
+      alwaysAllow: body.alwaysAllow,
+    });
+  }),
 ];
 
 function projectById(id: unknown): Project {

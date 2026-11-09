@@ -2,6 +2,8 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { agentKeys, type AgentDetail } from "@/entities/agent";
 import { EventTimeline } from "@/entities/event";
+import { SessionControls } from "@/features/control-session";
+import { SendMessageForm } from "@/features/send-message";
 
 import { AgentIdentity } from "./agent-identity";
 import { FilesChanged } from "./files-changed";
@@ -18,6 +20,16 @@ export function AgentDetailsBody({ detail }: { detail: AgentDetail }) {
   return (
     <div className="flex flex-col gap-4 overflow-y-auto px-4 pb-6">
       <AgentIdentity detail={detail} />
+      <Section index="00" title="Controls">
+        {detail.session ? (
+          <SessionControls session={detail.session} />
+        ) : (
+          <p className="font-mono text-xs text-muted-foreground">
+            The agent&apos;s session is unknown — no controls available.
+          </p>
+        )}
+        <SendMessageForm target={{ kind: "agent", agent, session: detail.session }} />
+      </Section>
       <Section index="01" title="Output summary">
         {agent.summary ? (
           <p className="font-mono text-xs whitespace-pre-wrap text-foreground">{agent.summary}</p>

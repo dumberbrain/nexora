@@ -60,7 +60,8 @@ export function ModelUsageConsentDialog({
           <label htmlFor={rememberId} className="font-mono text-xs leading-snug">
             Always allow model usage for <span className="text-phosphor">{projectName}</span>
             <span className="block text-muted-foreground">
-              Saved per project; it can be revoked later.
+              Saved per project; revoke it any time from the project&apos;s &quot;model usage&quot;
+              status.
             </span>
           </label>
         </div>

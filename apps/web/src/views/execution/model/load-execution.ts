@@ -2,13 +2,18 @@ import { type NexoraEvent } from "@nexora/contracts";
 import { type QueryClient } from "@tanstack/react-query";
 
 import { executionDetailQuery, executionKeys } from "@/entities/execution";
+import { sessionKeys, sessionListQuery } from "@/entities/session";
 import { executionTasksQuery, taskKeys } from "@/entities/task";
 
-/** Route loader: the execution and its tasks in parallel (prefetch — errors show in the view). */
+/**
+ * Route loader: the execution, its tasks and its sessions (whose capabilities drive the controls)
+ * in parallel (prefetch — errors show in the view).
+ */
 export function loadExecution(qc: QueryClient, executionId: string) {
   return Promise.all([
     qc.prefetchQuery(executionDetailQuery(executionId)),
     qc.prefetchQuery(executionTasksQuery(executionId)),
+    qc.prefetchQuery(sessionListQuery({ executionId })),
   ]);
 }
 
@@ -23,6 +28,10 @@ export function refreshOnEvents(qc: QueryClient, executionId: string, events: Ne
   }
   if (events.some((e) => !e.type.startsWith("tool.") && !e.type.startsWith("file."))) {
     jobs.push(qc.invalidateQueries({ queryKey: executionKeys.detail(executionId), exact: true }));
+  }
+  // sessions start/stop during a run — their capabilities decide which controls are enabled
+  if (events.some((e) => e.type.startsWith("session."))) {
+    jobs.push(qc.invalidateQueries({ queryKey: sessionKeys.list({ executionId }) }));
   }
   return Promise.all(jobs);
 }

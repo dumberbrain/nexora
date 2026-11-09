@@ -44,6 +44,47 @@ describe("ExecutionView", () => {
     expect(link).toHaveAttribute("href", `/executions/new?step=mode&executionId=${setup.id}`);
   });
 
+  it("puts stop / interrupt & hold / resume in the header of a launched execution", async () => {
+    renderWithProviders(<ExecutionView executionId={running.id} />);
+    const bar = await screen.findByRole("toolbar", { name: /execution controls/i });
+    expect(within(screen.getByRole("banner")).getByRole("toolbar")).toBe(bar);
+    for (const name of ["Stop", "Interrupt & hold", "Resume"]) {
+      expect(within(bar).getByRole("button", { name })).toBeInTheDocument();
+    }
+  });
+
+  it("gives every task row cancel / retry / review controls", async () => {
+    renderWithProviders(<ExecutionView executionId={running.id} />);
+    const table = await screen.findByRole("table", { name: /task statuses/i });
+    const row = within(table).getByRole("row", { name: /T-1/ });
+    expect(within(row).getByRole("button", { name: "Cancel T-1" })).not.toHaveAttribute(
+      "aria-disabled",
+    );
+    expect(within(row).getByRole("button", { name: "Retry T-1" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    expect(within(row).getByRole("button", { name: "Request review of T-1" })).toBeInTheDocument();
+  });
+
+  it("lets the user assign a task, see its approvals and open its messages", async () => {
+    renderWithProviders(<ExecutionView executionId={running.id} />);
+    expect(await screen.findByRole("form", { name: "Assign task" })).toBeInTheDocument();
+    const inbox = await screen.findByRole("region", { name: /approvals inbox/i });
+    expect(await within(inbox).findByText(/Drop legacy settings table/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /messages/i })).toHaveAttribute(
+      "href",
+      `/communication?executionId=${running.id}`,
+    );
+  });
+
+  it("keeps finished executions read-only (controls disabled, no assign form)", async () => {
+    renderWithProviders(<ExecutionView executionId={completed.id} />);
+    await screen.findByRole("region", { name: /verification/i });
+    expect(screen.queryByRole("form", { name: "Assign task" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("toolbar", { name: /execution controls/i })).toBeInTheDocument();
+  });
+
   it("shows an error for an unknown execution", async () => {
     renderWithProviders(<ExecutionView executionId="01JCXK0000000000000000X404" />);
     expect(await screen.findByText(/execution not found/i)).toBeInTheDocument();

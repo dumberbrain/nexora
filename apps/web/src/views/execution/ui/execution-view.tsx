@@ -8,11 +8,13 @@ import {
   setupStepOf,
 } from "@/entities/execution";
 import { ExecutionStatusBadge } from "@/entities/status";
+import { ExecutionControls } from "@/features/control-session";
 import { formatDateTime } from "@/shared/lib/format-time";
 import { useLiveSubscription } from "@/shared/socket/use-live-subscription";
 import { PageHeader } from "@/shared/ui/layout/page-header";
 import { ErrorState, LoadingState } from "@/shared/ui/state";
 
+import { ExecutionOperations } from "./components/execution-operations";
 import { TaskStatusTable } from "./components/task-status-table";
 import { VerificationSummary } from "./components/verification-summary";
 import { refreshOnEvents } from "../model/load-execution";
@@ -29,6 +31,7 @@ export function ExecutionView({ executionId }: { executionId: string }) {
     onEvents: (events) => void refreshOnEvents(qc, executionId, events),
   });
   const e = execution.data;
+  const launched = e ? isLaunched(e.status) : false;
 
   return (
     <div className="flex flex-col gap-6">
@@ -41,6 +44,7 @@ export function ExecutionView({ executionId }: { executionId: string }) {
             <>
               <ExecutionModeLabel mode={e.mode} strategy={e.strategy} />
               <ExecutionStatusBadge status={e.status} />
+              {launched ? <ExecutionControls execution={e} className="basis-full" /> : null}
             </>
           ) : null
         }
@@ -53,7 +57,7 @@ export function ExecutionView({ executionId }: { executionId: string }) {
           onRetry={() => void execution.refetch()}
         />
       ) : null}
-      {e && !isLaunched(e.status) ? (
+      {e && !launched ? (
         <p className="font-mono text-xs text-status-waiting">
           This execution is still being set up — nothing runs until its plan is approved.{" "}
           <Link
@@ -78,11 +82,21 @@ export function ExecutionView({ executionId }: { executionId: string }) {
         </dl>
       ) : null}
       <section aria-labelledby="execution-tasks" className="flex min-w-0 flex-col gap-2">
-        <h2 id="execution-tasks" className="text-sm tracking-widest">
-          Tasks
-        </h2>
-        <TaskStatusTable executionId={executionId} />
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 id="execution-tasks" className="text-sm tracking-widest">
+            Tasks
+          </h2>
+          <Link
+            to="/communication"
+            search={{ executionId }}
+            className="font-mono text-xs text-phosphor hover:underline"
+          >
+            messages →
+          </Link>
+        </div>
+        <TaskStatusTable executionId={executionId} withControls={launched} />
       </section>
+      {e && launched ? <ExecutionOperations execution={e} /> : null}
       {e && VERIFIED.has(e.status) ? <VerificationSummary verification={e.verification} /> : null}
     </div>
   );

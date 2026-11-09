@@ -1,9 +1,11 @@
 import {
   type ApiErrorBody,
+  type Message,
   type RuntimeCapabilityProfile,
   type Session,
   type SessionDetail,
   type SessionList,
+  type SessionStatus,
 } from "@nexora/contracts";
 import { http, HttpResponse } from "msw";
 
@@ -74,25 +76,102 @@ export const sessionFixtures: Session[] = [
   },
 ];
 
+/** Capability profile of an Agent SDK session Nexora started (runtime-adapter.md matrix). */
+export const managedCapabilities: RuntimeCapabilityProfile = {
+  runtime: "agent_sdk",
+  canStart: true,
+  canStop: true,
+  canInterrupt: true,
+  canPause: false,
+  canResume: true,
+  canRestart: true,
+  canSendMessage: "yes",
+  canSetPermissionMode: true,
+  emitsEvents: ["session.started", "session.stopped", "tool.invoked", "message.sent"],
+  reportsUsage: "exact",
+  notes: [],
+};
+
+/**
+ * A Nexora-managed session of the running execution X002. Reachable by id and by the
+ * `executionId` list filter only, so US1 list fixtures stay unchanged.
+ */
+export const managedSessionFixture: Session = {
+  ...base,
+  id: "0b1c2d3e-4f50-4a61-8b72-9c8d7e6f5a04",
+  executionId: "01JCXK0000000000000000X002",
+  executionMode: "multi_session",
+  currentTaskId: "T-1",
+  runtime: "agent_sdk",
+  observeOnly: false,
+  worktreePath: "C:/work/nexora/.nexora/worktrees/X002/T-1",
+  capabilities: managedCapabilities,
+  status: "running",
+  lastActivityAt: NOW - 5_000,
+  startedAt: NOW - 400_000,
+};
+
+const allSessions = () => [...sessionFixtures, managedSessionFixture];
+
+const CONTROL_STATUS: Record<string, SessionStatus> = {
+  stop: "stopped",
+  interrupt: "paused",
+  resume: "running",
+  restart: "starting",
+};
+
 const notFound: ApiErrorBody = { error: { code: "NOT_FOUND", message: "session not found" } };
+const observeOnly: ApiErrorBody = {
+  error: { code: "CONFLICT", message: "observe-only session — Nexora did not start it" },
+};
+
+/** POST /sessions/:id/messages and /agents/:id/messages answer with the recorded Message. */
+export const sentMessage = (text: string, to: Message["to"], executionId: string | null) =>
+  ({
+    id: "01JCXK0000000000000000M999",
+    executionId,
+    taskId: null,
+    from: { kind: "user" },
+    to,
+    type: "instruction",
+    summary: text.slice(0, 500),
+    ts: NOW,
+  }) satisfies Message;
 
 export const sessionHandlers = [
   http.get("*/api/v1/sessions", ({ request }) => {
     const url = new URL(request.url);
     const status = url.searchParams.get("status")?.split(",");
     const projectId = url.searchParams.get("projectId");
-    const items = sessionFixtures
+    const executionId = url.searchParams.get("executionId");
+    const items = (executionId ? allSessions() : sessionFixtures)
+      .filter((s) => !executionId || s.executionId === executionId)
       .filter((s) => !status || status.includes(s.status))
       .filter((s) => !projectId || s.projectId === projectId)
       .sort((a, b) => b.lastActivityAt - a.lastActivityAt);
     return HttpResponse.json<SessionList>({ items });
   }),
   http.get("*/api/v1/sessions/:id", ({ params }) => {
-    const session = sessionFixtures.find((s) => s.id === params.id);
+    const session = allSessions().find((s) => s.id === params.id);
     if (!session) return HttpResponse.json(notFound, { status: 404 });
     return HttpResponse.json<SessionDetail>({
       session,
       agents: agentFixtures.filter((a) => a.sessionId === session.id),
     });
+  }),
+  http.post("*/api/v1/sessions/:id/:control", async ({ params, request }) => {
+    const session = allSessions().find((s) => s.id === params.id);
+    if (!session) return HttpResponse.json(notFound, { status: 404 });
+    if (session.observeOnly) return HttpResponse.json(observeOnly, { status: 409 });
+    const control = String(params.control);
+    if (control === "messages") {
+      const body = (await request.json()) as { text: string };
+      return HttpResponse.json<Message>(
+        sentMessage(body.text, { kind: "agent", agentId: session.id }, session.executionId),
+      );
+    }
+    const status = CONTROL_STATUS[control];
+    if (!status) return HttpResponse.json(notFound, { status: 404 });
+    return HttpResponse.json<Session>({ ...session, status });
   }),
 ];

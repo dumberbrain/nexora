@@ -193,7 +193,7 @@ testable increment.
 - [X] T101 [US2] Implement verifier `apps/server/src/modules/execution-orchestrator/verifier.ts` (collect completed/failed tasks, changed files, run detected test command in project via allowlisted runner only if user approved in config, parse pass/fail counts)
 - [X] T102 [US2] Implement executions routes `apps/server/src/http/routes/executions.ts` (`POST /executions`, `GET /executions/:id`, `GET/PUT …/modes|mode`, `GET …/questions`, `PUT …/config`, `POST …/plan`, `POST …/approve` with `permissionBypass` requiring typed confirmation string, `GET …/verification`, `GET …/tasks`) and wire into Hono app
 - [X] T103 [P] [US2] Implement entities `apps/web/src/entities/{execution,task,approval}/` (api, key factories, types)
-- [ ] T104 [P] [US2] Implement feature `apps/web/src/features/submit-task/` (project select + prompt textarea 1–20 000 chars, RHF + zod; consent dialog before model-backed analysis/planning stating it consumes model usage, with per-project "always allow" toggle that can be revoked — FR-008) and analysis summary widget `apps/web/src/widgets/analysis-summary/`
+- [X] T104 [P] [US2] Implement feature `apps/web/src/features/submit-task/` (project select + prompt textarea 1–20 000 chars, RHF + zod; consent dialog before model-backed analysis/planning stating it consumes model usage, with per-project "always allow" toggle that can be revoked — FR-008) and analysis summary widget `apps/web/src/widgets/analysis-summary/`
 - [X] T105 [P] [US2] Implement feature `apps/web/src/features/choose-mode/` (mode cards: available/recommended badge/reason; unavailable disabled with reason + how to enable)
 - [X] T106 [P] [US2] Implement feature `apps/web/src/features/answer-questions/` (dynamic RHF form from Question[] with defaults; strategy, agent config, skills, MCP, parallelism, approval checkpoints)
 - [X] T107 [US2] Implement feature `apps/web/src/features/approve-plan/` (plan table: ID, title, description, agent, mode, deps, priority, status; conflict highlights; checkbox per risky task; permission-bypass toggle off by default requiring typed confirmation)
@@ -219,11 +219,11 @@ testable increment.
 
 - [ ] T112 [US3] Implement control operations in `apps/server/src/modules/execution-orchestrator/controls.ts` (controls only for Nexora-started sessions — observed sessions are observe-only; stop, interrupt-and-hold labelled "Interrupt & hold" (API name `pause`) only when all runtimes support interrupt+resume, resume, cancel task, retry, assign additional task, request review by Code Reviewer role, restart session) to pass T109, T110
 - [ ] T113 [US3] Implement routes `apps/server/src/http/routes/controls.ts`: `POST /executions/:id/{stop,pause,resume}`, `POST /tasks/:id/{cancel,retry,review}`, `POST /executions/:id/tasks`, `POST /sessions/:id/{stop,interrupt,restart,resume,messages}`, `POST /agents/:id/messages`
-- [ ] T114 [P] [US3] Implement feature `apps/web/src/features/control-session/` (buttons derived only from `capabilities`; unsupported disabled with reason tooltip; confirmation dialog for stop)
-- [ ] T115 [P] [US3] Implement feature `apps/web/src/features/decide-approval/` + widget `apps/web/src/widgets/approvals-inbox/` (pending list, approve/reject with note, toast on new approval request)
-- [ ] T116 [P] [US3] Implement Communication Center widget `apps/web/src/widgets/message-feed/` + entity `apps/web/src/entities/message/` + route `apps/web/src/routes/communication.tsx` (sender, receiver, timestamp, type, related task, summary; live via socket; no hidden reasoning) with component test `apps/web/src/widgets/message-feed/message-feed.test.tsx`
-- [ ] T117 [P] [US3] Implement features `apps/web/src/features/{retry-task,send-message,assign-task,request-review}/`
-- [ ] T118 [US3] Integrate controls into agent-details-panel, session view and execution view (`apps/web/src/widgets/agent-details-panel/`, `apps/web/src/views/session/`, `apps/web/src/views/execution/`)
+- [X] T114 [P] [US3] Implement feature `apps/web/src/features/control-session/` (buttons derived only from `capabilities`; unsupported disabled with reason tooltip; confirmation dialog for stop)
+- [X] T115 [P] [US3] Implement feature `apps/web/src/features/decide-approval/` + widget `apps/web/src/widgets/approvals-inbox/` (pending list, approve/reject with note, toast on new approval request)
+- [X] T116 [P] [US3] Implement Communication Center widget `apps/web/src/widgets/message-feed/` + entity `apps/web/src/entities/message/` + route `apps/web/src/routes/communication.tsx` (sender, receiver, timestamp, type, related task, summary; live via socket; no hidden reasoning) with component test `apps/web/src/widgets/message-feed/message-feed.test.tsx`
+- [X] T117 [P] [US3] Implement features `apps/web/src/features/{retry-task,send-message,assign-task,request-review}/`
+- [X] T118 [US3] Integrate controls into agent-details-panel, session view and execution view (`apps/web/src/widgets/agent-details-panel/`, `apps/web/src/views/session/`, `apps/web/src/views/execution/`)
 
 **Checkpoint**: Human control complete for Multi-Session and Subagents modes
 

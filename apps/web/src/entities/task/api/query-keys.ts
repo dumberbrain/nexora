@@ -7,7 +7,8 @@ import { ENTITY_ROOTS } from "@/shared/api";
  *               shared/api/entity-keys convention; byExecution(id) lives under lists()
  *               and holds the whole ExecutionTasks payload ({ items, conflicts })
  * staleTime:    10 s   gcTime: 10 min  (statuses change constantly while running)
- * invalidation: generate plan → setQueryData(byExecution(id)); approve → invalidate it
+ * invalidation: generate plan → setQueryData(byExecution(id)); approve → invalidate it;
+ *               US3 cancel/retry/review/assign → patchExecutionTask(byExecution(id)) + invalidate
  * realtime:     socket `entity.changed` kind=task invalidates lists() → byExecution refetches;
  *               the execution view also invalidates it on live `task.*` events
  */
