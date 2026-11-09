@@ -8,6 +8,7 @@ import { registerConsentRoutes } from "./http/routes/consent";
 import { registerControlRoutes, registerMessageRoutes } from "./http/routes/controls";
 import { registerExecutionRoutes } from "./http/routes/executions";
 import { registerRuntimeRoutes } from "./http/routes/runtime";
+import { registerTaskRoutes } from "./http/routes/tasks";
 import { type Logger } from "./lib/logger";
 import { runCommand } from "./lib/process";
 import { type EventBus, type EventStore } from "./modules/event-manager";
@@ -23,6 +24,7 @@ import { AgentSdkAdapter, CliHeadlessAdapter, RuntimeManager } from "./modules/r
 import { ScriptedFakeAdapter } from "./modules/runtime-manager/adapters/fake/scripted-fake.adapter";
 import { type ClaudeProbe } from "./modules/runtime-manager/environment";
 import { gitBranchOf } from "./modules/session-manager";
+import { type BoardService, createBoard } from "./modules/task-manager/board";
 import { type Services } from "./services";
 
 /**
@@ -82,6 +84,7 @@ export interface OrchestrationLayer {
   runtime: RuntimeManager;
   orchestration: Orchestration;
   controls: ControlService;
+  board: BoardService;
   registerRoutes(api: Hono<AppBindings>): void;
   /** stop scheduling, then every managed runtime, then liveness timers */
   close(): Promise<void>;
@@ -124,10 +127,18 @@ export function createOrchestrationLayer(deps: OrchestrationLayerDeps): Orchestr
     agents: services.agents,
   });
 
+  const board = createBoard({
+    orchestrator: orchestration.orchestrator,
+    tasks: orchestration.tasks,
+    approvals: orchestration.approvals,
+    audit,
+  });
+
   return {
     runtime,
     orchestration,
     controls,
+    board,
     registerRoutes: (api) => {
       registerRuntimeRoutes(api, { runtime });
       registerExecutionRoutes(api, orchestration);
@@ -135,6 +146,7 @@ export function createOrchestrationLayer(deps: OrchestrationLayerDeps): Orchestr
       registerConsentRoutes(api, { consent: orchestration.consent, projects: services.projects });
       registerControlRoutes(api, { controls });
       registerMessageRoutes(api, { communication: orchestration.communication });
+      registerTaskRoutes(api, { board });
     },
     close: async () => {
       await orchestration.close();

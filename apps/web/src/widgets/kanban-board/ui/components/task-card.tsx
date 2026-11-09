@@ -37,19 +37,18 @@ export function TaskCard({ task }: { task: Task }) {
         ref={setActivatorNodeRef}
         {...attributes}
         {...listeners}
-        aria-label={`${task.id} ${task.title}`}
         {...(blocked ? { "aria-describedby": reasonId } : {})}
         className={cn(
           "flex flex-col gap-1.5 text-left outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
           blocked ? "cursor-default" : "cursor-grab active:cursor-grabbing",
         )}
       >
-        <span className="flex items-center justify-between gap-2">
-          <span className="text-phosphor">{task.id}</span>
-          <TaskStatusBadge status={task.status} />
+        {/* name comes from the content (WCAG 2.5.3): "<id> <title> <status> …" */}
+        <span className="text-sm leading-snug break-words text-foreground">
+          <span className="text-phosphor">{task.id}</span> {task.title}
         </span>
-        <span className="text-sm leading-snug break-words text-foreground">{task.title}</span>
         <span className="flex flex-wrap items-center gap-2 text-[10px] text-muted-foreground">
+          <TaskStatusBadge status={task.status} />
           <PriorityTag priority={task.priority} />
           <span>{task.assignedAgentRole ?? "unassigned"}</span>
           {task.attempt > 1 ? <span className="tabular-nums">attempt #{task.attempt}</span> : null}

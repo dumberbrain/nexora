@@ -58,7 +58,9 @@ function renderBoard(
 }
 
 const column = (name: string) => screen.getByRole("list", { name });
-const card = (name: string) => screen.getByRole("button", { name });
+/** card buttons are named by their content: "<id> <title> <status> <priority> <role>" */
+const cardName = (idAndTitle: string) => new RegExp(`^${idAndTitle}`);
+const card = (name: string) => screen.getByRole("button", { name: cardName(name) });
 
 /** Keyboard drag: pick up, arrow across columns, drop — one keystroke at a time. */
 async function keyboardMove(
@@ -76,13 +78,13 @@ describe("KanbanBoard", () => {
   it("renders the six columns with every task in the column its status maps to", async () => {
     renderBoard();
     const board = await screen.findByRole("region", { name: "Task board" });
-    await within(board).findByRole("button", { name: "T-1 Add theme store" });
+    await within(board).findByRole("button", { name: cardName("T-1 Add theme store") });
     for (const name of COLUMNS) expect(within(board).getByRole("list", { name })).toBeVisible();
 
     const ids = (name: string) =>
       within(column(name))
         .getAllByRole("button")
-        .map((b) => b.getAttribute("aria-label")?.split(" ")[0]);
+        .map((b) => /^T-\d+/.exec(b.textContent ?? "")?.[0]);
     expect(ids("Backlog")).toEqual(["T-1", "T-2"]);
     expect(ids("Todo")).toEqual(["T-3"]);
     expect(ids("In Progress")).toEqual(["T-4"]);
@@ -93,7 +95,7 @@ describe("KanbanBoard", () => {
 
   it("only lets Backlog and Todo cards be dragged; others explain why", async () => {
     renderBoard();
-    const running = await screen.findByRole("button", { name: "T-4 Persist preference" });
+    const running = await screen.findByRole("button", { name: cardName("T-4 Persist preference") });
     expect(running).toHaveAttribute("aria-disabled", "true");
     expect(running).toHaveAccessibleDescription(/only backlog and todo/i);
     expect(card("T-1 Add theme store")).not.toHaveAttribute("aria-disabled", "true");
@@ -101,7 +103,7 @@ describe("KanbanBoard", () => {
 
   it("links each card to its execution", async () => {
     renderBoard();
-    await screen.findByRole("button", { name: "T-1 Add theme store" });
+    await screen.findByRole("button", { name: cardName("T-1 Add theme store") });
     const link = within(column("Backlog")).getAllByRole("link")[0]!;
     expect(link).toHaveAttribute("href", `/executions/${X002}`);
   });
@@ -115,13 +117,13 @@ describe("KanbanBoard", () => {
       }),
     );
     const { user, queryClient } = renderBoard();
-    await screen.findByRole("button", { name: "T-1 Add theme store" });
+    await screen.findByRole("button", { name: cardName("T-1 Add theme store") });
 
     await keyboardMove(user, "T-1 Add theme store", "ArrowRight");
 
     await waitFor(() =>
       expect(
-        within(column("Todo")).getByRole("button", { name: "T-1 Add theme store" }),
+        within(column("Todo")).getByRole("button", { name: cardName("T-1 Add theme store") }),
       ).toBeVisible(),
     );
     expect(bodies).toEqual([
@@ -130,13 +132,13 @@ describe("KanbanBoard", () => {
     // still in Todo once the board refetches the server's state
     await waitFor(() => expect(queryClient.isMutating() + queryClient.isFetching()).toBe(0));
     expect(
-      within(column("Todo")).getByRole("button", { name: "T-1 Add theme store" }),
+      within(column("Todo")).getByRole("button", { name: cardName("T-1 Add theme store") }),
     ).toBeVisible();
   });
 
   it("announces pick-up, target column and drop for screen readers", async () => {
     const { user } = renderBoard();
-    await screen.findByRole("button", { name: "T-3 Wire toggle into settings page" });
+    await screen.findByRole("button", { name: cardName("T-3 Wire toggle into settings page") });
     act(() => card("T-3 Wire toggle into settings page").focus());
     await user.keyboard("[Space]");
     expect(await screen.findByText(/picked up T-3.*todo/i)).toBeInTheDocument();
@@ -147,7 +149,7 @@ describe("KanbanBoard", () => {
     await waitFor(() =>
       expect(
         within(column("Backlog")).getByRole("button", {
-          name: "T-3 Wire toggle into settings page",
+          name: cardName("T-3 Wire toggle into settings page"),
         }),
       ).toBeVisible(),
     );
@@ -162,7 +164,7 @@ describe("KanbanBoard", () => {
       }),
     );
     const { user } = renderBoard();
-    await screen.findByRole("button", { name: "T-1 Add theme store" });
+    await screen.findByRole("button", { name: cardName("T-1 Add theme store") });
     act(() => card("T-1 Add theme store").focus());
     await user.keyboard("[Space]");
     await user.keyboard("[ArrowRight]");
@@ -177,7 +179,7 @@ describe("KanbanBoard", () => {
 
     expect(await screen.findByText(/only backlog ⇄ todo/i)).toBeInTheDocument();
     expect(
-      within(column("Backlog")).getByRole("button", { name: "T-1 Add theme store" }),
+      within(column("Backlog")).getByRole("button", { name: cardName("T-1 Add theme store") }),
     ).toBeVisible();
     expect(patch).not.toHaveBeenCalled();
   });
@@ -195,13 +197,15 @@ describe("KanbanBoard", () => {
       }),
     );
     const { user } = renderBoard();
-    await screen.findByRole("button", { name: "T-2 Drop legacy settings table" });
+    await screen.findByRole("button", { name: cardName("T-2 Drop legacy settings table") });
 
     await keyboardMove(user, "T-2 Drop legacy settings table", "ArrowRight");
     // optimistic: in Todo while the server decides
     await waitFor(() =>
       expect(
-        within(column("Todo")).getByRole("button", { name: "T-2 Drop legacy settings table" }),
+        within(column("Todo")).getByRole("button", {
+          name: cardName("T-2 Drop legacy settings table"),
+        }),
       ).toBeVisible(),
     );
     release();
@@ -210,7 +214,9 @@ describe("KanbanBoard", () => {
     expect(screen.getByText("Could not move T-2")).toBeInTheDocument();
     await waitFor(() =>
       expect(
-        within(column("Backlog")).getByRole("button", { name: "T-2 Drop legacy settings table" }),
+        within(column("Backlog")).getByRole("button", {
+          name: cardName("T-2 Drop legacy settings table"),
+        }),
       ).toBeVisible(),
     );
   });
@@ -224,7 +230,7 @@ describe("KanbanBoard", () => {
       }),
     );
     renderBoard();
-    await screen.findByRole("button", { name: "T-1 Add theme store" });
+    await screen.findByRole("button", { name: cardName("T-1 Add theme store") });
     await waitFor(() =>
       expect(fake().sent).toContainEqual({
         event: "subscribe",
@@ -248,7 +254,7 @@ describe("KanbanBoard", () => {
 
   it("filters by execution and project", async () => {
     const { user, onFiltersChange } = renderBoard({});
-    await screen.findByRole("button", { name: "T-1 Fix flaky staleness test" });
+    await screen.findByRole("button", { name: cardName("T-1 Fix flaky staleness test") });
     await waitFor(() =>
       expect(within(screen.getByLabelText("Execution")).getAllByRole("option").length).toBe(4),
     );
