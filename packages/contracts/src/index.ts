@@ -24,4 +24,5 @@ export * from "./api/controls";
 export * from "./api/board";
 export * from "./api/workflows";
 export * from "./api/teams";
+export * from "./api/integrations";
 export * from "./socket";

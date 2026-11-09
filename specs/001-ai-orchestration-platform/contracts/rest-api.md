@@ -98,14 +98,15 @@ Node `config` is validated per kind (`NODE_CONFIG_SCHEMAS` in contracts/api/work
 
 ## Integrations & GitHub
 
-| GET | `/integrations?projectId=` | skills, commands, agents, MCP servers (secrets stripped) |
+| GET | `/integrations?projectId=&kind=&refresh=` | skills, commands, agents, MCP servers with tools, health, permission status (secrets stripped) → `IntegrationList` |
 | GET | `/runtime/environment` | Claude Code version, auth status, Agent Teams support, gh status |
 | POST | `/runtime/agent-teams/enable` | `{ projectId, confirmation: "enable agent teams" }` → writes the flag to the project's `.claude/settings.local.json` (audited) |
 | GET | `/sessions/:id/team` | `TeamView` of a Nexora-started Agent Teams lead (members, tasks, messages — `best_effort`) |
 
 Terminal: Socket.IO namespace `/terminal` (auth required, Nexora-spawned lead sessions only): `terminal:attach` → ack with backlog, `terminal:input`, `terminal:resize`, server `terminal:output`, `terminal:exit` (contracts/api/teams.ts).
+| GET | `/github/repos` | owner/repo of registered projects' remotes (repo picker) |
 | GET | `/github/status` | `connected \| not_installed \| not_authenticated` + setup hint |
-| GET | `/github/repos/:owner/:repo/{branches,commits,pulls}` | via `gh api` (read-only) |
+| GET | `/github/repos/:owner/:repo/{branches,commits,pulls}` | via `gh api` (read-only); branches/commits fall back to local `git` (`source: local_git`) |
 | GET | `/github/repos/:owner/:repo/pulls/:n/files` | changed files + review status |
 
 ## Hook ingestion (internal, loopback only)
