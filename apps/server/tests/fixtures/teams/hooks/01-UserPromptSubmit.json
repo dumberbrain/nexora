@@ -1,0 +1,10 @@
+{
+  "session_id": "9da5d295-d920-41ad-899a-7b0b1b4a8d68",
+  "transcript_path": "<HOME>\\.claude\\projects\\<HOME-SLUG>-AppData-Local-Temp-<REPO-NAME>\\9da5d295-d920-41ad-899a-7b0b1b4a8d68.jsonl",
+  "cwd": "<REPO>",
+  "scratchpad_dir": "<HOME>\\AppData\\Local\\Temp\\claude\\a4de315a6a27c12c\\9da5d295-d920-41ad-899a-7b0b1b4a8d68\\scratchpad",
+  "prompt_id": "0aa66007-56cf-4760-a43b-eb10b35f08ed",
+  "permission_mode": "acceptEdits",
+  "hook_event_name": "UserPromptSubmit",
+  "prompt": "Create an agent team with exactly 2 teammates. Teammate one writes the file hello.txt containing 'hello'. Teammate two writes bye.txt containing 'bye'. Keep it minimal, no other work. When both are done, ask them to shut down, clean up the team, and then reply with the word DONE written twice joined by a hyphen."
+}

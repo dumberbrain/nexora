@@ -1,0 +1,39 @@
+{
+  "session_id": "9da5d295-d920-41ad-899a-7b0b1b4a8d68",
+  "transcript_path": "<HOME>\\.claude\\projects\\<HOME-SLUG>-AppData-Local-Temp-<REPO-NAME>\\9da5d295-d920-41ad-899a-7b0b1b4a8d68.jsonl",
+  "cwd": "<REPO>",
+  "scratchpad_dir": "<HOME>\\AppData\\Local\\Temp\\claude\\a4de315a6a27c12c\\9da5d295-d920-41ad-899a-7b0b1b4a8d68\\scratchpad",
+  "prompt_id": "0aa66007-56cf-4760-a43b-eb10b35f08ed",
+  "permission_mode": "acceptEdits",
+  "effort": {
+    "level": "medium"
+  },
+  "hook_event_name": "PostToolUse",
+  "tool_name": "Agent",
+  "tool_input": {
+    "description": "Write hello.txt",
+    "prompt": "Create the file hello.txt in the working directory <REPO> containing exactly the text: hello. Do nothing else. Reply with DONE when written.",
+    "subagent_type": "general-purpose",
+    "name": "teammate-one"
+  },
+  "tool_response": {
+    "status": "teammate_spawned",
+    "prompt": "Create the file hello.txt in the working directory <REPO> containing exactly the text: hello. Do nothing else. Reply with DONE when written.",
+    "agentId": "ateammate-one-a2fbe48e2f0981ca",
+    "resolvedModel": "claude-haiku-5-5",
+    "teammate_id": "teammate-one@session-9da5d295",
+    "agent_id": "ateammate-one-a2fbe48e2f0981ca",
+    "agent_type": "general-purpose",
+    "model": "haiku",
+    "name": "teammate-one",
+    "color": "blue",
+    "tmux_session_name": "in-process",
+    "tmux_window_name": "in-process",
+    "tmux_pane_id": "in-process",
+    "team_name": "session-9da5d295",
+    "is_splitpane": false,
+    "plan_mode_required": false
+  },
+  "tool_use_id": "toolu_01MivTydCSVAn2WjUYNRRWgP",
+  "duration_ms": 42
+}

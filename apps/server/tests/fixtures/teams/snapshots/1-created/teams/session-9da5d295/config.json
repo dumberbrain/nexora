@@ -1,0 +1,23 @@
+{
+  "name": "session-9da5d295",
+  "createdAt": 1794259763973,
+  "leadAgentId": "team-lead@session-9da5d295",
+  "leadSessionId": "9da5d295-d920-41ad-899a-7b0b1b4a8d68",
+  "leadProcess": {
+    "pid": 6944,
+    "pidSpace": "<HOST>",
+    "claimedAt": 1794259763973
+  },
+  "members": [
+    {
+      "agentId": "team-lead@session-9da5d295",
+      "name": "team-lead",
+      "agentType": "team-lead",
+      "joinedAt": 1794259763973,
+      "tmuxPaneId": "leader",
+      "cwd": "<REPO>",
+      "subscriptions": [],
+      "backendType": "in-process"
+    }
+  ]
+}

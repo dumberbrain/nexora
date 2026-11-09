@@ -279,7 +279,7 @@ testable increment.
 
 ### Tests for User Story 6 ⚠️
 
-- [ ] T134 [US6] Spike S2: verify `node-pty` prebuilt install on Windows 10 / Node 22, launch interactive `claude` with `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in PTY, create a 2-teammate team, capture hook payloads (TaskCreated, TaskCompleted, TeammateIdle) and team files to `apps/server/tests/fixtures/teams/`; record result + fallback decision in research.md (S2)
+- [X] T134 [US6] Spike S2: verify `node-pty` prebuilt install on Windows 10 / Node 22, launch interactive `claude` with `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in PTY, create a 2-teammate team, capture hook payloads (TaskCreated, TaskCompleted, TeammateIdle) and team files to `apps/server/tests/fixtures/teams/`; record result + fallback decision in research.md (S2)
 - [ ] T135 [P] [US6] Contract test `apps/server/tests/contract/agent-team-adapter.test.ts`: fixtures → team_lead/teammate agents, team tasks, messages from inbox files (`best_effort`), capabilities `canSendMessage: 'lead_only'`, `canPause/canResume: false`
 - [ ] T136 [P] [US6] Unit test `apps/server/tests/unit/execution-orchestrator/hybrid-planner.test.ts`: every task in hybrid plan has `mode` + non-empty `mechanismReason`; Agent Teams never chosen when unavailable
 

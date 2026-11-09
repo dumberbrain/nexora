@@ -1,0 +1,12 @@
+[
+  {
+    "from": "teammate-two",
+    "text": "{\"type\":\"idle_notification\",\"from\":\"teammate-two\",\"timestamp\":\"2026-11-09T21:29:49.551Z\",\"idleReason\":\"available\",\"result\":\"DONE. I created `<REPO>\\\\bye.txt` containing `bye` and sent \\\"DONE\\\" to team-lead.\"}",
+    "timestamp": "2026-11-09T21:29:49.551Z",
+    "color": "green",
+    "msgV": 1,
+    "msg_id": "e1f67e37-ee74-4b5a-877b-e288d714a4ce",
+    "type": "message",
+    "read": false
+  }
+]

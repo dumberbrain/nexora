@@ -214,6 +214,46 @@ Script `apps/server/scripts/spike-sdk.ts` (model haiku, `settingSources: []`); f
 - Also emitted: `rate_limit_event`, `system/commands_changed` (ignored by the mapper).
 - No pause primitive exists (confirms R1): "Interrupt & hold" = `interrupt()` then `resume`.
 
+## S2 result — Agent Teams lead under a PTY (2026-11-09, Claude Code 2.1.321, Windows 10, Node 22.23)
+
+Run: interactive `claude --model haiku --permission-mode acceptEdits` in `node-pty`, flag
+`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`, scratch git repo, prompt "team of 2 teammates, one writes
+hello.txt, one bye.txt, then shut down and clean up". Done in 32 s, both files written. Fixtures
+(sanitised: `<HOME>`, `<REPO>`, `<HOST>`): `apps/server/tests/fixtures/teams/` — `hooks/*.json`
+(42 payloads in order) and `snapshots/<n>-<stage>/teams/<team>/{config.json,inboxes/*.json}`.
+
+- **node-pty**: `1.0.0` has no Windows prebuild (node-gyp build fails without build tools) —
+  **`1.1.0` ships `win32-x64` prebuilds and works**; pin it. ConPTY needs a console: under a
+  console-less parent (Git Bash) spawn hangs; the server started from a terminal is fine.
+  `pty.kill()` throws `AttachConsole failed` on Windows ⇒ stop with `taskkill /T /F /PID <pid>`
+  (Ctrl-C via PTY input for a polite interrupt).
+- **Environment**: a child started from inside another Claude Code session inherits
+  `CLAUDECODE` / `CLAUDE_CODE_*` markers (e.g. `CLAUDE_CODE_CHILD_SESSION` turns transcripts off).
+  The adapter strips every `CLAUDECODE*` / `CLAUDE_CODE_*` variable except
+  `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`.
+- **Start-up dialogs** (interactive only): workspace trust for a new folder — default option is
+  **"No, exit"**, so the adapter must not blindly press Enter; and "New MCP server found" when the
+  worktree has `.mcp.json` (default "continue without"). Decision: Nexora never auto-accepts
+  trust; the lead's terminal is shown (T139/T141) and the session waits in
+  `waiting_for_input` until the user answers there.
+- **Team files**: a team `session-<first 8 of session id>` is created **at session start**, before
+  any teammate: `~/.claude/teams/<team>/config.json` with `leadSessionId`, `leadAgentId`
+  (`team-lead@<team>`), `leadProcess.pid` (= PTY pid ⇒ how Nexora finds *its* team),
+  `members[]` (`agentId`, `name`, `agentType`, `cwd`, `backendType: "in-process"`, `joinedAt`).
+  Members are appended as teammates spawn and removed on shutdown (lead remains). Inboxes:
+  `inboxes/<member>.json` = array of `{from, text, timestamp, msg_id, type, read, …}`; `text` may
+  itself be JSON (`idle_notification`, `shutdown_request/response`). Inboxes are **emptied within
+  seconds** once read ⇒ polling is `best_effort` (confirms R3). `~/.claude/tasks/<team>/` existed
+  but stayed empty (the lead did not use the shared task list for this small job).
+- **Hooks**: teammates appear as `SubagentStart/Stop` with `agent_id` (`a<name>-<hex>`) and
+  `agent_type` = teammate name; `TeammateIdle` carries `teammate_name` + `team_name`; tool hooks
+  carry the teammate's `agent_id`. Team tools are deferred (`TeamCreate`, `TeamDelete`,
+  `SendMessage` with a `shutdown_request` / `shutdown_response` protocol). `TaskCreated` /
+  `TaskCompleted` did **not** fire in this run (no shared tasks) — the contract test covers them
+  only through the documented payload shape, marked as such.
+- **Decision**: PTY adapter is viable on Windows with `node-pty@1.1.0`; keep the observe-only
+  fallback for when the native module cannot load.
+
 ## R13. Toolchain versions (Phase 1, 2026-11-08)
 
 - **TypeScript 6.0.3**, not 7.0: `typescript-eslint` 8.72 peer range is `<6.1.0` (TS 7 is the

@@ -1,0 +1,40 @@
+{
+  "session_id": "9da5d295-d920-41ad-899a-7b0b1b4a8d68",
+  "transcript_path": "<HOME>\\.claude\\projects\\<HOME-SLUG>-AppData-Local-Temp-<REPO-NAME>\\9da5d295-d920-41ad-899a-7b0b1b4a8d68.jsonl",
+  "cwd": "<REPO>",
+  "scratchpad_dir": "<HOME>\\AppData\\Local\\Temp\\claude\\a4de315a6a27c12c\\9da5d295-d920-41ad-899a-7b0b1b4a8d68\\scratchpad",
+  "prompt_id": "0aa66007-56cf-4760-a43b-eb10b35f08ed",
+  "permission_mode": "acceptEdits",
+  "effort": {
+    "level": "medium"
+  },
+  "hook_event_name": "PostToolUse",
+  "tool_name": "ListAgents",
+  "tool_input": {},
+  "tool_response": {
+    "listing": "This session is nexora-spike-s2-91js4n-b5 [933c3e] — the name other sessions use to message it (it is not listed below; a message to it would be a message to yourself).\n\nPeer sessions (2):\n  nexora-52 [7f4ad4]  ·  interactive  ·  idle  ·  started 3h ago\n  nexora-e3 [4dba78]  ·  interactive  ·  busy  ·  started 8h ago",
+    "sections": [
+      {
+        "kind": "sessions",
+        "total": 2,
+        "rows": [
+          {
+            "name": "nexora-52",
+            "ref": "7f4ad4",
+            "type": "interactive",
+            "status": "idle"
+          },
+          {
+            "name": "nexora-e3",
+            "ref": "4dba78",
+            "type": "interactive",
+            "status": "busy"
+          }
+        ]
+      }
+    ],
+    "notes": []
+  },
+  "tool_use_id": "toolu_01EGHCxgrwqVmw284E3DkxVs",
+  "duration_ms": 36
+}

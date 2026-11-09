@@ -1,0 +1,11 @@
+[
+  {
+    "from": "team-lead",
+    "text": "{\"type\":\"shutdown_request\",\"requestId\":\"shutdown-1794259792191@teammate-one\",\"from\":\"team-lead\",\"reason\":\"hello.txt done, team wrapping up\",\"timestamp\":\"2026-11-09T21:29:52.191Z\"}",
+    "timestamp": "2026-11-09T21:29:52.191Z",
+    "msgV": 1,
+    "msg_id": "d0b28110-374f-4a7a-8ecf-c882eafefac4",
+    "type": "message",
+    "read": false
+  }
+]

@@ -1,0 +1,25 @@
+{
+  "session_id": "9da5d295-d920-41ad-899a-7b0b1b4a8d68",
+  "transcript_path": "<HOME>\\.claude\\projects\\<HOME-SLUG>-AppData-Local-Temp-<REPO-NAME>\\9da5d295-d920-41ad-899a-7b0b1b4a8d68.jsonl",
+  "cwd": "<REPO>",
+  "scratchpad_dir": "<HOME>\\AppData\\Local\\Temp\\claude\\a4de315a6a27c12c\\9da5d295-d920-41ad-899a-7b0b1b4a8d68\\scratchpad",
+  "prompt_id": "0aa66007-56cf-4760-a43b-eb10b35f08ed",
+  "permission_mode": "acceptEdits",
+  "agent_id": "ateammate-two-9d07d21bbee1d514",
+  "agent_type": "teammate-two",
+  "effort": {
+    "level": "medium"
+  },
+  "hook_event_name": "PreToolUse",
+  "tool_name": "SendMessage",
+  "tool_input": {
+    "to": "team-lead",
+    "summary": "Confirm bye.txt written",
+    "message": "DONE",
+    "type": "message",
+    "recipient": "team-lead",
+    "recipient_kind": "name",
+    "content": "DONE"
+  },
+  "tool_use_id": "toolu_01SNQvp9KrhUroRv6UzwRFUr"
+}

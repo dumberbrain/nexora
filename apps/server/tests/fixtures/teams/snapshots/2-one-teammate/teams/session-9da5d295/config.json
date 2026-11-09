@@ -1,0 +1,37 @@
+{
+  "name": "session-9da5d295",
+  "createdAt": 1794259763973,
+  "leadAgentId": "team-lead@session-9da5d295",
+  "leadSessionId": "9da5d295-d920-41ad-899a-7b0b1b4a8d68",
+  "leadProcess": {
+    "pid": 6944,
+    "pidSpace": "<HOST>",
+    "claimedAt": 1794259763973
+  },
+  "members": [
+    {
+      "agentId": "team-lead@session-9da5d295",
+      "name": "team-lead",
+      "agentType": "team-lead",
+      "joinedAt": 1794259763973,
+      "tmuxPaneId": "leader",
+      "cwd": "<REPO>",
+      "subscriptions": [],
+      "backendType": "in-process"
+    },
+    {
+      "agentId": "teammate-one@session-9da5d295",
+      "name": "teammate-one",
+      "color": "blue",
+      "joinedAt": 1794259781448,
+      "tmuxPaneId": "in-process",
+      "subscriptions": [],
+      "agentType": "general-purpose",
+      "model": "haiku",
+      "prompt": "Create the file hello.txt in the working directory <REPO> containing exactly the text: hello. Do nothing else. Reply with DONE when written.",
+      "planModeRequired": false,
+      "cwd": "<REPO>",
+      "backendType": "in-process"
+    }
+  ]
+}

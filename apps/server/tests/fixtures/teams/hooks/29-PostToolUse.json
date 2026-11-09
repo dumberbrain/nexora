@@ -1,0 +1,29 @@
+{
+  "session_id": "9da5d295-d920-41ad-899a-7b0b1b4a8d68",
+  "transcript_path": "<HOME>\\.claude\\projects\\<HOME-SLUG>-AppData-Local-Temp-<REPO-NAME>\\9da5d295-d920-41ad-899a-7b0b1b4a8d68.jsonl",
+  "cwd": "<REPO>",
+  "scratchpad_dir": "<HOME>\\AppData\\Local\\Temp\\claude\\a4de315a6a27c12c\\9da5d295-d920-41ad-899a-7b0b1b4a8d68\\scratchpad",
+  "prompt_id": "0aa66007-56cf-4760-a43b-eb10b35f08ed",
+  "permission_mode": "acceptEdits",
+  "effort": {
+    "level": "medium"
+  },
+  "hook_event_name": "PostToolUse",
+  "tool_name": "SendMessage",
+  "tool_input": {
+    "to": "teammate-two",
+    "summary": "Request shutdown of teammate-two",
+    "message": {
+      "type": "shutdown_request",
+      "reason": "bye.txt done, team wrapping up"
+    }
+  },
+  "tool_response": {
+    "success": true,
+    "message": "Shutdown request sent to teammate-two. Request ID: shutdown-1794259792685@teammate-two",
+    "request_id": "shutdown-1794259792685@teammate-two",
+    "target": "teammate-two"
+  },
+  "tool_use_id": "toolu_016BnzVjYthpVTqLhry6iATS",
+  "duration_ms": 29
+}
