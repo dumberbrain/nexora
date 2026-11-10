@@ -16,6 +16,7 @@ explanation instead of starting in a weaker mode.
 | `NEXORA_DATA_DIR`          | `~/.nexora` (test: `<os tmp>/nexora-test-<pid>`) | Directory holding `nexora.db` (SQLite, WAL). Created if missing.                                                                      |
 | `NEXORA_PUBLIC_URL`        | `http://127.0.0.1:3022`                          | Base URL written into installed hooks (`<url>/api/v1/hooks/ingest`) and shown as the MCP endpoint (`<url>/mcp`). Must be a valid URL. |
 | `NEXORA_LOG_LEVEL`         | `info`                                           | pino log level (`fatal`, `error`, `warn`, `info`, `debug`, `trace`). Logs are JSON on stdout and pass through the secret redactor.    |
+| `NEXORA_RETENTION_DAYS`    | `30`                                             | Days to keep events (1–36500). Older events are purged at boot and every 6 h; error/approval events and audit entries are kept.       |
 | `NEXORA_TEST_FAKE_RUNTIME` | unset                                            | `1` replaces the Claude runtimes with a scripted fake. **Only allowed with `NODE_ENV=test`** — the server refuses to start otherwise. |
 | `NEXORA_E2E_PORT`          | `3022`                                           | Playwright only (`playwright.config.ts`): port of the E2E server, for when 3022 is already in use.                                    |
 

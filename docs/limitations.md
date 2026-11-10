@@ -81,9 +81,13 @@ message them, and always answers hooks with `{}` (no decisions). Also:
 
 ## Known gaps in this version
 
-- **Restart recovery and event retention** are not part of this version yet (Phase 11 tasks
-  T155–T158): after a server restart, sessions that were running are not re-attached, and events
-  are kept until you delete the data directory.
+- **After a server restart** Nexora cannot re-attach to processes it started: sessions that were
+  starting, running, idle, waiting for approval, paused or unresponsive are marked `unknown` (history
+  is kept). A session goes back to `running` when its next hook event arrives.
+- **Event retention** deletes events older than `NEXORA_RETENTION_DAYS` (default 30) at boot and every
+  6 hours. Error events and approval events are kept; audit entries are never deleted.
+- Execution prompts are stored as typed (unredacted), because the agent needs the full text — do not
+  paste secrets into a task prompt.
 - API tokens authenticate only `/mcp` and the `/live` socket, not the REST API (there are no
   per-scope REST checks). There is no audit-log viewer yet (entries are in the database).
 - Token names stay reserved after revoke.
