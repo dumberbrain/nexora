@@ -20,4 +20,5 @@ export const NAV_ITEMS: NavItem[] = [
   { index: "07", label: "logs", to: "/logs", story: "US1" },
   { index: "08", label: "skills & mcp", to: "/integrations", story: "US7" },
   { index: "09", label: "github", to: "/github", story: "US7" },
+  { index: "10", label: "settings", to: "/settings", story: "US8" },
 ];

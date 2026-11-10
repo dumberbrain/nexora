@@ -10,6 +10,7 @@ import { messageHandlers } from "./messages";
 import { projectHandlers } from "./projects";
 import { runtimeHandlers } from "./runtime";
 import { sessionHandlers } from "./sessions";
+import { settingsHandlers } from "./settings";
 import { statsHandlers } from "./stats";
 import { taskHandlers } from "./tasks";
 import { teamHandlers } from "./teams";
@@ -48,6 +49,13 @@ export {
   observedCapabilities,
   sessionFixtures,
 } from "./sessions";
+export {
+  apiTokenFixtures,
+  CREATED_TOKEN_SECRET,
+  MCP_ENDPOINT,
+  resetSettings,
+  settingsFixture,
+} from "./settings";
 export { statsFixture } from "./stats";
 export { boardFixtures, resetTaskBoard } from "./tasks";
 export {
@@ -69,7 +77,7 @@ export {
   workflowRunFixture,
 } from "./workflows";
 
-/** Default handlers (US1 monitoring + US2 orchestration + US3 controls + US4 board + US5 workflows + US6 teams + US7 integrations/GitHub); tests override per case with `server.use(...)`. */
+/** Default handlers (US1 monitoring + US2 orchestration + US3 controls + US4 board + US5 workflows + US6 teams + US7 integrations/GitHub + US8 settings/tokens); tests override per case with `server.use(...)`. */
 export const handlers: RequestHandler[] = [
   ...projectHandlers,
   ...sessionHandlers,
@@ -85,4 +93,5 @@ export const handlers: RequestHandler[] = [
   ...integrationHandlers,
   ...githubHandlers,
   ...teamHandlers,
+  ...settingsHandlers,
 ];
