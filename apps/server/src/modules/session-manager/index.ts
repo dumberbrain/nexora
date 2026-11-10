@@ -6,4 +6,5 @@ export {
   type SessionObservation,
   type SessionProjectionDeps,
 } from "./session-projection";
+export { RECOVERABLE_STATUSES, recoverSessions, type RecoveryDeps } from "./recovery";
 export { SessionRepository } from "./session.repository";

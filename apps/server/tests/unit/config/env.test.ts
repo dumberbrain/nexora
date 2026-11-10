@@ -81,6 +81,13 @@ describe("loadEnv", () => {
     );
   });
 
+  it("defaults event retention to 30 days and honours NEXORA_RETENTION_DAYS", () => {
+    expect(loadEnv({}, deps).retentionDays).toBe(30);
+    expect(loadEnv({ NEXORA_RETENTION_DAYS: "7" }, deps).retentionDays).toBe(7);
+    expect(() => loadEnv({ NEXORA_RETENTION_DAYS: "0" }, deps)).toThrow(/NEXORA_RETENTION_DAYS/);
+    expect(() => loadEnv({ NEXORA_RETENTION_DAYS: "abc" }, deps)).toThrow(/NEXORA_RETENTION_DAYS/);
+  });
+
   it("uses a throw-away data dir under tmp in test mode when none is given", () => {
     expect(loadEnv({ NODE_ENV: "test" }, deps).dataDir).toBe(join(TMP, "nexora-test-4242"));
   });

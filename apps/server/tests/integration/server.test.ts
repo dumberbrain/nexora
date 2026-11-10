@@ -7,10 +7,12 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { type NexoraEnv } from "../../src/config/env";
 import { createLogger } from "../../src/lib/logger";
+import { EXTERNAL_OBSERVED_CAPABILITIES } from "../../src/modules/session-manager";
 import { createNexoraServer, type NexoraServer } from "../../src/server";
 
 let server: NexoraServer;
 let base: string;
+let env: NexoraEnv;
 const port = 40_000 + Math.floor(Math.random() * 10_000);
 
 beforeAll(async () => {
@@ -21,7 +23,7 @@ beforeAll(async () => {
   writeFileSync(join(web, "static", "app.js"), "console.log(1)");
   writeFileSync(join(base, "secret.txt"), "nope");
 
-  const env: NexoraEnv = {
+  env = {
     nodeEnv: "production",
     host: "127.0.0.1",
     port,
@@ -30,6 +32,7 @@ beforeAll(async () => {
     dataDir: join(base, "data"),
     publicUrl: `http://127.0.0.1:${port}`,
     testFakeRuntime: false,
+    retentionDays: 30,
   };
   server = await createNexoraServer({
     env,
@@ -89,5 +92,44 @@ describe("createNexoraServer", () => {
       socket.on("connect_error", reject);
     });
     socket.disconnect();
+  });
+
+  it("on restart marks lost sessions unknown and purges expired events (T157/T158)", async () => {
+    const now = Date.now();
+    server.services.sessions.insert({
+      id: "lost-session",
+      executionId: null,
+      executionMode: null,
+      currentTaskId: null,
+      projectId: null,
+      runtime: "external_observed",
+      observeOnly: true,
+      cwd: base,
+      gitBranch: null,
+      worktreePath: null,
+      model: null,
+      status: "running",
+      capabilities: EXTERNAL_OBSERVED_CAPABILITIES,
+      pid: null,
+      usage: null,
+      lastActivityAt: now,
+      startedAt: now,
+      endedAt: null,
+    });
+    const meta = { source: "hook", reliability: "authoritative", severity: "info" } as const;
+    const day = 86_400_000;
+    server.store.append({ ...meta, ts: now - 40 * day, type: "tool.invoked", summary: "old" });
+    server.store.append({ ...meta, ts: now - 40 * day, type: "error", summary: "old error" });
+    server.store.append({ ...meta, ts: now, type: "tool.invoked", summary: "fresh" });
+    await server.close();
+
+    server = await createNexoraServer({
+      env,
+      webDistDir: null,
+      logger: createLogger({ level: "silent" }),
+    });
+    expect(server.services.sessions.get("lost-session")?.status).toBe("unknown");
+    const summaries = server.store.list({ limit: 10 }).items.map((e) => e.summary);
+    expect(summaries.sort()).toEqual(["fresh", "old error"]);
   });
 });

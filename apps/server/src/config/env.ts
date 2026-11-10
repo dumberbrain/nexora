@@ -21,6 +21,8 @@ export interface NexoraEnv {
   publicUrl: string;
   /** FakeRuntimeAdapter for E2E — only ever allowed with NODE_ENV=test */
   testFakeRuntime: boolean;
+  /** event history retention in days (NEXORA_RETENTION_DAYS, default 30) */
+  retentionDays: number;
 }
 
 interface EnvDeps {
@@ -33,6 +35,7 @@ const defaultDeps: EnvDeps = { homedir, tmpdir, pid: process.pid };
 
 export const LOOPBACK_HOSTS = new Set(["127.0.0.1", "::1", "localhost"]);
 export const MIN_TOKEN_LENGTH = 32;
+export const DEFAULT_RETENTION_DAYS = 30;
 /** Production serves API + SPA on 3022; in development the Rsbuild dev server owns 3022. */
 const DEFAULT_PORT: Record<NodeEnv, number> = { production: 3022, test: 3022, development: 3023 };
 
@@ -45,6 +48,7 @@ const RawSchema = z.object({
   NEXORA_DATA_DIR: z.string().trim().min(1).optional(),
   NEXORA_PUBLIC_URL: z.url().optional(),
   NEXORA_TEST_FAKE_RUNTIME: z.enum(["0", "1"]).optional(),
+  NEXORA_RETENTION_DAYS: z.coerce.number().int().min(1).max(36_500).optional(),
 });
 
 /**
@@ -106,5 +110,6 @@ export function loadEnv(
     dataDir,
     publicUrl,
     testFakeRuntime,
+    retentionDays: e.NEXORA_RETENTION_DAYS ?? DEFAULT_RETENTION_DAYS,
   };
 }

@@ -25,6 +25,7 @@ export const testEnv: NexoraEnv = {
   dataDir: ":memory:",
   publicUrl: "http://127.0.0.1:3022",
   testFakeRuntime: false,
+  retentionDays: 30,
 };
 
 const FIXTURE_DIR = join(import.meta.dirname, "..", "fixtures", "hooks");
