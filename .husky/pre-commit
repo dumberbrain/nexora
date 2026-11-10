@@ -74,7 +74,7 @@ if [ -n "$LINT_FILES" ]; then
   if [ ! -d node_modules ]; then
     step_skip "no node_modules, CI still checks this"
   else
-    echo "$LINT_FILES" | xargs npx eslint --no-warn-ignored || fail "lint failed"
+    echo "$LINT_FILES" | xargs -n 50 npx eslint --no-warn-ignored || fail "lint failed"
     step_ok
   fi
 fi
@@ -84,7 +84,7 @@ if [ -n "$FMT_FILES" ]; then
   if [ ! -d node_modules ]; then
     step_skip "no node_modules, CI still checks this"
   else
-    echo "$FMT_FILES" | xargs npx prettier --check --ignore-unknown || fail "formatting differs from prettier"
+    echo "$FMT_FILES" | xargs -n 50 npx prettier --check --ignore-unknown || fail "formatting differs from prettier"
     step_ok
   fi
 fi
