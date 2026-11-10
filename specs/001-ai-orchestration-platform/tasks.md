@@ -326,9 +326,9 @@ testable increment.
 
 **Independent Test**: quickstart V10 — token-authenticated client lists sessions; `start_execution` with risky task returns `approval_required`
 
-- [ ] T151 [P] [US8] Integration test `apps/server/tests/integration/mcp-server.test.ts` (MCP client SDK over Streamable HTTP): disabled by default (404), unauthenticated → 401, `read` token cannot call control tools, invalid input → `isError` with VALIDATION_FAILED, `start_execution` never approves risky tasks, every call audited with actor `mcp_client:<name>`
-- [ ] T152 [US8] Implement API token management `apps/server/src/modules/permission-manager/token.service.ts` (hashed storage, scopes `read|control`, create/revoke) and routes `apps/server/src/http/routes/tokens.ts`
-- [ ] T153 [US8] Implement MCP server `apps/server/src/mcp/{server.ts,tools/*.ts}` mounted at `/mcp` (tools per `contracts/mcp-tools.md`, zod → JSON Schema inputs, calling existing module services only) to pass T151
+- [X] T151 [P] [US8] Integration test `apps/server/tests/integration/mcp-server.test.ts` (MCP client SDK over Streamable HTTP): disabled by default (404), unauthenticated → 401, `read` token cannot call control tools, invalid input → `isError` with VALIDATION_FAILED, `start_execution` never approves risky tasks, every call audited with actor `mcp_client:<name>`
+- [X] T152 [US8] Implement API token management `apps/server/src/modules/permission-manager/token.service.ts` (hashed storage, scopes `read|control`, create/revoke) and routes `apps/server/src/http/routes/tokens.ts`
+- [X] T153 [US8] Implement MCP server `apps/server/src/mcp/{server.ts,tools/*.ts}` mounted at `/mcp` (tools per `contracts/mcp-tools.md`, zod → JSON Schema inputs, calling existing module services only) to pass T151
 - [ ] T154 [P] [US8] Implement settings view `apps/web/src/views/settings/` + route `apps/web/src/routes/settings.tsx` (enable MCP server, create/revoke tokens shown once, remote-access status read-only)
 
 **Checkpoint**: All user stories complete
