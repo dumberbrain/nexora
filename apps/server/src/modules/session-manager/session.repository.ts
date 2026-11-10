@@ -1,4 +1,4 @@
-import { type Session, type SessionListQuery } from "@nexora/contracts";
+import { type Session, type SessionListQuery, type SessionStatus } from "@nexora/contracts";
 import { and, desc, eq, inArray, type SQL } from "drizzle-orm";
 
 import { type Db } from "../../db/client";
@@ -22,6 +22,17 @@ export class SessionRepository {
   update(id: string, patch: Partial<Omit<Session, "id">>): void {
     if (Object.keys(patch).length === 0) return;
     this.db.update(sessions).set(patch).where(eq(sessions.id, id)).run();
+  }
+
+  /** Every session in one of `statuses` (restart recovery). */
+  listByStatus(statuses: readonly SessionStatus[]): Session[] {
+    if (statuses.length === 0) return [];
+    return this.db
+      .select()
+      .from(sessions)
+      .where(inArray(sessions.status, [...statuses]))
+      .all()
+      .map(toSession);
   }
 
   /** Newest activity first. */

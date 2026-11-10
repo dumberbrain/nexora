@@ -22,7 +22,8 @@ const PASSIVE = new Set(["Notification", "TeammateIdle", "CwdChanged"]);
 
 /**
  * Status after a hook event: activity → running, Stop → idle, PermissionRequest →
- * waiting_for_approval, StopFailure → failed, SessionEnd → stopped.
+ * waiting_for_approval, StopFailure → failed, SessionEnd → stopped. A session left `unknown` by
+ * restart recovery re-attaches as running on any event that is not itself a status change.
  */
 export function nextSessionStatus(current: SessionStatus | null, hook: string): SessionStatus {
   switch (hook) {
@@ -35,7 +36,7 @@ export function nextSessionStatus(current: SessionStatus | null, hook: string): 
     case "PermissionRequest":
       return "waiting_for_approval";
     default:
-      return PASSIVE.has(hook) && current !== null ? current : "running";
+      return PASSIVE.has(hook) && current !== null && current !== "unknown" ? current : "running";
   }
 }
 

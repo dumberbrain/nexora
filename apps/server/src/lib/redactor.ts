@@ -41,6 +41,14 @@ const TOKEN_PATTERNS: RegExp[] = [
   /\bnxr_[A-Za-z0-9_-]{32,}/g, // Nexora API token (US8)
 ];
 
+/**
+ * AWS secret access key (40 chars, no fixed prefix) after its well-known name, including the
+ * whitespace-separated CLI form `aws configure set aws_secret_access_key <key>` that KEY_VALUE
+ * (which needs `:`/`=`) does not see.
+ */
+const AWS_SECRET =
+  /(\baws[_-]?secret[_-]?access[_-]?key["']?\s*[:=\s]\s*["']?)[A-Za-z0-9/+=]{40}(?![A-Za-z0-9/+=])/gi;
+
 /** `Bearer xyz` / `Basic xyz` → keep the scheme. */
 const AUTH_SCHEME = /\b(Bearer|Basic)\s+[A-Za-z0-9._~+/=-]{6,}/g;
 
@@ -75,6 +83,7 @@ function looksRandom(value: string): boolean {
 export function redactString(input: string): string {
   let out = input.replace(PEM, REDACTED);
   for (const re of TOKEN_PATTERNS) out = out.replace(re, REDACTED);
+  out = out.replace(AWS_SECRET, `$1${REDACTED}`);
   out = out.replace(AUTH_SCHEME, `$1 ${REDACTED}`);
   out = out.replace(URL_CREDENTIALS, `$1${REDACTED}$3`);
   out = out.replace(KEY_VALUE, (_m, prefix: string, dq?: string) =>

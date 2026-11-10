@@ -9,6 +9,7 @@ const OPENAI = fake("sk-proj-", "b".repeat(40));
 const GH_PAT = fake("ghp_", "c".repeat(36));
 const GH_FINE = fake("github_pat_", "D".repeat(30));
 const AWS_ID = fake("AKIA", "ABCDEFGHIJKLMNOP");
+const AWS_SECRET = fake("wJalrXUtnFEMI/K7MDENG/", "bPxRfiCY", "EXAMPLEKEY");
 const NEXORA = fake("nxr_", "E".repeat(20), "f".repeat(23));
 
 describe("redactString", () => {
@@ -37,6 +38,19 @@ describe("redactString", () => {
     expect(redactString("db_password: 'p@ss w0rd'")).toBe(`db_password: ${REDACTED}`);
     expect(redactString("--api_key=xyz123")).toBe(`--api_key=${REDACTED}`);
     expect(redactString('"client_secret":"zzz"')).toBe(`"client_secret":"${REDACTED}"`);
+  });
+
+  it("removes AWS secret access keys after their name, also in the CLI form", () => {
+    expect(redactString(`aws configure set aws_secret_access_key ${AWS_SECRET}`)).toBe(
+      `aws configure set aws_secret_access_key ${REDACTED}`,
+    );
+    expect(redactString(`AWS_SECRET_ACCESS_KEY=${AWS_SECRET}`)).toBe(
+      `AWS_SECRET_ACCESS_KEY=${REDACTED}`,
+    );
+    expect(redactString(`aws_secret_access_key = "${AWS_SECRET}"`)).not.toContain(AWS_SECRET);
+    expect(redactString("aws_secret_access_key is required")).toBe(
+      "aws_secret_access_key is required",
+    );
   });
 
   it("removes PEM private keys entirely", () => {

@@ -16,9 +16,11 @@ import { registerTokenRoutes } from "./http/routes/tokens";
 import { logger as defaultLogger, type Logger } from "./lib/logger";
 import { mountMcp } from "./mcp/server";
 import { EventBus, EventStore } from "./modules/event-manager";
+import { RetentionJob } from "./modules/event-manager/retention";
 import { AuditService } from "./modules/permission-manager/audit.service";
 import { SettingsService } from "./modules/permission-manager/settings.service";
 import { TokenService } from "./modules/permission-manager/token.service";
+import { recoverSessions } from "./modules/session-manager";
 import { createOrchestrationLayer, type OrchestrationLayer } from "./orchestration";
 import { createGateway, type Gateway } from "./realtime/gateway";
 import { createTerminalGateway } from "./realtime/terminal-gateway";
@@ -78,6 +80,17 @@ export async function createNexoraServer(opts: CreateServerOptions): Promise<Nex
     publishStats: (stats) => live.gateway?.publishStats(stats),
   });
   const us2 = createOrchestrationLayer({ db, env, bus, store, audit, logger: log, services });
+  // restart recovery: sessions this process holds no handle for are "unknown", never "running";
+  // observed ones re-attach on their next hook event
+  recoverSessions({
+    sessions: services.sessions,
+    bus,
+    isLive: (id) => us2.runtime.getHandle(id) !== undefined,
+    logger: log,
+  });
+  // event retention: on boot, then every few hours (unref'd; stopped on close)
+  const retention = new RetentionJob({ db, retentionDays: env.retentionDays, logger: log });
+  retention.start();
   // US8: API tokens (hashed) + settings; tokens authenticate only /mcp and the read-only /live socket —
   // never the REST API, which has no per-scope checks (a read token must not reach control routes)
   const tokens = new TokenService({ db, audit });
@@ -168,6 +181,7 @@ export async function createNexoraServer(opts: CreateServerOptions): Promise<Nex
     close: async () => {
       if (closed) return;
       closed = true;
+      retention.close();
       await us2.close();
       services.close();
       terminal?.close();

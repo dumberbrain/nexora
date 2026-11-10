@@ -15,6 +15,7 @@ const baseEnv: NexoraEnv = {
   dataDir: ":memory:",
   publicUrl: "http://127.0.0.1:3022",
   testFakeRuntime: false,
+  retentionDays: 30,
 };
 
 let db: Db | undefined;

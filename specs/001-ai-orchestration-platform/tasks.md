@@ -337,12 +337,12 @@ testable increment.
 
 ## Phase 11: Polish & Cross-Cutting Concerns
 
-- [ ] T155 [P] Unit test `apps/server/tests/unit/session-manager/recovery.test.ts`: on boot, `running` sessions without a live handle become `unknown`; history preserved; next hook event for that session id re-attaches it as `running`
-- [ ] T156 [P] Unit test `apps/server/tests/unit/event-manager/retention.test.ts`: deletes events older than retention (default 30 days, configurable), keeps `error`/approval events and all audit entries, removes matching FTS rows
-- [ ] T157 Implement restart recovery `apps/server/src/modules/session-manager/recovery.ts`: on boot mark non-reattachable `running` sessions `unknown`, keep history, re-attach observed sessions on next hook; to pass T155
-- [ ] T158 [P] Implement retention job `apps/server/src/modules/event-manager/retention.ts` (default 30 days, configurable; keep error/approval/audit events) to pass T156
+- [X] T155 [P] Unit test `apps/server/tests/unit/session-manager/recovery.test.ts`: on boot, `running` sessions without a live handle become `unknown`; history preserved; next hook event for that session id re-attaches it as `running`
+- [X] T156 [P] Unit test `apps/server/tests/unit/event-manager/retention.test.ts`: deletes events older than retention (default 30 days, configurable), keeps `error`/approval events and all audit entries, removes matching FTS rows
+- [X] T157 Implement restart recovery `apps/server/src/modules/session-manager/recovery.ts`: on boot mark non-reattachable `running` sessions `unknown`, keep history, re-attach observed sessions on next hook; to pass T155
+- [X] T158 [P] Implement retention job `apps/server/src/modules/event-manager/retention.ts` (default 30 days, configurable; keep error/approval/audit events) to pass T156
 - [ ] T159 [P] Load test script `apps/server/scripts/load-test.ts` (10 sessions, 1 000 events/min via ingest) measuring p95 latency from ingest to rendered event in the dashboard (must be ≤ 2 s, SC-001) + Playwright perf check that UI interactions stay ≤ 1 s (SC-007)
-- [ ] T160 [P] Secret-leak test `apps/server/tests/integration/secret-leak.test.ts` seeding known secret patterns through hooks, SDK fixtures, MCP configs; assert absent from DB, socket emits, exports, MCP responses (SC-004)
+- [X] T160 [P] Secret-leak test `apps/server/tests/integration/secret-leak.test.ts` seeding known secret patterns through hooks, SDK fixtures, MCP configs; assert absent from DB, socket emits, exports, MCP responses (SC-004)
 - [ ] T161 [P] Axe accessibility sweep across all routes `e2e/a11y.spec.ts`; dark and light theme screenshots
 - [ ] T162 Security review of the branch (`/security-review`), fix findings; verify loopback default and remote refusal (quickstart V11)
 - [ ] T163 [P] Documentation in `docs/`: `installation.md`, `configuration.md` (env vars, ports 3022/3023, data dir), `runtime-setup.md` (Claude Code login, Agent Teams flag, node-pty, gh), `mcp-setup.md`, `usage-examples.md`, `troubleshooting.md`, `limitations.md` (no true pause — "Interrupt & hold" = interrupt + resume by session id, API name `pause`; observed sessions are observe-only; team messaging lead-only; estimated cost; best-effort team files)
