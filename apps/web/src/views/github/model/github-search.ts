@@ -25,7 +25,9 @@ export function cleanGithubSearch(search: Record<string, unknown>): GithubSearch
 /**
  * Only the status is prefetched: repo data must not be requested until the view knows gh is
  * connected (not_installed / not_authenticated show setup guidance instead).
+ * Not awaited: the status shells out to `gh auth status` (often > 1 s), so blocking the route on
+ * it broke the ≤ 1 s navigation budget (SC-007) — the view shows its own loading state instead.
  */
-export function loadGithub(qc: QueryClient) {
-  return qc.prefetchQuery(githubStatusQuery());
+export function loadGithub(qc: QueryClient): void {
+  void qc.prefetchQuery(githubStatusQuery());
 }
