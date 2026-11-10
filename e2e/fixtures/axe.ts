@@ -28,7 +28,20 @@ export const test = base.extend<AxeFixtures>({
         }
         return;
       }
+      // Measure the settled UI: a dialog fading in or a button whose `disabled` opacity is still
+      // transitioning would otherwise be sampled mid-animation as a false contrast failure.
+      await page
+        .waitForFunction(
+          () => document.getAnimations().every((a) => a.playState !== "running"),
+          undefined,
+          { timeout: 5_000 },
+        )
+        .catch(() => undefined); // an endless animation (spinner) must not block the check
       const results = await new AxeBuilder({ page })
+        // Toasts are global (socket broadcast): on the shared E2E server another spec's
+        // "Approval needed" toast can appear or fade out on any page at any moment, so it is
+        // sampled mid-transition. Toast content is covered by the component tests.
+        .exclude("[data-sonner-toaster]")
         .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
         .analyze();
       expect(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([]);

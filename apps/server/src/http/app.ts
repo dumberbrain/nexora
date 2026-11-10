@@ -29,6 +29,11 @@ export interface AppDeps {
    * that bring their own credential check (e.g. hook ingest with X-Nexora-Hook-Token)
    */
   registerPublicRoutes?: (api: Hono<AppBindings>) => void;
+  /**
+   * registers routes at the app ROOT (outside /api/v1) before the SPA catch-all — e.g. the
+   * optional MCP endpoint `/mcp`, which brings its own bearer-token auth
+   */
+  registerRootRoutes?: (app: Hono<AppBindings>) => void;
   /** built SPA directory served on non-API paths (production / e2e) */
   webDistDir?: string;
 }
@@ -116,6 +121,7 @@ export function createApp(deps: AppDeps): Hono<AppBindings> {
   deps.registerRoutes?.(api);
 
   app.route("/api/v1", api);
+  deps.registerRootRoutes?.(app);
   if (deps.webDistDir) registerStaticSpa(app, deps.webDistDir);
   app.notFound(notFound);
   app.onError(errorMapper(log));

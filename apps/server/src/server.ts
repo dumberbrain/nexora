@@ -11,9 +11,14 @@ import { closeDb, type Db, openDb } from "./db/client";
 import { createApp } from "./http/app";
 import { SessionKeys } from "./http/middleware/session-cookie";
 import { registerApiRoutes, registerPublicApiRoutes } from "./http/routes";
+import { registerSettingsRoutes } from "./http/routes/settings";
+import { registerTokenRoutes } from "./http/routes/tokens";
 import { logger as defaultLogger, type Logger } from "./lib/logger";
+import { mountMcp } from "./mcp/server";
 import { EventBus, EventStore } from "./modules/event-manager";
 import { AuditService } from "./modules/permission-manager/audit.service";
+import { SettingsService } from "./modules/permission-manager/settings.service";
+import { TokenService } from "./modules/permission-manager/token.service";
 import { createOrchestrationLayer, type OrchestrationLayer } from "./orchestration";
 import { createGateway, type Gateway } from "./realtime/gateway";
 import { createTerminalGateway } from "./realtime/terminal-gateway";
@@ -73,6 +78,10 @@ export async function createNexoraServer(opts: CreateServerOptions): Promise<Nex
     publishStats: (stats) => live.gateway?.publishStats(stats),
   });
   const us2 = createOrchestrationLayer({ db, env, bus, store, audit, logger: log, services });
+  // US8: API tokens (hashed) + settings; tokens authenticate only /mcp and the read-only /live socket —
+  // never the REST API, which has no per-scope checks (a read token must not reach control routes)
+  const tokens = new TokenService({ db, audit });
+  const settings = new SettingsService({ db, audit, env });
   const ports = [...new Set([env.port, WEB_PORT])];
 
   const serveSpa = env.nodeEnv !== "development" && opts.webDistDir !== null;
@@ -91,7 +100,22 @@ export async function createNexoraServer(opts: CreateServerOptions): Promise<Nex
     registerRoutes: (api) => {
       registerApiRoutes(api, services);
       us2.registerRoutes(api);
+      registerTokenRoutes(api, { tokens, audit });
+      registerSettingsRoutes(api, { settings, audit });
     },
+    registerRootRoutes: (root) =>
+      mountMcp(root, {
+        orchestration: us2.orchestration,
+        controls: us2.controls,
+        sessions: services.sessions,
+        agents: services.agents,
+        store,
+        audit,
+        tokens,
+        settings,
+        publicUrl: env.publicUrl,
+        logger: log,
+      }),
     ...(serveSpa ? { webDistDir } : {}),
   });
 
@@ -103,6 +127,7 @@ export async function createNexoraServer(opts: CreateServerOptions): Promise<Nex
     keys,
     policy: { remote: env.remote, ports },
     envToken: env.token,
+    verifyApiToken: tokens.verifier,
   });
   live.gateway = gateway;
   // US6: /terminal namespace for Nexora-started Agent Teams leads (same io, auth and origin check)
