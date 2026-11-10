@@ -1,4 +1,4 @@
-import { SkillNodeConfigSchema } from "@nexora/contracts";
+import { SkillNodeConfigSchema } from "@ubuliera/contracts";
 
 import { runSessionNode, type SessionNodeDeps } from "./session";
 import { type NodeExecutor } from "../executor";

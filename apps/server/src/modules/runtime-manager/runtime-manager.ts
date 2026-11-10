@@ -7,7 +7,7 @@ import {
   type Session,
   type Usage,
   UsageSchema,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 import { cliClaudeProbe, type ClaudeProbe, detectAgentTeams, detectClaude } from "./environment";
 import {
@@ -167,9 +167,9 @@ export class RuntimeManager implements ManagedRuntime {
   }
 
   async startManagedSession(input: ManagedInput, deps: ManagedDeps): Promise<SessionHandle> {
-    const worktrees = path.join(input.projectRoot, ".nexora", "worktrees");
+    const worktrees = path.join(input.projectRoot, ".ubuliera", "worktrees");
     if (!isInsideRoot(worktrees, input.cwd) || isInsideRoot(input.cwd, worktrees)) {
-      throw new PathGuardError(`A managed session must run in a Nexora worktree: ${input.cwd}`);
+      throw new PathGuardError(`A managed session must run in a Ubuliera worktree: ${input.cwd}`);
     }
     const adapter = this.adapter(input.runtime ?? this.defaultKind);
     const capabilities = adapter.capabilities();

@@ -1,6 +1,6 @@
 import { homedir } from "node:os";
 
-import { type RuntimeCapabilityProfile } from "@nexora/contracts";
+import { type RuntimeCapabilityProfile } from "@ubuliera/contracts";
 
 import { AnalysisService } from "./analysis/analysis.service";
 import { ConsentService } from "./consent.service";

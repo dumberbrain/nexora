@@ -87,9 +87,11 @@ describe("TeamLeadTerminal", () => {
   });
 
   it("reports a refused attach", async () => {
-    socket.attachAck = { ok: false, error: "not a Nexora-started lead session" };
+    socket.attachAck = { ok: false, error: "not a Ubuliera-started lead session" };
     renderTerminal();
-    expect(await screen.findByRole("alert")).toHaveTextContent(/not a Nexora-started lead session/);
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      /not a Ubuliera-started lead session/,
+    );
   });
 
   it("shows when the lead process exited", async () => {

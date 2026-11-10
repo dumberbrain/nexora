@@ -1,6 +1,6 @@
 import { sep } from "node:path";
 
-import { type Execution, ExecutionSchema, ExecutionTasksSchema } from "@nexora/contracts";
+import { type Execution, ExecutionSchema, ExecutionTasksSchema } from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { fakeEnvironment } from "../fakes/fake-managed-runtime";
@@ -32,7 +32,7 @@ const send = (method: string, path: string, body?: unknown) =>
       ...HOST,
       cookie: auth.cookie,
       "content-type": "application/json",
-      "x-nexora-csrf": auth.csrf,
+      "x-ubuliera-csrf": auth.csrf,
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
@@ -86,7 +86,7 @@ describe("Agent Teams mode", () => {
     expect(lead?.input.taskId).toBeNull();
     expect(lead?.input.executionMode).toBe("agent_teams");
     expect(lead?.input.cwd).toBe(approved.worktreePath);
-    expect(lead?.input.cwd.startsWith(`${h.root}${sep}.nexora${sep}worktrees`)).toBe(true);
+    expect(lead?.input.cwd.startsWith(`${h.root}${sep}.ubuliera${sep}worktrees`)).toBe(true);
     expect(lead?.input.prompt).toMatch(/agent team/i);
     expect(lead?.input.prompt).toMatch(/T-1: Add a users endpoint/);
     expect(lead?.input.prompt).toMatch(/T-2: Build the users page/);

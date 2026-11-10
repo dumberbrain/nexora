@@ -1,6 +1,6 @@
 # Usage examples
 
-All examples assume Nexora runs on <http://localhost:3022> (see [installation.md](installation.md)).
+All examples assume Ubuliera runs on <http://localhost:3022> (see [installation.md](installation.md)).
 UI labels are quoted in **bold**.
 
 ## 1. Watch a Claude Code session you started yourself
@@ -9,7 +9,7 @@ UI labels are quoted in **bold**.
 2. On the project row: **Install hooks** → review the preview → confirm.
 3. In a terminal: `cd C:\work\demo-repo && claude`, then ask for something that uses a subagent,
    e.g. _"Use a general-purpose subagent to create hello.txt containing hi"_.
-4. In Nexora:
+4. In Ubuliera:
    - **Sessions** lists the session with an **observe-only** badge;
    - **Canvas** draws `main → general-purpose`; click a node for the agent details panel (tools,
      files changed, last output);
@@ -48,7 +48,7 @@ POST /api/v1/executions/<id>/plan        { "modelAssisted": false }
 POST /api/v1/executions/<id>/approve     { "approveRiskyTaskIds": [] }
 ```
 
-Managed work runs in `<repo>/.nexora/worktrees/<execution>/…` on `nexora/<execution>` branches —
+Managed work runs in `<repo>/.ubuliera/worktrees/<execution>/…` on `ubuliera/<execution>` branches —
 your checkout is not touched and nothing is pushed.
 
 ## 3. Approve, reject and stop
@@ -86,7 +86,7 @@ transitions with `409 CONFLICT`.
 ## 6. Agent Teams
 
 With `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (see [runtime-setup.md](runtime-setup.md#agent-teams))
-choose **Agent Teams** on New execution. Nexora starts the lead in a terminal you can see and type
+choose **Agent Teams** on New execution. Ubuliera starts the lead in a terminal you can see and type
 into (agent details panel of the lead). Teammates and their tasks appear from hooks and team files
 (marked best effort). Messages go to the lead only.
 
@@ -99,15 +99,15 @@ into (agent details panel of the lead). Teammates and their tasks appear from ho
   projects that have a github.com remote, read-only through `gh`. Without `gh` it shows setup
   steps.
 
-## 8. Drive Nexora from another agent (MCP)
+## 8. Drive Ubuliera from another agent (MCP)
 
 Enable the MCP server and create a token in **Settings**, then:
 
 ```bash
-claude mcp add --transport http nexora http://127.0.0.1:3022/mcp --header "Authorization: Bearer <secret>"
+claude mcp add --transport http ubuliera http://127.0.0.1:3022/mcp --header "Authorization: Bearer <secret>"
 ```
 
-In that Claude Code session: _"Use the nexora tools to list my sessions"_ or _"plan and start
+In that Claude Code session: _"Use the ubuliera tools to list my sessions"_ or _"plan and start
 execution &lt;id&gt; in multi_session mode"_. Risky tasks come back as `approval_required` with a
 dashboard link. Details: [mcp-setup.md](mcp-setup.md).
 
@@ -115,7 +115,7 @@ dashboard link. Details: [mcp-setup.md](mcp-setup.md).
 
 ```bash
 # against a running server (production or dev); add --duration/--sessions/--rate to change load
-npm run load-test --workspace @nexora/server -- --url http://127.0.0.1:3022
+npm run load-test --workspace @ubuliera/server -- --url http://127.0.0.1:3022
 ```
 
 Drives 10 synthetic sessions at 1 000 events/min through the real hook ingest endpoint and

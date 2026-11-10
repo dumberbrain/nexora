@@ -1,4 +1,4 @@
-import { PAUSE_CONTROL_LABEL, type Session } from "@nexora/contracts";
+import { PAUSE_CONTROL_LABEL, type Session } from "@ubuliera/contracts";
 import { describe, expect, it } from "vitest";
 
 import { deriveExecutionControls, deriveSessionControls } from "./derive-controls";

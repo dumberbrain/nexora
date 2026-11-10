@@ -23,7 +23,7 @@ Observed-session data comes from real Claude Code hook payloads recorded in spik
 | V8  | US6      | `e2e/us6-agent-teams.spec.ts` (disabled with instructions → enable; lead terminal, teammates/tasks `best_effort`); spike S2 real run in `research.md`                                                             | Pass (recorded S2); live run pending         |
 | V9  | US7      | `e2e/us7-integrations.spec.ts` (secrets redacted, gh setup guidance); `secret-leak.test.ts`                                                                                                                      | Pass                                         |
 | V10 | US8      | `e2e/us8-mcp.spec.ts` (enable MCP, token shown once, `list_sessions` matches dashboard, `start_execution` → `approval_required`)                                                                                 | Pass                                         |
-| V11 | Security | Manual: `NEXORA_HOST=0.0.0.0` → exit 1, "Refusing to bind to non-loopback host…"; `NEXORA_REMOTE=1` + 5-char token → "NEXORA_TOKEN must be at least 32 characters."; defaults → `LISTENING 127.0.0.1:3098`     | Pass (live)                                  |
+| V11 | Security | Manual: `UBULIERA_HOST=0.0.0.0` → exit 1, "Refusing to bind to non-loopback host…"; `UBULIERA_REMOTE=1` + 5-char token → "UBULIERA_TOKEN must be at least 32 characters."; defaults → `LISTENING 127.0.0.1:3098`     | Pass (live)                                  |
 | V12 | Security | `apps/server/tests/integration/secret-leak.test.ts` (hooks, SDK stream, MCP configs → DB rows, DB files, socket, JSONL/CSV export, REST, MCP): found and fixed an AWS CLI-form key leak in the redactor         | Pass                                         |
 
 ## Automated checks (same commit)
@@ -34,7 +34,7 @@ Observed-session data comes from real Claude Code hook payloads recorded in spik
 | `npm run lint`                        | ok (`--max-warnings 0`)                                                                   |
 | `npm test` (Vitest)                   | 128 files, 1062 tests passed                                                              |
 | `npm run test:e2e` (Playwright)       | 141 passed on chromium, firefox, webkit (incl. a11y sweep: 13 routes × dark/light)        |
-| `npm run load-test -w @nexora/server` | 10 sessions, ~987 events/min, 0 lost, p95 ingest→socket 137–140 ms (≤ 2 s, SC-001)        |
+| `npm run load-test -w @ubuliera/server` | 10 sessions, ~987 events/min, 0 lost, p95 ingest→socket 137–140 ms (≤ 2 s, SC-001)        |
 | `e2e/perf.spec.ts`                    | route navigation, open session, open board ≤ 1 s on 3 browsers (SC-007)                   |
 | `/security-review` (T162)             | no findings ≥ 8/10 confidence; loopback default + remote refusal verified (V11)           |
 

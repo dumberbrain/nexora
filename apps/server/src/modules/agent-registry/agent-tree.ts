@@ -1,4 +1,4 @@
-import { type Agent, type AgentStatus } from "@nexora/contracts";
+import { type Agent, type AgentStatus } from "@ubuliera/contracts";
 
 import { type AgentRepository } from "./agent.repository";
 import { redactString } from "../../lib/redactor";
@@ -130,7 +130,7 @@ export class AgentTree {
       role: o.agentType ? type : null,
       definitionPath: null,
       status: "running",
-      currentTaskId: null, // observed sessions carry no Nexora task
+      currentTaskId: null, // observed sessions carry no Ubuliera task
       summary: null,
     };
     this.repo.insert(agent);

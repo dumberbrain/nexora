@@ -1,5 +1,5 @@
-import { ApprovalDecisionInputSchema } from "@nexora/contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { ApprovalDecisionInputSchema } from "@ubuliera/contracts";
 import { z } from "zod";
 
 import { approvalApi, type ApprovalDecisionInput, approvalKeys } from "@/entities/approval";

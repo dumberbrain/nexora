@@ -4,7 +4,7 @@ import {
   ExecutionTasksSchema,
   TaskListSchema,
   TaskSchema,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { HOST, login } from "../helpers/us1";
@@ -30,7 +30,7 @@ const send = (method: string, path: string, body?: unknown) =>
       ...HOST,
       cookie: auth.cookie,
       "content-type": "application/json",
-      "x-nexora-csrf": auth.csrf,
+      "x-ubuliera-csrf": auth.csrf,
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });

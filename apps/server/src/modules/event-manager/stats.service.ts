@@ -1,4 +1,4 @@
-import { type Stats } from "@nexora/contracts";
+import { type Stats } from "@ubuliera/contracts";
 import { count, desc, eq, inArray, type SQL } from "drizzle-orm";
 import { type SQLiteTable } from "drizzle-orm/sqlite-core";
 

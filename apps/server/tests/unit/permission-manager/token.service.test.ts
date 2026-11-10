@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { ApiTokenSchema, CreateApiTokenResultSchema } from "@nexora/contracts";
+import { ApiTokenSchema, CreateApiTokenResultSchema } from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { closeDb, openDb, type Db } from "../../../src/db/client";

@@ -10,7 +10,7 @@ import {
   ModeOptionListSchema,
   QuestionListSchema,
   VerificationSchema,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { HOST, login } from "../helpers/us1";
@@ -36,7 +36,7 @@ const send = (method: string, path: string, body?: unknown) =>
       ...HOST,
       cookie: auth.cookie,
       "content-type": "application/json",
-      "x-nexora-csrf": auth.csrf,
+      "x-ubuliera-csrf": auth.csrf,
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
@@ -143,12 +143,12 @@ describe("executions flow (fake ManagedRuntime)", () => {
     const running = ExecutionSchema.parse(await json(approved));
     expect(running.status).toBe("running");
     expect(running.permissionBypass).toBe(false);
-    expect(running.worktreePath).toContain(`${sep}.nexora${sep}worktrees${sep}${e.id}`);
+    expect(running.worktreePath).toContain(`${sep}.ubuliera${sep}worktrees${sep}${e.id}`);
 
     await vi.waitFor(() => expect(h.runtime.sessions).toHaveLength(2));
     for (const s of h.runtime.sessions) {
       expect(s.input.cwd).not.toBe(h.root);
-      expect(s.input.cwd.startsWith(`${h.root}${sep}.nexora${sep}worktrees`)).toBe(true);
+      expect(s.input.cwd.startsWith(`${h.root}${sep}.ubuliera${sep}worktrees`)).toBe(true);
       expect(s.input.permissionMode).toBe("default");
       expect(s.input.idleTimeoutMs).toBe(600_000);
     }

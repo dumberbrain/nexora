@@ -1,6 +1,6 @@
 # Installation
 
-Nexora is a local, single-user web app: one Node process serves the REST API, the realtime
+Ubuliera is a local, single-user web app: one Node process serves the REST API, the realtime
 socket, the optional MCP endpoint and (in production) the built dashboard, all on
 `http://localhost:3022`. Data lives in one SQLite file in your home directory.
 
@@ -19,8 +19,8 @@ OS. In short:
 ## 2. Install dependencies
 
 ```bash
-git clone <your fork or copy of this repository> nexora
-cd nexora
+git clone <your fork or copy of this repository> ubuliera
+cd ubuliera
 npm ci            # exact versions from package-lock.json
 ```
 
@@ -29,7 +29,7 @@ tree) and installs the native modules:
 
 - `better-sqlite3` — prebuilt binaries for Node 22 on Windows, macOS and Linux.
 - `node-pty@1.1.0` — only used to host an Agent Teams lead. 1.1.0 ships a `win32-x64` prebuild;
-  if the native module cannot load, Nexora still starts and Agent Teams becomes observe-only
+  if the native module cannot load, Ubuliera still starts and Agent Teams becomes observe-only
   (see [runtime-setup.md](runtime-setup.md#node-pty)).
 
 ## 3. Run in production mode (recommended for daily use)
@@ -39,11 +39,11 @@ npm run build     # builds apps/web (Rsbuild) then apps/server (tsup)
 npm start         # NODE_ENV=production node apps/server/dist/main.js
 ```
 
-Open <http://localhost:3022>. The server log line `nexora listening` shows the URL, the data
+Open <http://localhost:3022>. The server log line `ubuliera listening` shows the URL, the data
 directory and `remote: false`.
 
-The database is created and migrated automatically on start (`~/.nexora/nexora.db`). You can also
-apply migrations explicitly with `npm run db:migrate` — it uses the same `NEXORA_DATA_DIR`.
+The database is created and migrated automatically on start (`~/.ubuliera/ubuliera.db`). You can also
+apply migrations explicitly with `npm run db:migrate` — it uses the same `UBULIERA_DATA_DIR`.
 
 Check health:
 
@@ -60,12 +60,12 @@ npm run dev
 
 This starts two processes with `concurrently`:
 
-| Process                 | Port | What it does                                                           |
-| ----------------------- | ---- | ---------------------------------------------------------------------- |
-| `@nexora/web` (Rsbuild) | 3022 | dashboard with hot reload; proxies `/api`, `/mcp`, `/socket.io` → 3023 |
-| `@nexora/server` (tsx)  | 3023 | API, realtime, MCP; restarts on change (`tsx watch`)                   |
+| Process                   | Port | What it does                                                           |
+| ------------------------- | ---- | ---------------------------------------------------------------------- |
+| `@ubuliera/web` (Rsbuild) | 3022 | dashboard with hot reload; proxies `/api`, `/mcp`, `/socket.io` → 3023 |
+| `@ubuliera/server` (tsx)  | 3023 | API, realtime, MCP; restarts on change (`tsx watch`)                   |
 
-Use <http://localhost:3022> in both modes. Hooks installed by Nexora post to
+Use <http://localhost:3022> in both modes. Hooks installed by Ubuliera post to
 `http://127.0.0.1:3022/api/v1/hooks/ingest` by default, which reaches the server through the
 Rsbuild proxy in development — so keep the web dev server running while observing sessions.
 
@@ -88,12 +88,12 @@ npm run test:e2e       # Playwright + axe against the production build (fake run
 ```
 
 `npm run test:e2e` builds and starts its own server on port 3022 with `NODE_ENV=test` and the
-test-only fake runtime. If something already listens on 3022, set `NEXORA_E2E_PORT`.
+test-only fake runtime. If something already listens on 3022, set `UBULIERA_E2E_PORT`.
 
 ## Uninstall
 
-- Remove Nexora's hooks from each project (project row → **Manage hooks** → **Uninstall hooks**), or delete
-  the Nexora entries from `.claude/settings.local.json` — they are the `http` hooks whose URL ends
+- Remove Ubuliera's hooks from each project (project row → **Manage hooks** → **Uninstall hooks**), or delete
+  the Ubuliera entries from `.claude/settings.local.json` — they are the `http` hooks whose URL ends
   in `/api/v1/hooks/ingest`.
-- Delete the data directory (`~/.nexora` by default) and any `<repo>/.nexora/worktrees` folders
-  Nexora created for managed executions.
+- Delete the data directory (`~/.ubuliera` by default) and any `<repo>/.ubuliera/worktrees` folders
+  Ubuliera created for managed executions.

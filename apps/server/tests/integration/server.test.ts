@@ -5,21 +5,21 @@ import { join } from "node:path";
 import { io as ioc } from "socket.io-client";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { type NexoraEnv } from "../../src/config/env";
+import { type UbulieraEnv } from "../../src/config/env";
 import { createLogger } from "../../src/lib/logger";
 import { EXTERNAL_OBSERVED_CAPABILITIES } from "../../src/modules/session-manager";
-import { createNexoraServer, type NexoraServer } from "../../src/server";
+import { createUbulieraServer, type UbulieraServer } from "../../src/server";
 
-let server: NexoraServer;
+let server: UbulieraServer;
 let base: string;
-let env: NexoraEnv;
+let env: UbulieraEnv;
 const port = 40_000 + Math.floor(Math.random() * 10_000);
 
 beforeAll(async () => {
-  base = mkdtempSync(join(tmpdir(), "nexora-server-"));
+  base = mkdtempSync(join(tmpdir(), "ubuliera-server-"));
   const web = join(base, "web");
   mkdirSync(join(web, "static"), { recursive: true });
-  writeFileSync(join(web, "index.html"), "<!doctype html><title>Nexora</title>");
+  writeFileSync(join(web, "index.html"), "<!doctype html><title>Ubuliera</title>");
   writeFileSync(join(web, "static", "app.js"), "console.log(1)");
   writeFileSync(join(base, "secret.txt"), "nope");
 
@@ -34,7 +34,7 @@ beforeAll(async () => {
     testFakeRuntime: false,
     retentionDays: 30,
   };
-  server = await createNexoraServer({
+  server = await createUbulieraServer({
     env,
     webDistDir: web,
     logger: createLogger({ level: "silent" }),
@@ -48,7 +48,7 @@ afterAll(async () => {
 
 const get = (path: string) => fetch(`${server.url}${path}`);
 
-describe("createNexoraServer", () => {
+describe("createUbulieraServer", () => {
   it("binds to loopback and serves /api/v1/health", async () => {
     expect(server.url).toBe(`http://127.0.0.1:${port}`);
     const res = await get("/api/v1/health");
@@ -59,9 +59,9 @@ describe("createNexoraServer", () => {
   it("serves the SPA with fallback for client-side routes", async () => {
     const root = await get("/");
     expect(root.headers.get("content-type")).toContain("text/html");
-    expect(await root.text()).toContain("Nexora");
+    expect(await root.text()).toContain("Ubuliera");
     const deep = await get("/sessions/abc");
-    expect(await deep.text()).toContain("Nexora");
+    expect(await deep.text()).toContain("Ubuliera");
     const asset = await get("/static/app.js");
     expect(asset.headers.get("cache-control")).toContain("immutable");
   });
@@ -123,7 +123,7 @@ describe("createNexoraServer", () => {
     server.store.append({ ...meta, ts: now, type: "tool.invoked", summary: "fresh" });
     await server.close();
 
-    server = await createNexoraServer({
+    server = await createUbulieraServer({
       env,
       webDistDir: null,
       logger: createLogger({ level: "silent" }),

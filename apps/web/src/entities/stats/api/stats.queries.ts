@@ -1,5 +1,5 @@
-import { type Stats } from "@nexora/contracts";
 import { queryOptions } from "@tanstack/react-query";
+import { type Stats } from "@ubuliera/contracts";
 
 import { http } from "@/shared/api";
 

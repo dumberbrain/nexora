@@ -1,4 +1,4 @@
-import { type ExecutionConfig } from "@nexora/contracts";
+import { type ExecutionConfig } from "@ubuliera/contracts";
 
 import {
   type AgentDefinitionInput,
@@ -9,7 +9,7 @@ import {
 } from "../../runtime-manager/runtime-adapter";
 import { type NodeContext, type NodeOutcome } from "../executor";
 
-/** The execution a workflow's sessions run in (always its Nexora worktree, never the project root). */
+/** The execution a workflow's sessions run in (always its Ubuliera worktree, never the project root). */
 export interface WorkflowSessionTarget {
   executionId: string;
   projectRoot: string;
@@ -39,7 +39,7 @@ export interface SessionSpec {
 /** Shared context lines for a workflow step prompt. */
 export function stepContext(ctx: NodeContext): string[] {
   return [
-    `You are running step "${ctx.node.label}" of an automated Nexora workflow, inside an isolated git worktree.`,
+    `You are running step "${ctx.node.label}" of an automated Ubuliera workflow, inside an isolated git worktree.`,
     ...(ctx.prompt.trim() ? [`Overall goal of the workflow: ${ctx.prompt.trim()}`] : []),
   ];
 }

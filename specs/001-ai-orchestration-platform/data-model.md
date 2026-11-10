@@ -1,6 +1,6 @@
 # Data Model: AI Development Orchestration Platform
 
-Persistence: local SQLite file (`~/.nexora/nexora.db` by default) via Drizzle ORM. All IDs are
+Persistence: local SQLite file (`~/.ubuliera/ubuliera.db` by default) via Drizzle ORM. All IDs are
 ULIDs (sortable, generated server-side) unless the value comes from Claude Code (session ids are
 Claude's UUIDs). All timestamps are ISO-8601 UTC strings stored as `INTEGER` epoch ms.
 Every write goes through a zod schema in `packages/contracts` (single source of truth shared by
@@ -27,7 +27,7 @@ AuditEntry (append-only)
 | rootPath | string | absolute, normalised, unique; MUST exist; all agent work confined under it |
 | detectedStack | json | `{ languages[], frameworks[], packageManager?, testRunners[] }` |
 | instructionFiles | json | paths of CLAUDE.md / AGENTS.md found |
-| hooksInstalled | boolean | true after user approved Nexora hook install |
+| hooksInstalled | boolean | true after user approved Ubuliera hook install |
 | createdAt / lastAnalyzedAt | epoch ms | |
 
 ## Execution
@@ -41,7 +41,7 @@ AuditEntry (append-only)
 | mode | enum | `multi_session` \| `agent_teams` \| `subagents` \| `workflow` \| `hybrid` |
 | strategy | enum | `spec_driven` \| `plan_first` \| `tdd` \| `direct` \| `research_first` |
 | config | json | answers to follow-up questions (parallelism, approval policy, maxParallelSessions ≤ 8 (default 4), budgetUsd?, idleTimeoutMs (default 600 000), turnTimeoutMs (default 1 800 000), modelAnalysisConsent: boolean) |
-| worktreePath | string | execution-level isolated worktree `<repo>/.nexora/worktrees/<execution>/main` (FR-034) |
+| worktreePath | string | execution-level isolated worktree `<repo>/.ubuliera/worktrees/<execution>/main` (FR-034) |
 | status | enum | see state machine below |
 | permissionBypass | boolean | default **false**; true only with explicit per-execution confirmation (FR-053) |
 | verification | json? | final summary: tasks done/failed, changed files, test results |
@@ -89,11 +89,11 @@ attempt)`; any non-terminal → `cancelled`. User drag allowed only between `pen
 | projectId | FK? | resolved from `cwd` |
 | runtime | enum | `agent_sdk` \| `cli_headless` \| `agent_team_pty` \| `external_observed` (same as `RuntimeKind` in contracts/runtime-adapter.md) |
 | observeOnly | boolean | true for `external_observed`; UI labels "observe-only" |
-| cwd / gitBranch / worktreePath? | string | worktreePath always set for Nexora-managed sessions |
+| cwd / gitBranch / worktreePath? | string | worktreePath always set for Ubuliera-managed sessions |
 | model | string? | only when reported |
 | status | enum | `starting, running, idle, waiting_for_approval, paused, unresponsive, stopped, failed, unknown` |
 | capabilities | json | `RuntimeCapabilityProfile` snapshot |
-| pid | int? | only for processes Nexora spawned |
+| pid | int? | only for processes Ubuliera spawned |
 | usage | json? | `{ inputTokens, outputTokens, costUsd }` **only** if runtime reported |
 | lastActivityAt / startedAt / endedAt | epoch ms | |
 

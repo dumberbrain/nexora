@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { type NexoraEvent } from "./entities/event";
+import { type UbulieraEvent } from "./entities/event";
 import { ExecutionModeSchema } from "./enums";
 import { UlidSchema } from "./primitives";
 
@@ -79,7 +79,7 @@ export const ReplayDoneSchema = z.object({
 export type ReplayDone = z.infer<typeof ReplayDoneSchema>;
 
 /** Batched `event` payload — one emission per room per EVENT_BATCH_MS. */
-export type EventBatch = { events: NexoraEvent[] };
+export type EventBatch = { events: UbulieraEvent[] };
 
 /** Typed Socket.IO maps shared by server (Server<…>) and client (Socket<…>). */
 export interface ServerToClientEvents {

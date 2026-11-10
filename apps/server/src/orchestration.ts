@@ -1,6 +1,6 @@
 import { type Hono } from "hono";
 
-import { type NexoraEnv } from "./config/env";
+import { type UbulieraEnv } from "./config/env";
 import { type Db } from "./db/client";
 import { type AppBindings } from "./http/context";
 import { registerApprovalRoutes } from "./http/routes/approvals";
@@ -80,7 +80,7 @@ const fakeClaudeProbe: ClaudeProbe = {
 
 export interface OrchestrationLayerDeps {
   db: Db;
-  env: NexoraEnv;
+  env: UbulieraEnv;
   bus: EventBus;
   store: EventStore;
   audit: AuditService;

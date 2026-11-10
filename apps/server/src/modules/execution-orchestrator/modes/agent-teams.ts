@@ -1,9 +1,9 @@
-import { type Execution, type Task } from "@nexora/contracts";
+import { type Execution, type Task } from "@ubuliera/contracts";
 
 /**
  * Agent Teams mode (T140, research R3 + S2): ONE interactive Claude Code lead (runtime
  * `agent_team_pty`) in the execution worktree. The lead creates a native agent team and spawns
- * its own teammates; Nexora observes the team (hooks + read-only team files) and never emulates
+ * its own teammates; Ubuliera observes the team (hooks + read-only team files) and never emulates
  * a team with subagents (FR-011).
  */
 

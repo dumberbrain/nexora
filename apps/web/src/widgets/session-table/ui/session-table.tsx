@@ -52,7 +52,7 @@ export function SessionTable({
       empty ?? (
         <EmptyState
           title="No sessions observed yet"
-          description="Sessions appear here as soon as Claude Code runs in a project with Nexora hooks installed."
+          description="Sessions appear here as soon as Claude Code runs in a project with Ubuliera hooks installed."
         />
       )
     );

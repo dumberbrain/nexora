@@ -1,4 +1,4 @@
-import { RISK_CLASSES } from "@nexora/contracts";
+import { RISK_CLASSES } from "@ubuliera/contracts";
 import { useId } from "react";
 import { type FieldErrors, type UseFormRegister } from "react-hook-form";
 

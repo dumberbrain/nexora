@@ -11,7 +11,7 @@ export type ApiTokenVerifier = (
 
 export interface AuthOptions {
   keys: SessionKeys;
-  /** NEXORA_TOKEN for remote mode */
+  /** UBULIERA_TOKEN for remote mode */
   envToken: string | undefined;
   verifyApiToken?: ApiTokenVerifier;
 }

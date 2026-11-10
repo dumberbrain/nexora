@@ -4,7 +4,7 @@ export type {
   EventSource,
   EventType,
   ExecutionMode,
-  NexoraEvent,
+  UbulieraEvent,
   Reliability,
   Severity,
 } from "./model/types";

@@ -1,4 +1,4 @@
-import { type ApprovalRequest, type ApprovalStatus } from "@nexora/contracts";
+import { type ApprovalRequest, type ApprovalStatus } from "@ubuliera/contracts";
 import { and, desc, eq } from "drizzle-orm";
 
 import { type Db } from "../../db/client";

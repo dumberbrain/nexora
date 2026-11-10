@@ -10,7 +10,7 @@
 
 ## GitHub CLI
 
-Nexora reads GitHub data only through `gh api` (read-only). Without it the GitHub view shows
+Ubuliera reads GitHub data only through `gh api` (read-only). Without it the GitHub view shows
 setup guidance instead of data; everything else works.
 
 ### Windows

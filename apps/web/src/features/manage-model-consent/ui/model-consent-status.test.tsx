@@ -7,7 +7,7 @@ import { projectFixtures } from "../../../../tests/msw/handlers";
 import { server } from "../../../../tests/msw/server";
 import { renderWithProviders } from "../../../../tests/render";
 
-const [nexora, billing] = projectFixtures as [
+const [ubuliera, billing] = projectFixtures as [
   (typeof projectFixtures)[0],
   (typeof projectFixtures)[0],
 ];
@@ -21,10 +21,12 @@ describe("ModelConsentStatus", () => {
         return undefined;
       }),
     );
-    const { user } = renderWithProviders(<ModelConsentStatus project={nexora} />);
+    const { user } = renderWithProviders(<ModelConsentStatus project={ubuliera} />);
     const status = await screen.findByRole("group", { name: /model usage/i });
     await waitFor(() => expect(status).toHaveTextContent(/always allowed/i));
-    await user.click(screen.getByRole("button", { name: "Revoke model-usage consent for nexora" }));
+    await user.click(
+      screen.getByRole("button", { name: "Revoke model-usage consent for ubuliera" }),
+    );
     await waitFor(() => expect(status).toHaveTextContent(/asks every time/i));
     expect(bodies).toEqual([{ alwaysAllow: false }]);
     expect(

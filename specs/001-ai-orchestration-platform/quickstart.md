@@ -15,7 +15,7 @@ Proves the feature end-to-end. Contracts: [rest-api](contracts/rest-api.md),
 
 ```bash
 npm install
-npm run db:migrate          # creates ~/.nexora/nexora.db
+npm run db:migrate          # creates ~/.ubuliera/ubuliera.db
 npm run build && npm start  # production: http://localhost:3022
 # development: npm run dev  (web 3022 → proxies API on 3023)
 ```
@@ -37,7 +37,7 @@ bound to `127.0.0.1`.
 | V8 | US6 | With flag set, choose Agent Teams | Lead runs in terminal panel; teammates/tasks appear from hooks + team files marked best_effort |
 | V9 | US7 | Open Skills & MCP, GitHub | Secrets redacted; GitHub shows setup guidance when gh missing |
 | V10 | US8 | Enable MCP, create token, call `list_sessions`, then `start_execution` on plan with risky task | Results match dashboard; returns `approval_required` |
-| V11 | Security | Start with `NEXORA_HOST=0.0.0.0` without token | Server refuses to start with explanation |
+| V11 | Security | Start with `UBULIERA_HOST=0.0.0.0` without token | Server refuses to start with explanation |
 | V12 | Security | Seed secrets in tool input; export logs | No secret appears in UI, export, MCP output |
 
 ## Automated checks

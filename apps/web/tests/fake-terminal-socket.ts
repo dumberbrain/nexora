@@ -1,6 +1,6 @@
 import { EventEmitter } from "node:events";
 
-import { type TerminalAttachAck } from "@nexora/contracts";
+import { type TerminalAttachAck } from "@ubuliera/contracts";
 
 /**
  * Stand-in for the /terminal Socket.IO client (widgets/terminal). Mock the widget's socket module:

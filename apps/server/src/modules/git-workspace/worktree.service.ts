@@ -8,7 +8,7 @@ import {
 } from "node:fs";
 import path from "node:path";
 
-import { TaskIdSchema, UlidSchema } from "@nexora/contracts";
+import { TaskIdSchema, UlidSchema } from "@ubuliera/contracts";
 
 import { isInsideRoot } from "../../lib/path-guard";
 import { ProcessExitError, runCommand, type RunResult } from "../../lib/process";
@@ -24,23 +24,23 @@ export interface Worktree {
   branch: string;
 }
 
-const EXCLUDE_ENTRY = ".nexora/";
+const EXCLUDE_ENTRY = ".ubuliera/";
 const isWin = process.platform === "win32";
 
 const defaultGit: GitRunner = (cwd, args) => runCommand("git", args, { cwd, timeoutMs: 120_000 });
 
-/** Folder holding every Nexora worktree of a repository. */
-export const worktreesRoot = (repoRoot: string) => path.join(repoRoot, ".nexora", "worktrees");
+/** Folder holding every Ubuliera worktree of a repository. */
+export const worktreesRoot = (repoRoot: string) => path.join(repoRoot, ".ubuliera", "worktrees");
 
-/** `nexora/<execution>` — the execution branch. */
-export const executionBranch = (executionId: string) => `nexora/${executionId}`;
+/** `ubuliera/<execution>` — the execution branch. */
+export const executionBranch = (executionId: string) => `ubuliera/${executionId}`;
 /**
- * Task branch. NOT `nexora/<execution>/<task>` as first planned: git cannot hold both
- * `refs/heads/nexora/<execution>` (a file) and `refs/heads/nexora/<execution>/<task>` (needs a
+ * Task branch. NOT `ubuliera/<execution>/<task>` as first planned: git cannot hold both
+ * `refs/heads/ubuliera/<execution>` (a file) and `refs/heads/ubuliera/<execution>/<task>` (needs a
  * directory of the same name), so the task part is joined with `--`.
  */
 export const taskBranch = (executionId: string, taskId: string) =>
-  `nexora/${executionId}--${taskId}`;
+  `ubuliera/${executionId}--${taskId}`;
 
 const samePath = (a: string, b: string) => {
   const norm = (p: string) => (isWin ? path.resolve(p).toLowerCase() : path.resolve(p));
@@ -65,8 +65,8 @@ const gitMessage = (err: unknown) =>
 
 /**
  * Git workspace isolation (T092, FR-034). Every managed execution works in
- * `<repo>/.nexora/worktrees/<execution>/main` on `nexora/<execution>`; parallel conflicting tasks
- * get `<repo>/.nexora/worktrees/<execution>/<task>`. `.nexora/` is added to the repo's
+ * `<repo>/.ubuliera/worktrees/<execution>/main` on `ubuliera/<execution>`; parallel conflicting tasks
+ * get `<repo>/.ubuliera/worktrees/<execution>/<task>`. `.ubuliera/` is added to the repo's
  * `.git/info/exclude` (never to a tracked file). Branches are kept on cleanup so work is never
  * lost; nothing is ever pushed.
  */
@@ -108,7 +108,7 @@ export class WorktreeService {
   }
 
   /**
-   * Remove one Nexora worktree. Fails on uncommitted changes unless `discardChanges` is set
+   * Remove one Ubuliera worktree. Fails on uncommitted changes unless `discardChanges` is set
    * (an explicit user decision). The branch is kept.
    */
   async remove(
@@ -118,7 +118,7 @@ export class WorktreeService {
   ): Promise<void> {
     const root = worktreesRoot(repoRoot);
     if (samePath(root, worktreePath) || !isInsideRoot(root, worktreePath)) {
-      throw new WorktreeError(`Not a Nexora worktree: ${worktreePath}`);
+      throw new WorktreeError(`Not a Ubuliera worktree: ${worktreePath}`);
     }
     const registered = await this.list(repoRoot);
     if (!registered.some((p) => samePath(p, worktreePath))) {
@@ -193,7 +193,7 @@ export class WorktreeService {
     }
   }
 
-  /** Add `.nexora/` to the repo's (common) `info/exclude` once. */
+  /** Add `.ubuliera/` to the repo's (common) `info/exclude` once. */
   private async ensureExcluded(repoRoot: string): Promise<void> {
     const r = await this.git(repoRoot, ["rev-parse", "--git-common-dir"]);
     const gitDir = path.resolve(repoRoot, r.stdout.trim());

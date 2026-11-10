@@ -1,4 +1,4 @@
-import { type Execution, type WorkflowRun, type WorkflowVersion } from "@nexora/contracts";
+import { type Execution, type WorkflowRun, type WorkflowVersion } from "@ubuliera/contracts";
 
 import { type Logger } from "../../../lib/logger";
 import { newId } from "../../../lib/ulid";

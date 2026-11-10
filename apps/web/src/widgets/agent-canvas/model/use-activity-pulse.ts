@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { type NexoraEvent } from "@/entities/event";
+import { type UbulieraEvent } from "@/entities/event";
 import { useLiveSubscription } from "@/shared/socket/use-live-subscription";
 
 /** How long a node/edge stays highlighted after related activity (FR-025). */
@@ -9,7 +9,7 @@ export const PULSE_MS = 1500;
 let pulseSeq = 0;
 
 /** Agent a live event belongs to: its agentId, else the session's main agent (id = session id). */
-export function agentIdOf(e: Pick<NexoraEvent, "agentId" | "sessionId">): string | null {
+export function agentIdOf(e: Pick<UbulieraEvent, "agentId" | "sessionId">): string | null {
   return e.agentId ?? e.sessionId;
 }
 

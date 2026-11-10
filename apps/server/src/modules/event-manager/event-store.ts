@@ -4,11 +4,11 @@ import {
   type EventType,
   MAX_EVENT_PAYLOAD_BYTES,
   MAX_EVENT_SUMMARY,
-  type NexoraEvent,
+  type UbulieraEvent,
   type Page,
   type Reliability,
   type Severity,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { and, asc, desc, eq, gt, gte, inArray, isNull, lt, lte, sql, type SQL } from "drizzle-orm";
 
 import { type EventBus } from "./event-bus";
@@ -67,7 +67,7 @@ function ftsQuery(q: string): string {
 }
 
 type Row = typeof events.$inferSelect;
-const toEvent = (r: Row): NexoraEvent => ({ ...r, payload: r.payload ?? null });
+const toEvent = (r: Row): UbulieraEvent => ({ ...r, payload: r.payload ?? null });
 
 /**
  * Event persistence + publication. append() is synchronous for producers and publishes at once;
@@ -75,7 +75,7 @@ const toEvent = (r: Row): NexoraEvent => ({ ...r, payload: r.payload ?? null });
  * misses an event that was already published.
  */
 export class EventStore {
-  private buffer: NexoraEvent[] = [];
+  private buffer: UbulieraEvent[] = [];
   private timer: NodeJS.Timeout | undefined;
   private readonly batchMs: number;
   private readonly now: () => number;
@@ -89,10 +89,10 @@ export class EventStore {
     this.now = opts.now ?? Date.now;
   }
 
-  append(input: EventInput): NexoraEvent {
+  append(input: EventInput): UbulieraEvent {
     const now = this.now();
     const { payload, truncated } = capPayload(input.payload);
-    const event: NexoraEvent = {
+    const event: UbulieraEvent = {
       id: newId(now),
       ts: input.ts ?? now,
       type: input.type,
@@ -126,7 +126,7 @@ export class EventStore {
   }
 
   /** Newest first, cursor = last seen id (Live Logs, GET /events). */
-  list(q: Partial<EventQuery> & { limit: number }): Page<NexoraEvent> {
+  list(q: Partial<EventQuery> & { limit: number }): Page<UbulieraEvent> {
     this.flush();
     const where: SQL[] = [];
     if (q.cursor) where.push(lt(events.id, q.cursor));
@@ -157,7 +157,7 @@ export class EventStore {
   }
 
   /** Oldest first after `afterId` — reconnect replay (contracts/socket-events.md). */
-  since(scope: ReplayScope, limit: number): NexoraEvent[] {
+  since(scope: ReplayScope, limit: number): UbulieraEvent[] {
     this.flush();
     const where: SQL[] = [];
     if (scope.afterId) where.push(gt(events.id, scope.afterId));

@@ -13,7 +13,7 @@ const NOTHING_OBSERVED = (
   <EmptyState
     index="[00]"
     title="No Claude Code sessions observed yet"
-    description="Register a project, install the Nexora hooks into its Claude Code settings, then run `claude` in that folder. Sessions, agents and events show up here as they happen — nothing on this page is simulated."
+    description="Register a project, install the Ubuliera hooks into its Claude Code settings, then run `claude` in that folder. Sessions, agents and events show up here as they happen — nothing on this page is simulated."
   />
 );
 

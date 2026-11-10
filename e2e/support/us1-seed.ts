@@ -20,7 +20,7 @@ export const S1 = {
 async function login(api: APIRequestContext): Promise<string> {
   const res = await api.get("/api/v1/auth/session");
   expect(res.ok()).toBeTruthy();
-  const csrf = (await api.storageState()).cookies.find((c) => c.name === "nexora_csrf")?.value;
+  const csrf = (await api.storageState()).cookies.find((c) => c.name === "ubuliera_csrf")?.value;
   expect(csrf).toBeTruthy();
   return csrf!;
 }
@@ -33,8 +33,8 @@ export async function seedObservedSession(
   api: APIRequestContext,
 ): Promise<{ name: string; cleanup: () => void }> {
   const csrf = await login(api);
-  const root = mkdtempSync(join(tmpdir(), "nexora-e2e-project-"));
-  const headers = { "x-nexora-csrf": csrf };
+  const root = mkdtempSync(join(tmpdir(), "ubuliera-e2e-project-"));
+  const headers = { "x-ubuliera-csrf": csrf };
   const name = basename(root);
 
   const project = await api.post("/api/v1/projects", {
@@ -54,12 +54,12 @@ export async function seedObservedSession(
   const settings = JSON.parse(
     readFileSync(join(root, ".claude", "settings.local.json"), "utf8"),
   ) as { hooks: Record<string, Array<{ hooks: Array<{ headers: Record<string, string> }> }>> };
-  const token = settings.hooks.PreToolUse![0]!.hooks[0]!.headers["X-Nexora-Hook-Token"]!;
+  const token = settings.hooks.PreToolUse![0]!.hooks[0]!.headers["X-Ubuliera-Hook-Token"]!;
 
   for (const file of readdirSync(FIXTURES).sort()) {
     const body = readFileSync(join(FIXTURES, file), "utf8");
     const res = await api.post("/api/v1/hooks/ingest", {
-      headers: { "content-type": "application/json", "X-Nexora-Hook-Token": token },
+      headers: { "content-type": "application/json", "X-Ubuliera-Hook-Token": token },
       data: body,
     });
     expect(res.status(), file).toBe(200);

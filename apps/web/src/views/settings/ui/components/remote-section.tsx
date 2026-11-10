@@ -19,7 +19,7 @@ export function RemoteSection({ remote }: { remote: Settings["remote"] }) {
   return (
     <Section
       title="Remote access"
-      description="Read-only. Nexora binds to loopback unless remote access is enabled with environment variables before start-up. Never expose it directly to the public internet."
+      description="Read-only. Ubuliera binds to loopback unless remote access is enabled with environment variables before start-up. Never expose it directly to the public internet."
     >
       <ul aria-label="Remote access status" className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         <Fact

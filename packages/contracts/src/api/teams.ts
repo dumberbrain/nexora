@@ -5,7 +5,7 @@ import { EpochMsSchema, UlidSchema } from "../primitives";
 /*
  * US6 — Agent Teams + Hybrid (research.md R3 and "S2 result"). Team state is read from
  * `~/.claude/teams/<team>/` and `~/.claude/tasks/<team>/` (read-only, `best_effort`) and from
- * hooks; Nexora never writes team files and never simulates a team with subagents.
+ * hooks; Ubuliera never writes team files and never simulates a team with subagents.
  */
 
 /** Exact phrase for enabling Agent Teams in a project (FR-011: explicit confirmation). */
@@ -62,7 +62,7 @@ export const TeamMessageSchema = z.object({
 });
 export type TeamMessage = z.infer<typeof TeamMessageSchema>;
 
-/** GET /sessions/:id/team — the team led by a Nexora-started Agent Teams lead session. */
+/** GET /sessions/:id/team — the team led by a Ubuliera-started Agent Teams lead session. */
 export const TeamViewSchema = z.object({
   sessionId: z.string().min(1),
   teamName: z.string().min(1),
@@ -79,7 +79,7 @@ export type TeamView = z.infer<typeof TeamViewSchema>;
 
 export const TERMINAL_NAMESPACE = "/terminal";
 
-/** client → server `terminal:attach` (only Nexora-spawned lead sessions; auth required). */
+/** client → server `terminal:attach` (only Ubuliera-spawned lead sessions; auth required). */
 export const TerminalAttachSchema = z.object({
   sessionId: z.string().min(1),
   cols: z.number().int().min(20).max(500),

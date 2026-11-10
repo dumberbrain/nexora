@@ -4,19 +4,19 @@
  * scope "global", session cookie) measures ingest → socket arrival latency. The socket arrival
  * is the proxy for "rendered in the dashboard": the SPA renders straight from that batch.
  *
- *   npm run load-test --workspace @nexora/server -- [--url http://127.0.0.1:3022]
+ *   npm run load-test --workspace @ubuliera/server -- [--url http://127.0.0.1:3022]
  *     [--duration 60] [--sessions 10] [--rate 1000] [--threshold 2000]
  *
- *   --url        running Nexora server (loopback: hook ingest only accepts loopback peers)
+ *   --url        running Ubuliera server (loopback: hook ingest only accepts loopback peers)
  *   --duration   seconds of load (default 60)
  *   --sessions   concurrent synthetic sessions (default 10)
  *   --rate       total events per minute across all sessions (default 1000)
  *   --threshold  p95 budget in ms (default 2000, SC-001)
  *
  * Setup mirrors a real user: GET /auth/session → register a throw-away project → install hooks
- * with explicit confirmation → read the generated X-Nexora-Hook-Token. The synthetic sessions
+ * with explicit confirmation → read the generated X-Ubuliera-Hook-Token. The synthetic sessions
  * (ids "loadtest-<run>-<n>") stay in that server's history; run against a scratch data dir
- * (NEXORA_DATA_DIR) to keep your real one clean. Exits 1 when p95 > threshold or events are lost.
+ * (UBULIERA_DATA_DIR) to keep your real one clean. Exits 1 when p95 > threshold or events are lost.
  */
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -32,7 +32,7 @@ import {
   type ServerToClientEvents,
   SOCKET_PATH,
   type SubscribeAck,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { io, type Socket } from "socket.io-client";
 
 const say = (m: string) => process.stdout.write(`[load-test] ${m}\n`);
@@ -61,7 +61,7 @@ const THRESHOLD_MS = positive("threshold", args.threshold);
 const DRAIN_MS = 10_000;
 
 const RUN = Date.now().toString(36);
-const MARKER = `nexora-load-test ${RUN}`;
+const MARKER = `ubuliera-load-test ${RUN}`;
 
 // ---- HTTP with the loopback session cookie ----
 
@@ -87,7 +87,7 @@ async function login(): Promise<void> {
   if (!res.ok) throw new Error(`GET /auth/session → ${res.status} (is the server running?)`);
   const pairs = res.headers.getSetCookie().map((c) => c.split(";")[0]!);
   cookieHeader = pairs.join("; ");
-  csrf = pairs.find((p) => p.startsWith("nexora_csrf="))?.slice("nexora_csrf=".length) ?? "";
+  csrf = pairs.find((p) => p.startsWith("ubuliera_csrf="))?.slice("ubuliera_csrf=".length) ?? "";
   if (!csrf) throw new Error("server did not issue a csrf cookie (remote mode is not supported)");
 }
 
@@ -98,7 +98,7 @@ interface Setup {
 }
 
 async function setupProject(): Promise<Setup> {
-  const root = mkdtempSync(join(tmpdir(), "nexora-load-test-"));
+  const root = mkdtempSync(join(tmpdir(), "ubuliera-load-test-"));
   const project = await api<{ id: string }>("POST", "/projects", {
     rootPath: root,
     name: basename(root),

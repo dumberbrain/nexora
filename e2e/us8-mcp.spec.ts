@@ -10,7 +10,7 @@ import { type APIRequestContext, request as playwrightRequest } from "@playwrigh
 import { expect, test } from "./fixtures/axe";
 import { removeTempRepo } from "./support/temp-repo";
 
-// US8 — drive Nexora from another agent via MCP (quickstart V10): enable MCP and create a token in
+// US8 — drive Ubuliera from another agent via MCP (quickstart V10): enable MCP and create a token in
 // Settings, then a real MCP client lists sessions and `start_execution` stops at approval_required.
 test.describe.configure({ mode: "serial" });
 
@@ -26,13 +26,13 @@ let secret = "";
 let tokenName = "";
 
 async function call(method: "post" | "put", path: string, data: unknown = {}) {
-  const res = await api[method](`/api/v1${path}`, { headers: { "x-nexora-csrf": csrf }, data });
+  const res = await api[method](`/api/v1${path}`, { headers: { "x-ubuliera-csrf": csrf }, data });
   expect(res.ok(), `${method.toUpperCase()} ${path}`).toBeTruthy();
   return (await res.json()) as Record<string, unknown>;
 }
 
 async function mcpClient(baseURL: string, token: string) {
-  const client = new Client({ name: "nexora-e2e", version: "1.0.0" });
+  const client = new Client({ name: "ubuliera-e2e", version: "1.0.0" });
   const transport = new StreamableHTTPClientTransport(new URL("/mcp", baseURL), {
     requestInit: { headers: { authorization: `Bearer ${token}` } },
   });
@@ -41,22 +41,22 @@ async function mcpClient(baseURL: string, token: string) {
 }
 
 test.beforeAll(async ({ baseURL }) => {
-  root = mkdtempSync(join(tmpdir(), "nexora-e2e-us8-"));
+  root = mkdtempSync(join(tmpdir(), "ubuliera-e2e-us8-"));
   tokenName = `e2e-${basename(root)
     .slice(-6)
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "x")}`;
   const git = (...args: string[]) => execFileSync("git", args, { cwd: root });
   git("init", "-q", "-b", "main");
-  git("config", "user.email", "e2e@nexora.local");
-  git("config", "user.name", "nexora e2e");
+  git("config", "user.email", "e2e@ubuliera.local");
+  git("config", "user.name", "ubuliera e2e");
   writeFileSync(join(root, "package.json"), JSON.stringify({ name: "e2e-us8" }));
   git("add", ".");
   git("commit", "-q", "-m", "init");
 
   api = await playwrightRequest.newContext({ baseURL: baseURL! });
   expect((await api.get("/api/v1/auth/session")).ok()).toBeTruthy();
-  csrf = (await api.storageState()).cookies.find((c) => c.name === "nexora_csrf")!.value;
+  csrf = (await api.storageState()).cookies.find((c) => c.name === "ubuliera_csrf")!.value;
 });
 
 test.afterAll(async () => {
@@ -91,7 +91,7 @@ test("settings: enable MCP and create a control token whose secret is shown once
   await expect(dialog).toContainText("you will not see it again");
   secret = (await dialog.locator("code").first().innerText()).trim();
   expect(secret).toMatch(/^nxr_/);
-  await expect(dialog).toContainText("claude mcp add --transport http nexora");
+  await expect(dialog).toContainText("claude mcp add --transport http ubuliera");
   await expectNoA11yViolations();
   await dialog.getByRole("button", { name: "I saved it" }).click();
   await expect(dialog).toBeHidden();

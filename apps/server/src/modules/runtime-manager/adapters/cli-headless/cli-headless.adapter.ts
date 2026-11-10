@@ -1,4 +1,4 @@
-import { type RuntimeCapabilityProfile } from "@nexora/contracts";
+import { type RuntimeCapabilityProfile } from "@ubuliera/contracts";
 
 import {
   runCommand,
@@ -74,7 +74,7 @@ async function defaultVersion(): Promise<string> {
 /**
  * CLI headless runtime (T086): one `claude -p` process per session in stream-json mode; messages
  * are written to stdin, output is mapped by the shared MessageMapper (source `stream_json`).
- * Scope (T094): the CLI cannot ask Nexora before a tool runs, so shell tools are disallowed and
+ * Scope (T094): the CLI cannot ask Ubuliera before a tool runs, so shell tools are disallowed and
  * every streamed tool call is checked by the guard after the fact — a violation stops the session.
  */
 export class CliHeadlessAdapter implements RuntimeAdapter {
@@ -115,7 +115,7 @@ export class CliHeadlessAdapter implements RuntimeAdapter {
     const sessionKnown = deferred<string>();
     sessionKnown.promise.catch(() => undefined);
     let sessionId: string | null = input.resumeSessionId ?? null;
-    /** why Nexora ended the process: user stop, or a scope violation */
+    /** why Ubuliera ended the process: user stop, or a scope violation */
     let ending: { outcome: "stopped" | "failed"; error: string | null } | null = null;
 
     const proc = this.spawn("claude", cliArgs(input), { cwd: input.cwd });
@@ -210,7 +210,7 @@ export class CliHeadlessAdapter implements RuntimeAdapter {
         turns.settle({ outcome: "stopped", sessionId, resultText: null, usage: null, error: null });
         proc.endInput();
         proc.kill();
-        emitEnd("session.stopped", "Session stopped by Nexora", "stopped");
+        emitEnd("session.stopped", "Session stopped by Ubuliera", "stopped");
         return Promise.resolve();
       },
       interrupt: () => unsupported("interrupt"),

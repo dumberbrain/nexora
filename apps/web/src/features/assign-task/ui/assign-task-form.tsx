@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { RISK_CLASSES } from "@nexora/contracts";
+import { RISK_CLASSES } from "@ubuliera/contracts";
 import { ListPlusIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 

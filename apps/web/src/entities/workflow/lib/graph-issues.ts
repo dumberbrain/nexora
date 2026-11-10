@@ -1,4 +1,4 @@
-import { GraphIssueSchema, GraphValidationSchema } from "@nexora/contracts";
+import { GraphIssueSchema, GraphValidationSchema } from "@ubuliera/contracts";
 
 import { ApiError } from "@/shared/api";
 

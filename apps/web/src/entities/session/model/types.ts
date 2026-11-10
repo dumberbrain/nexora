@@ -1,4 +1,4 @@
-import { type SessionStatus } from "@nexora/contracts";
+import { type SessionStatus } from "@ubuliera/contracts";
 
 export type {
   Message,
@@ -9,7 +9,7 @@ export type {
   SessionList,
   SessionStatus,
   Usage,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 /** GET /sessions filters — plain primitives only (they become part of the query key). */
 export type SessionListFilters = {

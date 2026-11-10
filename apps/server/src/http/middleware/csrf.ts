@@ -1,4 +1,4 @@
-import { CSRF_HEADER } from "@nexora/contracts";
+import { CSRF_HEADER } from "@ubuliera/contracts";
 import { type MiddlewareHandler } from "hono";
 import { getCookie } from "hono/cookie";
 
@@ -9,7 +9,7 @@ import { CSRF_COOKIE, safeEqual, type SessionKeys } from "./session-cookie";
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 
 /**
- * Double-submit CSRF check for cookie-authenticated mutating requests: the X-Nexora-CSRF header
+ * Double-submit CSRF check for cookie-authenticated mutating requests: the X-Ubuliera-CSRF header
  * must equal the csrf cookie and the server's key. Bearer requests carry no ambient credentials
  * and are exempt.
  */

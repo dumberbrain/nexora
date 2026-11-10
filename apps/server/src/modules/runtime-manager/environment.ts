@@ -1,13 +1,13 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
-import { type RuntimeEnvironment } from "@nexora/contracts";
+import { type RuntimeEnvironment } from "@ubuliera/contracts";
 
 import { runCommand, type RunResult } from "../../lib/process";
 
 export const AGENT_TEAMS_FLAG = "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS";
 
-/** How Nexora asks the local `claude` CLI about itself — never a model call. */
+/** How Ubuliera asks the local `claude` CLI about itself — never a model call. */
 export interface ClaudeProbe {
   /** `claude --version`; rejects when the CLI is missing */
   version(): Promise<string>;
@@ -109,6 +109,6 @@ export function detectAgentTeams(opts: {
   if (hit) return { enabled: true, detail: `${AGENT_TEAMS_FLAG}=1 is set in ${hit}` };
   return {
     enabled: false,
-    detail: `Set ${AGENT_TEAMS_FLAG}=1 — Nexora can add it to project settings after you confirm`,
+    detail: `Set ${AGENT_TEAMS_FLAG}=1 — Ubuliera can add it to project settings after you confirm`,
   };
 }

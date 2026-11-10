@@ -33,18 +33,18 @@ uv 0.11.1, git 2.35.1; **gh CLI not installed**; `~/.claude/teams` absent (Agent
 
 - **Decision**: Three sources, normalised by Event Manager:
   1. **Claude Code `http` hooks** → `POST http://127.0.0.1:3022/api/v1/hooks/ingest` for sessions
-     *not* started by Nexora (observed sessions, Agent Teams). Events used: SessionStart, SessionEnd,
+     *not* started by Ubuliera (observed sessions, Agent Teams). Events used: SessionStart, SessionEnd,
      UserPromptSubmit, PreToolUse, PostToolUse, PostToolUseFailure, PermissionRequest,
      PermissionDenied, Notification, SubagentStart, SubagentStop, TaskCreated, TaskCompleted,
      TeammateIdle, Stop, StopFailure, FileChanged, WorktreeCreate, WorktreeRemove, CwdChanged.
-  2. **SDK / stream-json messages** for Nexora-managed sessions (`system:init`, `assistant`, `user`
+  2. **SDK / stream-json messages** for Ubuliera-managed sessions (`system:init`, `assistant`, `user`
      with `parent_tool_use_id` ⇒ subagent tree, `result` with `usage`, `modelUsage`,
      `total_cost_usd`). SDK `hooks` option + `includeHookEvents` for tool/subagent events
      in-process.
   3. **Agent Teams files** (read-only polling of `~/.claude/teams/<team>/config.json`,
      `inboxes/*.json`, `~/.claude/tasks/<team>/`) — reliability `best_effort`; docs say "do not
-     edit" ⇒ Nexora never writes them.
-- **Rationale**: hooks are the only documented way to see sessions Nexora did not spawn; `http`
+     edit" ⇒ Ubuliera never writes them.
+- **Rationale**: hooks are the only documented way to see sessions Ubuliera did not spawn; `http`
   type avoids shipping a helper script. Common fields `session_id, cwd, hook_event_name,
   transcript_path, agent_id, agent_type, tool_use_id` give the joins we need.
 - **Hook install**: written to the project's `.claude/settings.local.json` (git-ignored) only after
@@ -60,7 +60,7 @@ uv 0.11.1, git 2.35.1; **gh CLI not installed**; `~/.claude/teams` absent (Agent
 
 - **Decision**: Supported only when `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is set (env or
   settings `env`) — detected by Runtime Manager. Because teams are **not available in `-p` or SDK
-  sessions**, Nexora launches the team lead as an **interactive `claude` process inside a
+  sessions**, Ubuliera launches the team lead as an **interactive `claude` process inside a
   pseudo-terminal** (`node-pty`), sends the initial prompt as typed input, and observes via hooks
   (TaskCreated, TaskCompleted, TeammateIdle, SubagentStart/Stop with `agent_id`) + team files.
   A terminal panel (xterm.js) in Agent Details lets the user interact directly.
@@ -68,7 +68,7 @@ uv 0.11.1, git 2.35.1; **gh CLI not installed**; `~/.claude/teams` absent (Agent
   (PTY input, `best_effort`), message individual teammates ✘ (no documented external API),
   pause ✘, resume ✘ (in-process teammates not restored on resume — documented limitation).
 - **Never** emulated with subagents (spec FR-011). If the flag is absent the mode is disabled with
-  "Set CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 — Nexora can add it to project settings after you
+  "Set CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 — Ubuliera can add it to project settings after you
   confirm".
 - **Alternatives**: observe-only (user starts lead in own terminal) — kept as fallback when
   `node-pty` prebuilt binary is unavailable on the platform.
@@ -77,7 +77,7 @@ uv 0.11.1, git 2.35.1; **gh CLI not installed**; `~/.claude/teams` absent (Agent
 
 ## R4. Subagents mode
 
-- **Decision**: One SDK session; Nexora writes role definitions (Architect, Frontend Developer,
+- **Decision**: One SDK session; Ubuliera writes role definitions (Architect, Frontend Developer,
   Backend Developer, Database Engineer, QA Engineer, Security Reviewer, Code Reviewer, DevOps
   Engineer) as SDK `agents` (description, prompt, tools, model, permissionMode) — not files, unless
   the user chooses "save to `.claude/agents/`". Existing project/user agent files are discovered
@@ -88,9 +88,9 @@ uv 0.11.1, git 2.35.1; **gh CLI not installed**; `~/.claude/teams` absent (Agent
 
 - **Decision**: Planner assigns each task `ownedPaths` globs. Parallel tasks with overlapping
   globs ⇒ either serialised or each gets its own **git worktree** (`git worktree add
-  <repo>/.nexora/worktrees/<execution>/<task> -b nexora/<execution>/<task>`), created by Nexora's
-  Git service (not `claude -w`, so Nexora controls names/cleanup). SDK session `cwd` = worktree.
-  Merge back via a review task (Code Reviewer) + user approval; Nexora never force-pushes.
+  <repo>/.ubuliera/worktrees/<execution>/<task> -b ubuliera/<execution>/<task>`), created by Ubuliera's
+  Git service (not `claude -w`, so Ubuliera controls names/cleanup). SDK session `cwd` = worktree.
+  Merge back via a review task (Code Reviewer) + user approval; Ubuliera never force-pushes.
 - **Coordinator / message bus**: in-process Communication Manager; messages to managed sessions
   delivered with `streamInput`; every message is an `Event` + `Message` row.
 - **Concurrency**: default max 4 parallel sessions (configurable ≤ 8); `maxBudgetUsd` /
@@ -104,7 +104,7 @@ uv 0.11.1, git 2.35.1; **gh CLI not installed**; `~/.claude/teams` absent (Agent
   nodes (create ApprovalRequest, wait), retry with backoff, error edges. Node executors: `agent` →
   SDK session; `skill` → SDK session prompted with the skill slash command, **only** for skills the
   Skill Registry marks `executable` (user-invocable skills/commands); `mcp_tool` → call via the
-  SDK session with that MCP server enabled (Nexora does not call third-party MCP servers directly
+  SDK session with that MCP server enabled (Ubuliera does not call third-party MCP servers directly
   in v1). Existing `.specify/workflows/*.yml` etc. are listed but not executed unless an adapter
   exists (shown as "not executable").
 - **Alternatives**: Temporal / BullMQ — rejected (extra infra, constitution YAGNI).
@@ -113,7 +113,7 @@ uv 0.11.1, git 2.35.1; **gh CLI not installed**; `~/.claude/teams` absent (Agent
 
 - **Decision**: Hono on `@hono/node-server`; Socket.IO server attached to the same Node
   `http.Server` (`new Server(httpServer, { path: '/socket.io' })`). Validation with
-  `@hono/zod-validator`; schemas from `@nexora/contracts`. MCP via `@modelcontextprotocol/sdk`
+  `@hono/zod-validator`; schemas from `@ubuliera/contracts`. MCP via `@modelcontextprotocol/sdk`
   Streamable HTTP transport mounted at `/mcp`.
 - **Process model**: single Node process = API + realtime + MCP + orchestrator ⇒ no duplicated
   logic (FR-043). Child processes only for Claude runtimes, git, gh.
@@ -124,7 +124,7 @@ uv 0.11.1, git 2.35.1; **gh CLI not installed**; `~/.claude/teams` absent (Agent
 
 - **Decision**: `better-sqlite3` driver (sync, fastest, prebuilt for Node 22 on Windows) +
   `drizzle-orm` + `drizzle-kit` migrations; WAL mode; FTS5 table for event search; DB at
-  `~/.nexora/nexora.db` (override `NEXORA_DATA_DIR`). Event writes batched in a transaction every
+  `~/.ubuliera/ubuliera.db` (override `UBULIERA_DATA_DIR`). Event writes batched in a transaction every
   100 ms. Alternative `node:sqlite` built-in — rejected for now (still experimental flag in Node 22).
 
 ## R9. Frontend: React + Rsbuild + team standards
@@ -165,7 +165,7 @@ Run: `claude -p … --settings <file> --model haiku`, http hooks for every R2 ev
 server; main agent delegated a Write to a general-purpose subagent. Fixtures (paths scrubbed):
 `apps/server/tests/fixtures/hooks/*.json`, stream: `apps/server/tests/fixtures/stream-json/`.
 
-- **Custom headers work**: `headers: { "X-Nexora-Hook-Token": "…" }` arrived on every POST →
+- **Custom headers work**: `headers: { "X-Ubuliera-Hook-Token": "…" }` arrived on every POST →
   the installer uses the header (no query token). Requests come from Claude Code with UA `axios`.
 - **SessionStart is not delivered to `http` hooks** (only command hooks ran for it). ⇒ the session
   projection creates a session on the *first event of any type* for an unknown `session_id`.
@@ -184,7 +184,7 @@ server; main agent delegated a Write to a general-purpose subagent. Fixtures (pa
 - **Installer deliberately skips `WorktreeCreate` / `WorktreeRemove`**: per the hooks docs a hook
   on these events *replaces* Claude Code's own git-worktree handling, so an `{}` answer could break
   worktrees (not exercised in S1). Worktree activity of observed sessions is therefore not
-  captured in US1; Nexora-managed worktrees are tracked by the git-workspace module (US2).
+  captured in US1; Ubuliera-managed worktrees are tracked by the git-workspace module (US2).
 - Parent-link bookkeeping (pending `Agent` calls) is in memory; after a server restart an orphaned
   subagent is attached to the main agent.
 
@@ -203,7 +203,7 @@ Script `apps/server/scripts/spike-sdk.ts` (model haiku, `settingSources: []`); f
 - **SDK `hooks.PreToolUse` callback fired** with `(input, toolUseID)`; main-agent input has no
   `agent_id`. `includeHookEvents: true` produced no extra system messages for SDK callbacks.
 - **`interrupt()` resolves `{ still_queued: [] }`; the turn then ends with
-  `result.subtype = "error_during_execution"`, `is_error: true`.** Nexora maps a result that
+  `result.subtype = "error_during_execution"`, `is_error: true`.** Ubuliera maps a result that
   follows its own interrupt to status *interrupted*, not failed.
 - **Resume works**: a new `query({ resume: sessionId })` reports the same `session_id` and kept the
   context (answered "a.txt").
@@ -233,12 +233,12 @@ hello.txt, one bye.txt, then shut down and clean up". Done in 32 s, both files w
   `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`.
 - **Start-up dialogs** (interactive only): workspace trust for a new folder — default option is
   **"No, exit"**, so the adapter must not blindly press Enter; and "New MCP server found" when the
-  worktree has `.mcp.json` (default "continue without"). Decision: Nexora never auto-accepts
+  worktree has `.mcp.json` (default "continue without"). Decision: Ubuliera never auto-accepts
   trust; the lead's terminal is shown (T139/T141) and the session waits in
   `waiting_for_input` until the user answers there.
 - **Team files**: a team `session-<first 8 of session id>` is created **at session start**, before
   any teammate: `~/.claude/teams/<team>/config.json` with `leadSessionId`, `leadAgentId`
-  (`team-lead@<team>`), `leadProcess.pid` (= PTY pid ⇒ how Nexora finds *its* team),
+  (`team-lead@<team>`), `leadProcess.pid` (= PTY pid ⇒ how Ubuliera finds *its* team),
   `members[]` (`agentId`, `name`, `agentType`, `cwd`, `backendType: "in-process"`, `joinedAt`).
   Members are appended as teammates spawn and removed on shutdown (lead remains). Inboxes:
   `inboxes/<member>.json` = array of `{from, text, timestamp, msg_id, type, read, …}`; `text` may
@@ -279,11 +279,11 @@ hello.txt, one bye.txt, then shut down and clean up". Done in 32 s, both files w
 
 ## R11. Security
 
-- Bind `127.0.0.1` by default; `NEXORA_HOST` other than loopback refused unless
-  `NEXORA_REMOTE=1` **and** an auth token is configured (FR-050).
+- Bind `127.0.0.1` by default; `UBULIERA_HOST` other than loopback refused unless
+  `UBULIERA_REMOTE=1` **and** an auth token is configured (FR-050).
 - Loopback web auth: per-install random secret ⇒ `HttpOnly SameSite=Strict` cookie issued on first
   load from loopback + CSRF header; Host/Origin header check (DNS-rebinding protection).
-- Command allowlist: Nexora spawns only `claude`, `git`, `gh` with argument arrays (`execFile`, no
+- Command allowlist: Ubuliera spawns only `claude`, `git`, `gh` with argument arrays (`execFile`, no
   shell). Paths normalised + verified inside registered project roots (FR-051).
 - Redaction: pattern + entropy-based redactor (API keys, tokens, `Authorization`, `.env` values,
   private keys) applied before persistence, socket emit, export and MCP output (FR-052).

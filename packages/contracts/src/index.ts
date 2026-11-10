@@ -1,4 +1,4 @@
-/** Public API of @nexora/contracts — the single source of truth for server, web and MCP. */
+/** Public API of @ubuliera/contracts — the single source of truth for server, web and MCP. */
 export const CONTRACTS_VERSION = "0.1.0";
 
 export * from "./enums";

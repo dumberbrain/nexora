@@ -5,7 +5,7 @@ interface HooksStatusTagProps {
   className?: string;
 }
 
-/** Whether Nexora's observation hooks are installed in the project's Claude Code settings. */
+/** Whether Ubuliera's observation hooks are installed in the project's Claude Code settings. */
 export function HooksStatusTag({ installed, className }: HooksStatusTagProps) {
   return (
     <span

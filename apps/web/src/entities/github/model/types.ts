@@ -11,7 +11,7 @@ export type {
   GithubRepoList,
   GithubRepoRef,
   GithubStatus,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 /** A repository as the web addresses it: GitHub owner + repo name. */
 export interface RepoCoords {

@@ -1,5 +1,5 @@
-import { type Session } from "@nexora/contracts";
 import { useQuery } from "@tanstack/react-query";
+import { type Session } from "@ubuliera/contracts";
 import { type ReactNode } from "react";
 
 import { agentInsightQuery } from "@/entities/agent";

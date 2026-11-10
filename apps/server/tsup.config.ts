@@ -9,5 +9,5 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   // workspace package ships TypeScript sources — bundle it into the server output
-  noExternal: ["@nexora/contracts"],
+  noExternal: ["@ubuliera/contracts"],
 });

@@ -2,7 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 
-import { HOOK_TOKEN_HEADER, type HookPreview, type Project } from "@nexora/contracts";
+import { HOOK_TOKEN_HEADER, type HookPreview, type Project } from "@ubuliera/contracts";
 
 import { type ProjectRepository, type ProjectRow, toProject } from "./project.repository";
 import { AppError } from "../../http/errors";
@@ -10,14 +10,14 @@ import { PathGuardError, resolveInsideRoot } from "../../lib/path-guard";
 import { type AuditService } from "../permission-manager/audit.service";
 
 /**
- * Hook installer (T056, FR-041): merges Nexora `http` hooks into the project's
- * `.claude/settings.local.json` (git-ignored by Claude Code). Existing non-Nexora hooks and
- * settings are never removed or altered; Nexora entries are recognised by their ingest URL.
+ * Hook installer (T056, FR-041): merges Ubuliera `http` hooks into the project's
+ * `.claude/settings.local.json` (git-ignored by Claude Code). Existing non-Ubuliera hooks and
+ * settings are never removed or altered; Ubuliera entries are recognised by their ingest URL.
  *
  * WorktreeCreate/WorktreeRemove are deliberately NOT registered: a hook on those events replaces
  * Claude Code's own git worktree handling, so an observe-only `{}` response would break it.
  */
-export const NEXORA_HOOK_EVENTS = [
+export const UBULIERA_HOOK_EVENTS = [
   "UserPromptSubmit",
   "PreToolUse",
   "PostToolUse",
@@ -60,7 +60,7 @@ export function ingestUrl(publicUrl: string): string {
   return `${publicUrl.replace(/\/+$/, "")}${INGEST_PATH}`;
 }
 
-export function isNexoraHook(hook: unknown): boolean {
+export function isUbulieraHook(hook: unknown): boolean {
   return (
     isObject(hook) &&
     hook.type === "http" &&
@@ -69,17 +69,17 @@ export function isNexoraHook(hook: unknown): boolean {
   );
 }
 
-export function hasNexoraHooks(settings: JsonObject): boolean {
+export function hasUbulieraHooks(settings: JsonObject): boolean {
   if (!isObject(settings.hooks)) return false;
   return Object.values(settings.hooks).some(
     (groups) =>
       Array.isArray(groups) &&
-      groups.some((g) => isObject(g) && Array.isArray(g.hooks) && g.hooks.some(isNexoraHook)),
+      groups.some((g) => isObject(g) && Array.isArray(g.hooks) && g.hooks.some(isUbulieraHook)),
   );
 }
 
-/** Remove every Nexora hook; groups/events/`hooks` emptied by that removal are dropped. */
-export function removeNexoraHooks(settings: JsonObject): JsonObject {
+/** Remove every Ubuliera hook; groups/events/`hooks` emptied by that removal are dropped. */
+export function removeUbulieraHooks(settings: JsonObject): JsonObject {
   const hooks = settings.hooks;
   if (!isObject(hooks)) return { ...settings };
   const next: JsonObject = {};
@@ -94,7 +94,7 @@ export function removeNexoraHooks(settings: JsonObject): JsonObject {
         kept.push(group);
         continue;
       }
-      const remaining = group.hooks.filter((h) => !isNexoraHook(h));
+      const remaining = group.hooks.filter((h) => !isUbulieraHook(h));
       if (remaining.length === group.hooks.length) kept.push(group);
       else if (remaining.length > 0) kept.push({ ...group, hooks: remaining });
     }
@@ -105,11 +105,11 @@ export function removeNexoraHooks(settings: JsonObject): JsonObject {
   return out;
 }
 
-/** Replace any previous Nexora hooks with one `http` hook per event (idempotent). */
-export function mergeNexoraHooks(settings: JsonObject, url: string, token: string): JsonObject {
-  const base = removeNexoraHooks(settings);
+/** Replace any previous Ubuliera hooks with one `http` hook per event (idempotent). */
+export function mergeUbulieraHooks(settings: JsonObject, url: string, token: string): JsonObject {
+  const base = removeUbulieraHooks(settings);
   const hooks: JsonObject = isObject(base.hooks) ? { ...base.hooks } : {};
-  for (const event of NEXORA_HOOK_EVENTS) {
+  for (const event of UBULIERA_HOOK_EVENTS) {
     const entry = {
       ...(TOOL_EVENTS.has(event) ? { matcher: "*" } : {}),
       hooks: [
@@ -148,14 +148,14 @@ export class HookInstaller {
   async preview(projectId: string): Promise<HookPreview> {
     const project = this.project(projectId);
     const file = await this.read(project);
-    const after = mergeNexoraHooks(file.value, this.url, HOOK_TOKEN_PLACEHOLDER);
+    const after = mergeUbulieraHooks(file.value, this.url, HOOK_TOKEN_PLACEHOLDER);
     return {
       settingsPath: file.path,
       exists: file.exists,
       before: file.text,
       after: pretty(after),
-      events: [...NEXORA_HOOK_EVENTS],
-      alreadyInstalled: hasNexoraHooks(file.value),
+      events: [...UBULIERA_HOOK_EVENTS],
+      alreadyInstalled: hasUbulieraHooks(file.value),
     };
   }
 
@@ -164,7 +164,7 @@ export class HookInstaller {
     const project = this.project(projectId);
     const file = await this.read(project);
     const token = randomBytes(32).toString("base64url");
-    await this.write(file.path, pretty(mergeNexoraHooks(file.value, this.url, token)));
+    await this.write(file.path, pretty(mergeUbulieraHooks(file.value, this.url, token)));
     const updated = this.deps.repo.setHooks(project.id, true, hashToken(token)) ?? project;
     this.deps.audit.record({
       actor,
@@ -172,7 +172,7 @@ export class HookInstaller {
       targetType: "project",
       targetId: project.id,
       outcome: "success",
-      details: { settingsPath: file.path, events: NEXORA_HOOK_EVENTS.length, url: this.url },
+      details: { settingsPath: file.path, events: UBULIERA_HOOK_EVENTS.length, url: this.url },
     });
     return toProject(updated);
   }
@@ -180,8 +180,8 @@ export class HookInstaller {
   async uninstall(projectId: string, actor: string): Promise<Project> {
     const project = this.project(projectId);
     const file = await this.read(project);
-    const fileChanged = file.exists && hasNexoraHooks(file.value);
-    if (fileChanged) await this.write(file.path, pretty(removeNexoraHooks(file.value)));
+    const fileChanged = file.exists && hasUbulieraHooks(file.value);
+    if (fileChanged) await this.write(file.path, pretty(removeUbulieraHooks(file.value)));
     const updated = this.deps.repo.setHooks(project.id, false, null) ?? project;
     this.deps.audit.record({
       actor,

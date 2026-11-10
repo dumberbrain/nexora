@@ -5,4 +5,4 @@ export type {
   TeamMessage,
   TeamTask,
   TeamView,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";

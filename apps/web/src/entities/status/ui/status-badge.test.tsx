@@ -1,10 +1,10 @@
+import { render, screen } from "@testing-library/react";
 import {
   AGENT_STATUSES,
   EXECUTION_STATUSES,
   SESSION_STATUSES,
   TASK_STATUSES,
-} from "@nexora/contracts";
-import { render, screen } from "@testing-library/react";
+} from "@ubuliera/contracts";
 import { describe, expect, it } from "vitest";
 
 import { StatusBadge } from "./status-badge";

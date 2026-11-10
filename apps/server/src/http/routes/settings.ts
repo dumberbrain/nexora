@@ -1,4 +1,4 @@
-import { type Settings, UpdateMcpSettingsInputSchema } from "@nexora/contracts";
+import { type Settings, UpdateMcpSettingsInputSchema } from "@ubuliera/contracts";
 import { type Hono } from "hono";
 
 import { type AuditService } from "../../modules/permission-manager/audit.service";

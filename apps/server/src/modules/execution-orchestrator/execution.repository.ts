@@ -1,4 +1,4 @@
-import { type Execution } from "@nexora/contracts";
+import { type Execution } from "@ubuliera/contracts";
 import { desc, eq } from "drizzle-orm";
 
 import { type Db } from "../../db/client";

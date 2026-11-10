@@ -1,4 +1,4 @@
-import { ExecutionConfigSchema } from "@nexora/contracts";
+import { ExecutionConfigSchema } from "@ubuliera/contracts";
 import { z } from "zod";
 
 import { type ExecutionConfig, type Question } from "@/entities/execution";

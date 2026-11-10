@@ -5,7 +5,7 @@ import {
   GithubPullListSchema,
   GithubRepoListSchema,
   GithubStatusSchema,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { closeDb, openDb, type Db } from "../../src/db/client";

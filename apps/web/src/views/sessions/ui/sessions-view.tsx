@@ -8,7 +8,7 @@ export function SessionsView() {
       <PageHeader
         index="03"
         title="Sessions"
-        description="Claude Code sessions Nexora has seen. Observe-only sessions were started outside Nexora and keep their own permissions."
+        description="Claude Code sessions Ubuliera has seen. Observe-only sessions were started outside Ubuliera and keep their own permissions."
       />
       <SessionTable />
     </div>

@@ -14,4 +14,4 @@ export type {
   Strategy,
   TaskAnalysis,
   Verification,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";

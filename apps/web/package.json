@@ -1,8 +1,8 @@
 {
-  "name": "@nexora/web",
+  "name": "@ubuliera/web",
   "version": "0.1.0",
   "private": true,
-  "description": "Nexora dashboard SPA (React + Rsbuild, FSD, team-front profile shadcn-tailwind-tanstack-router)",
+  "description": "Ubuliera dashboard SPA (React + Rsbuild, FSD, team-front profile shadcn-tailwind-tanstack-router)",
   "type": "module",
   "scripts": {
     "dev": "rsbuild dev",

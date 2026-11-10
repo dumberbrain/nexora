@@ -1,5 +1,5 @@
-import { type Session } from "@nexora/contracts";
 import { useQueryClient } from "@tanstack/react-query";
+import { type Session } from "@ubuliera/contracts";
 import { type ReactNode } from "react";
 
 import { agentKeys, type AgentDetail } from "@/entities/agent";
@@ -15,14 +15,14 @@ import { UsageSummary } from "./usage-summary";
 
 interface AgentDetailsBodyProps {
   detail: AgentDetail;
-  /** renders the interactive terminal of a Nexora-started Agent Teams lead (widgets/terminal) */
+  /** renders the interactive terminal of a Ubuliera-started Agent Teams lead (widgets/terminal) */
   leadTerminal?: ((session: Session) => ReactNode) | undefined;
 }
 
 const isTeamAgent = (kind: AgentDetail["agent"]["kind"]) =>
   kind === "team_lead" || kind === "teammate";
 
-/** The lead PTY is only reachable for leads Nexora started itself (never observe-only). */
+/** The lead PTY is only reachable for leads Ubuliera started itself (never observe-only). */
 const leadSession = ({ agent, session }: AgentDetail): Session | null =>
   agent.kind === "team_lead" && session?.runtime === "agent_team_pty" && !session.observeOnly
     ? session

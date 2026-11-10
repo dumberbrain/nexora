@@ -1,4 +1,4 @@
-import { GITHUB_AUTH_HINT, GITHUB_INSTALL_HINT } from "@nexora/contracts";
+import { GITHUB_AUTH_HINT, GITHUB_INSTALL_HINT } from "@ubuliera/contracts";
 import { useId } from "react";
 
 import { type GithubStatus } from "@/entities/github";
@@ -13,7 +13,7 @@ interface SetupCardProps {
 }
 
 /**
- * Guidance when gh is missing or signed out. Nexora never installs or signs in for the user —
+ * Guidance when gh is missing or signed out. Ubuliera never installs or signs in for the user —
  * it shows the commands to run, then re-checks the status on demand.
  */
 export function SetupCard({ status, checking, onCheckAgain }: SetupCardProps) {

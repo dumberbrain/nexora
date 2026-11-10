@@ -1,6 +1,6 @@
 ---
 
-description: "Task list for AI Development Orchestration Platform (Nexora)"
+description: "Task list for AI Development Orchestration Platform (Ubuliera)"
 ---
 
 # Tasks: AI Development Orchestration Platform
@@ -42,9 +42,9 @@ testable increment.
 **Purpose**: Tooling, workspaces, prerequisites
 
 - [X] T001 Install and authenticate GitHub CLI on the dev machine: run `winget install --id GitHub.cli -e`, restart the shell, run `gh auth login` (interactive — user runs it via `! gh auth login`), verify with `gh --version` and `gh auth status`; document the steps (incl. macOS `brew install gh`, Linux package) in `docs/setup/prerequisites.md`
-- [X] T002 Create root `package.json` with npm workspaces `["apps/*","packages/*"]`, `"engines": {"node": ">=22"}`, scripts `dev`, `build`, `start`, `start:e2e` (production build with `NODE_ENV=test`, `NEXORA_TEST_FAKE_RUNTIME=1`, temporary `NEXORA_DATA_DIR`), `lint`, `typecheck`, `test`, `test:e2e`, `db:generate`, `db:migrate`; add `.nvmrc` (`22`) and `.npmrc` (`save-exact=true`)
+- [X] T002 Create root `package.json` with npm workspaces `["apps/*","packages/*"]`, `"engines": {"node": ">=22"}`, scripts `dev`, `build`, `start`, `start:e2e` (production build with `NODE_ENV=test`, `UBULIERA_TEST_FAKE_RUNTIME=1`, temporary `UBULIERA_DATA_DIR`), `lint`, `typecheck`, `test`, `test:e2e`, `db:generate`, `db:migrate`; add `.nvmrc` (`22`) and `.npmrc` (`save-exact=true`)
 - [X] T003 Create `tsconfig.base.json` (strict, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, ES2023, bundler resolution) and per-package `tsconfig.json` references
-- [X] T004 [P] Scaffold `packages/contracts` (`package.json` name `@nexora/contracts`, deps `zod`, `src/index.ts` barrel, build via `tsc`)
+- [X] T004 [P] Scaffold `packages/contracts` (`package.json` name `@ubuliera/contracts`, deps `zod`, `src/index.ts` barrel, build via `tsc`)
 - [X] T005 [P] Scaffold `apps/server` (`package.json` deps: `hono`, `@hono/node-server`, `@hono/zod-validator`, `socket.io`, `drizzle-orm`, `better-sqlite3`, `ulid`, `pino`, `picomatch`, `@anthropic-ai/claude-agent-sdk`, `@modelcontextprotocol/sdk`; dev: `drizzle-kit`, `tsx`, `vitest`, `@types/better-sqlite3`), `apps/server/drizzle.config.ts`
 - [X] T006 [P] Scaffold `apps/web` with Rsbuild: `apps/web/rsbuild.config.ts` (`@rsbuild/plugin-react`, `TanStackRouterRspack({ target: 'react', autoCodeSplitting: true })` from `@tanstack/router-plugin/rspack` in `tools.rspack.plugins`, `server.port: 3022`, `server.proxy` for `/api` and `/mcp` → `http://127.0.0.1:3023` and `/socket.io` with `ws: true`, alias `@` → `src`, `source.define` only for `PUBLIC_*`), `apps/web/postcss.config.mjs` (`@tailwindcss/postcss`), `apps/web/index.html`, `apps/web/src/app/main.tsx`
 - [X] T007 [P] Add web deps to `apps/web/package.json`: `react@19`, `react-dom@19`, `@tanstack/react-router`, `@tanstack/react-query`, `zustand`, `axios`, `socket.io-client`, `@xyflow/react`, `@dnd-kit/core`, `@dnd-kit/sortable`, `react-hook-form`, `@hookform/resolvers`, `zod`, `sonner`, `@xterm/xterm`, `class-variance-authority`, `tailwind-merge`, `lucide-react`; dev: `@tanstack/router-devtools`, `@testing-library/react`, `@testing-library/user-event`, `msw`, `jsdom`
@@ -55,7 +55,7 @@ testable increment.
 - [X] T012 [P] Initialise shadcn/ui: `apps/web/components.json`, primitives in `apps/web/src/shared/ui/` (button, card, badge, dialog, sheet, tabs, table, tooltip, dropdown-menu, input, textarea, select, checkbox, scroll-area, separator, skeleton, sonner), `cn` helper `apps/web/src/shared/lib/cn.ts`, design tokens (dark default + light) in `apps/web/src/app/styles/globals.css`
 - [X] T013 [P] Add CI workflow `.github/workflows/ci.yml` (node 22, `npm ci`, lint, typecheck, test, build, Playwright E2E, upload report)
 - [X] T014 [P] Add PR template `.github/pull_request_template.md` with a checklist stating compliance with constitution Principles I–V, security constraints, tests run, and documented limitations
-- [X] T015 [P] Extend `.gitignore` with `node_modules/`, `dist/`, `.nexora/`, `*.db`, `*.db-wal`, `*.db-shm`, `playwright-report/`, `test-results/`, `apps/web/src/routeTree.gen.ts`
+- [X] T015 [P] Extend `.gitignore` with `node_modules/`, `dist/`, `.ubuliera/`, `*.db`, `*.db-wal`, `*.db-shm`, `playwright-report/`, `test-results/`, `apps/web/src/routeTree.gen.ts`
 
 ---
 
@@ -75,7 +75,7 @@ testable increment.
 
 ### Server core (tests first)
 
-- [X] T021 [P] Write failing tests `apps/server/tests/unit/config/env.test.ts`: defaults host `127.0.0.1`, port 3022 (prod) / 3023 (dev); non-loopback host rejected unless `NEXORA_REMOTE=1` AND `NEXORA_TOKEN` (≥32 chars) set
+- [X] T021 [P] Write failing tests `apps/server/tests/unit/config/env.test.ts`: defaults host `127.0.0.1`, port 3022 (prod) / 3023 (dev); non-loopback host rejected unless `UBULIERA_REMOTE=1` AND `UBULIERA_TOKEN` (≥32 chars) set
 - [X] T022 Implement env config in `apps/server/src/config/env.ts` (zod) to pass T021
 - [X] T023 [P] Write failing tests `apps/server/tests/unit/lib/redactor.test.ts` (Anthropic/OpenAI/GitHub/AWS keys, bearer headers, `password=`, PEM private keys, high-entropy strings in `.env` lines; nested JSON; idempotent)
 - [X] T024 Implement redactor in `apps/server/src/lib/redactor.ts` to pass T023
@@ -85,9 +85,9 @@ testable increment.
 - [X] T028 Implement allowlisted process runner in `apps/server/src/lib/process.ts` (`execFile`/`spawn` with `shell:false`) to pass T027
 - [X] T029 [P] Implement `apps/server/src/lib/ulid.ts` (monotonic) and `apps/server/src/lib/logger.ts` (pino, redactor applied to all log objects)
 - [X] T030 Implement Drizzle schema for all tables in `apps/server/src/db/schema.ts` (projects, executions, tasks, task_dependencies, sessions, agents, events, messages, approval_requests, workflow_definitions, workflow_versions, workflow_runs, workflow_node_runs, integrations, audit_entries, api_tokens) with indexes `(session_id,id)`, `(execution_id,id)`, `(type,ts)`; generate migration in `apps/server/drizzle/`; add raw-SQL migration for FTS5 virtual table `events_fts(summary)`
-- [X] T031 Implement DB client `apps/server/src/db/client.ts` (data dir `NEXORA_DATA_DIR` default `~/.nexora`, WAL, foreign keys on, migrate on start) and `db:migrate` script `apps/server/src/db/migrate.ts`
+- [X] T031 Implement DB client `apps/server/src/db/client.ts` (data dir `UBULIERA_DATA_DIR` default `~/.ubuliera`, WAL, foreign keys on, migrate on start) and `db:migrate` script `apps/server/src/db/migrate.ts`
 - [X] T032 [P] Write failing tests `apps/server/tests/integration/http/security.test.ts` via `app.request()`: rejects foreign `Origin`/`Host` (DNS rebinding), mutating request without CSRF header → 403, bearer token required in remote mode, secure headers present
-- [X] T033 Implement Hono app `apps/server/src/http/app.ts` with middleware `apps/server/src/http/middleware/{origin-guard,session-cookie,csrf,bearer-auth,error-mapper}.ts` (cookie `HttpOnly; SameSite=Strict`, header `X-Nexora-CSRF`) and `GET /api/v1/health` → `{status, version, db, uptimeMs}` to pass T032
+- [X] T033 Implement Hono app `apps/server/src/http/app.ts` with middleware `apps/server/src/http/middleware/{origin-guard,session-cookie,csrf,bearer-auth,error-mapper}.ts` (cookie `HttpOnly; SameSite=Strict`, header `X-Ubuliera-CSRF`) and `GET /api/v1/health` → `{status, version, db, uptimeMs}` to pass T032
 - [X] T034 [P] Implement audit service (append-only, no update/delete) in `apps/server/src/modules/permission-manager/audit.service.ts` + test `apps/server/tests/unit/permission-manager/audit.test.ts`
 - [X] T035 [P] Write failing tests `apps/server/tests/unit/event-manager/event-store.test.ts`: 100 ms batched inserts, redaction before insert, payload > 32 KB truncated with flag, summary ≤ 500, cursor query by ULID ordered, filters (session, agent, execution, type[], severity[], from/to, FTS `q`)
 - [X] T036 Implement event store + bus in `apps/server/src/modules/event-manager/{event-store.ts,event-bus.ts,index.ts}` to pass T035
@@ -97,7 +97,7 @@ testable increment.
 
 ### Web core
 
-- [X] T040 [P] Implement `apps/web/src/shared/api/http.ts` (axios instance, base `/api/v1`, `withCredentials`, `X-Nexora-CSRF` header from cookie/meta, maps error shape to typed `ApiError`) + test `apps/web/src/shared/api/http.test.ts`
+- [X] T040 [P] Implement `apps/web/src/shared/api/http.ts` (axios instance, base `/api/v1`, `withCredentials`, `X-Ubuliera-CSRF` header from cookie/meta, maps error shape to typed `ApiError`) + test `apps/web/src/shared/api/http.test.ts`
 - [X] T041 [P] Implement `apps/web/src/shared/api/query-client.ts` (staleTime defaults per team standard, retry off for 4xx)
 - [X] T042 [P] Implement `apps/web/src/shared/lib/{logger.ts,create-resettable-store.ts}` and `apps/web/src/shared/config/env.ts` (`PUBLIC_*` only)
 - [X] T043 Implement socket client `apps/web/src/shared/socket/{client.ts,use-live-subscription.ts}` (singleton `socket.io-client`, stores `lastEventId` per subscription, re-subscribes with `sinceEventId` on reconnect, dedupes by id; `useEffect` allowed — external system: socket) + test `apps/web/src/shared/socket/use-live-subscription.test.ts`
@@ -120,16 +120,16 @@ testable increment.
 ### Tests for User Story 1 ⚠️ (write first, must fail)
 
 - [X] T049 [US1] Spike S1: in a scratch repo configure an `http` hook to a local echo server for every event in research R2, run a session with a subagent and a Write, save raw payloads to `apps/server/tests/fixtures/hooks/*.json` (redact secrets), and record whether `http` hooks support custom headers in `specs/001-ai-orchestration-platform/research.md` (S1 result)
-- [X] T050 [P] [US1] Contract test `apps/server/tests/contract/hook-ingest.test.ts`: each fixture maps per the table in `contracts/runtime-adapter.md` (SessionStart→session.started … StopFailure→error), PostToolUse Write/Edit adds derived `file.modified`, missing/invalid `X-Nexora-Hook-Token` → 401, response `{}` for observed sessions
+- [X] T050 [P] [US1] Contract test `apps/server/tests/contract/hook-ingest.test.ts`: each fixture maps per the table in `contracts/runtime-adapter.md` (SessionStart→session.started … StopFailure→error), PostToolUse Write/Edit adds derived `file.modified`, missing/invalid `X-Ubuliera-Hook-Token` → 401, response `{}` for observed sessions
 - [X] T051 [P] [US1] Unit test `apps/server/tests/unit/session-manager/session-projection.test.ts`: session status transitions from events, `lastActivityAt`, unknown project resolved by `cwd` under registered root
 - [X] T052 [P] [US1] Unit test `apps/server/tests/unit/agent-registry/agent-tree.test.ts`: SubagentStart/Stop `agent_id`/`agent_type` build parent/child tree under session main agent
-- [X] T053 [P] [US1] Unit test `apps/server/tests/unit/project-registry/hook-installer.test.ts`: preview produces diff of `.claude/settings.local.json` merging (never removing) existing hooks; install requires `confirm: true`; uninstall removes only Nexora entries
+- [X] T053 [P] [US1] Unit test `apps/server/tests/unit/project-registry/hook-installer.test.ts`: preview produces diff of `.claude/settings.local.json` merging (never removing) existing hooks; install requires `confirm: true`; uninstall removes only Ubuliera entries
 - [X] T054 [P] [US1] E2E `e2e/us1-live-monitoring.spec.ts`: POST recorded fixtures to ingest endpoint, assert Overview counters, Sessions row, canvas nodes/edge, agent details timeline/files, logs filter + export, axe clean
 
 ### Implementation for User Story 1
 
 - [X] T055 [P] [US1] Implement project registry `apps/server/src/modules/project-registry/{project.repository.ts,project.service.ts}` (register `rootPath` must exist, normalised, unique; name 1–120) and routes `apps/server/src/http/routes/projects.ts` (`GET/POST /projects`)
-- [X] T056 [US1] Implement hook installer `apps/server/src/modules/project-registry/hook-installer.ts` (per-project secret, `http` hook entries for R2 events to `${NEXORA_PUBLIC_URL}/api/v1/hooks/ingest` — `NEXORA_PUBLIC_URL` from env config, default `http://127.0.0.1:3022`, header or query-token per S1 result) and routes `GET /projects/:id/hooks/preview`, `POST /projects/:id/hooks/install`, `DELETE /projects/:id/hooks` with audit entries
+- [X] T056 [US1] Implement hook installer `apps/server/src/modules/project-registry/hook-installer.ts` (per-project secret, `http` hook entries for R2 events to `${UBULIERA_PUBLIC_URL}/api/v1/hooks/ingest` — `UBULIERA_PUBLIC_URL` from env config, default `http://127.0.0.1:3022`, header or query-token per S1 result) and routes `GET /projects/:id/hooks/preview`, `POST /projects/:id/hooks/install`, `DELETE /projects/:id/hooks` with audit entries
 - [X] T057 [US1] Implement hook normaliser `apps/server/src/modules/event-manager/normalizers/hook-normalizer.ts` (source `hook`, reliability `authoritative`; derived `file.modified` reliability `derived`) and ingest route `apps/server/src/http/routes/hooks.ts` (loopback only, token check)
 - [X] T058 [US1] Implement session manager projection `apps/server/src/modules/session-manager/{session.repository.ts,session-projection.ts,index.ts}` incl. git branch lookup via `git rev-parse --abbrev-ref HEAD` (process runner) and `entity.changed` emits
 - [X] T059 [US1] Implement agent registry `apps/server/src/modules/agent-registry/{agent.repository.ts,agent-tree.ts,index.ts}`
@@ -169,7 +169,7 @@ testable increment.
 - [X] T080 [P] [US2] Unit test `apps/server/tests/unit/execution-orchestrator/analysis-consent.test.ts`: default analysis performs only local inspection (no runtime started); model-backed analysis/planning refused with APPROVAL_REQUIRED until `modelAnalysisConsent` is true or a per-project always-allow preference exists (FR-008)
 - [X] T081 [P] [US2] Contract test `apps/server/tests/contract/agent-sdk-adapter.test.ts` replaying S3 fixtures: `system:init` → session.started with model, `parent_tool_use_id` → subagent agent tree, `result` → usage with `reportsUsage: 'estimate'`, `canUseTool` routed to ApprovalGate
 - [X] T082 [P] [US2] Integration test `apps/server/tests/integration/executions-flow.test.ts` with `FakeRuntimeAdapter` (`apps/server/tests/fakes/fake-runtime-adapter.ts`, test-only): POST /executions → modes → mode → questions → config → plan → approve → tasks run → verification
-- [X] T083 [P] [US2] E2E `e2e/us2-task-to-execution.spec.ts` (served by `start:e2e`; fake adapter enabled via `NEXORA_TEST_FAKE_RUNTIME=1` only when `NODE_ENV=test` — server refuses to start with the flag in any other environment): wizard flow, risky task approval checkbox, status board updates, axe clean
+- [X] T083 [P] [US2] E2E `e2e/us2-task-to-execution.spec.ts` (served by `start:e2e`; fake adapter enabled via `UBULIERA_TEST_FAKE_RUNTIME=1` only when `NODE_ENV=test` — server refuses to start with the flag in any other environment): wizard flow, risky task approval checkbox, status board updates, axe clean
 
 ### Implementation for User Story 2
 
@@ -181,7 +181,7 @@ testable increment.
 - [X] T089 [US2] Implement analysis service `apps/server/src/modules/execution-orchestrator/analysis/analysis.service.ts` (default = local heuristic: stack detection from manifests/lockfiles, CLAUDE.md/AGENTS.md, discovery results, heuristic complexity; optional model-backed refinement via read-only SDK query `permissionMode: 'plan'` returning zod-validated `TaskAnalysis` JSON, only with consent per FR-008) to pass T080
 - [X] T090 [US2] Implement mode advisor + question service `apps/server/src/modules/execution-orchestrator/{mode-advisor.ts,questions.ts}` (only relevant questions, each with `recommendedDefault`) to pass T076
 - [X] T091 [US2] Implement planner `apps/server/src/modules/execution-orchestrator/planner/{planner.ts,conflict-detector.ts}` (consent-gated per FR-008; read-only SDK query in the execution worktree producing tasks with ID `T-<n>`, title 1–200, owner role, deps, priority, `ownedPaths`, `riskClass`; DAG validation; conflicts) to pass T073, T074
-- [X] T092 [US2] Implement git workspace module `apps/server/src/modules/git-workspace/{worktree.service.ts,diff.service.ts}` (every managed execution gets an execution-level worktree `git worktree add <repo>/.nexora/worktrees/<execution>/main -b nexora/<execution>` stored in `Execution.worktreePath`; parallel conflicting tasks additionally get `<repo>/.nexora/worktrees/<execution>/<task>` on `nexora/<execution>/<task>`; add `.nexora/` to the target repo's `.git/info/exclude`; cleanup, changed files via `git diff --name-only`; never force-push)
+- [X] T092 [US2] Implement git workspace module `apps/server/src/modules/git-workspace/{worktree.service.ts,diff.service.ts}` (every managed execution gets an execution-level worktree `git worktree add <repo>/.ubuliera/worktrees/<execution>/main -b ubuliera/<execution>` stored in `Execution.worktreePath`; parallel conflicting tasks additionally get `<repo>/.ubuliera/worktrees/<execution>/<task>` on `ubuliera/<execution>/<task>`; add `.ubuliera/` to the target repo's `.git/info/exclude`; cleanup, changed files via `git diff --name-only`; never force-push)
 - [X] T093 [US2] Implement approval gate + approvals routes `apps/server/src/modules/permission-manager/approval.service.ts`, `apps/server/src/http/routes/approvals.ts` (`GET /approvals?status=pending`, `POST /approvals/:id/decision`) to pass T077
 - [X] T094 [US2] Implement scope guard `apps/server/src/modules/permission-manager/scope-guard.ts` and wire it into the Agent SDK adapter both as SDK `hooks.PreToolUse` (covers auto-approved tools, which skip `canUseTool`) and inside `canUseTool`; CLI headless adapter enforces via `--permission-prompt-tool` + PreToolUse hook; to pass T078
 - [X] T095 [US2] Implement task manager `apps/server/src/modules/task-manager/{task.repository.ts,task-state.ts,task.service.ts}` (statuses, attempts, changedFiles, testResults) to pass T073
@@ -217,7 +217,7 @@ testable increment.
 
 ### Implementation for User Story 3
 
-- [X] T112 [US3] Implement control operations in `apps/server/src/modules/execution-orchestrator/controls.ts` (controls only for Nexora-started sessions — observed sessions are observe-only; stop, interrupt-and-hold labelled "Interrupt & hold" (API name `pause`) only when all runtimes support interrupt+resume, resume, cancel task, retry, assign additional task, request review by Code Reviewer role, restart session) to pass T109, T110
+- [X] T112 [US3] Implement control operations in `apps/server/src/modules/execution-orchestrator/controls.ts` (controls only for Ubuliera-started sessions — observed sessions are observe-only; stop, interrupt-and-hold labelled "Interrupt & hold" (API name `pause`) only when all runtimes support interrupt+resume, resume, cancel task, retry, assign additional task, request review by Code Reviewer role, restart session) to pass T109, T110
 - [X] T113 [US3] Implement routes `apps/server/src/http/routes/controls.ts`: `POST /executions/:id/{stop,pause,resume}`, `POST /tasks/:id/{cancel,retry,review}`, `POST /executions/:id/tasks`, `POST /sessions/:id/{stop,interrupt,restart,resume,messages}`, `POST /agents/:id/messages`
 - [X] T114 [P] [US3] Implement feature `apps/web/src/features/control-session/` (buttons derived only from `capabilities`; unsupported disabled with reason tooltip; confirmation dialog for stop)
 - [X] T115 [P] [US3] Implement feature `apps/web/src/features/decide-approval/` + widget `apps/web/src/widgets/approvals-inbox/` (pending list, approve/reject with note, toast on new approval request)
@@ -287,7 +287,7 @@ testable increment.
 
 - [X] T137 [US6] Implement PTY adapter `apps/server/src/modules/runtime-manager/adapters/agent-team-pty/{agent-team-pty.adapter.ts,team-files-watcher.ts}` (spawn `claude` interactive in `node-pty` with flag env, initial prompt as input, Ctrl-C interrupt, read-only polling of `~/.claude/teams/<team>/config.json`, `inboxes/*.json`, `~/.claude/tasks/<team>/` — never write them) to pass T135; observe-only fallback when node-pty unavailable
 - [X] T138 [US6] Implement Agent Teams enablement flow: `POST /runtime/agent-teams/enable` in `apps/server/src/http/routes/runtime.ts` writing `env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS="1"` to project `.claude/settings.local.json` only after confirm, audited
-- [X] T139 [US6] Implement PTY websocket bridge `apps/server/src/realtime/terminal-gateway.ts` (namespace `/terminal`, only for Nexora-spawned lead sessions, auth required)
+- [X] T139 [US6] Implement PTY websocket bridge `apps/server/src/realtime/terminal-gateway.ts` (namespace `/terminal`, only for Ubuliera-spawned lead sessions, auth required)
 - [X] T140 [US6] Implement mode executors `apps/server/src/modules/execution-orchestrator/modes/{agent-teams.ts,hybrid.ts}` and hybrid planning rules in `apps/server/src/modules/execution-orchestrator/planner/hybrid-planner.ts` to pass T136
 - [X] T141 [P] [US6] Implement widget `apps/web/src/widgets/terminal/` (`@xterm/xterm` bound to `/terminal` socket; `useEffect` allowed — external system: xterm + socket) embedded in agent-details-panel for team leads
 - [X] T142 [P] [US6] Show team task list + teammate statuses on canvas and agent details (`apps/web/src/widgets/agent-canvas/components/team-group.tsx`), and hybrid mechanism/reason column in `apps/web/src/features/approve-plan/`
@@ -320,7 +320,7 @@ testable increment.
 
 ---
 
-## Phase 10: User Story 8 - Drive Nexora from another agent via MCP (Priority: P4)
+## Phase 10: User Story 8 - Drive Ubuliera from another agent via MCP (Priority: P4)
 
 **Goal**: Optional authenticated MCP endpoint exposing the 14 tools over the same services
 

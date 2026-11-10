@@ -39,7 +39,7 @@ function Row({ term, children }: { term: string; children: ReactNode }) {
 }
 
 /**
- * What Nexora found about the task before anything runs (US2-AS1): stack, instruction files,
+ * What Ubuliera found about the task before anything runs (US2-AS1): stack, instruction files,
  * skills, agents, MCP servers, complexity — and whether the model was used to find it (FR-008).
  */
 export function AnalysisSummary({ analysis, className }: AnalysisSummaryProps) {

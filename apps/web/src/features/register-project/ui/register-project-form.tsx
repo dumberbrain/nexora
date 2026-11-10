@@ -23,7 +23,7 @@ interface RegisterProjectFormProps {
 
 const DEFAULTS: RegisterProjectFormValues = { rootPath: "", name: "" };
 
-/** Register a local project folder so Nexora can attribute observed sessions to it. */
+/** Register a local project folder so Ubuliera can attribute observed sessions to it. */
 export function RegisterProjectForm({ onRegistered, className }: RegisterProjectFormProps) {
   const form = useForm<RegisterProjectFormValues>({
     resolver: zodResolver(RegisterProjectFormSchema),

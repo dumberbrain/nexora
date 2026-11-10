@@ -2,7 +2,7 @@ import {
   type IntegrationItem,
   type IntegrationList,
   type IntegrationListQuery,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 import { IntegrationRepository } from "./integration.repository";
 import { SkillRegistryService } from "./skill-registry.service";

@@ -49,4 +49,4 @@ export const HealthSchema = z.object({
 export type Health = z.infer<typeof HealthSchema>;
 
 /** Header carrying the CSRF token on mutating requests from the web app. */
-export const CSRF_HEADER = "X-Nexora-CSRF";
+export const CSRF_HEADER = "X-Ubuliera-CSRF";

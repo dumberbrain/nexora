@@ -1,8 +1,8 @@
-import { type RuntimeCapabilityProfile } from "@nexora/contracts";
+import { type RuntimeCapabilityProfile } from "@ubuliera/contracts";
 
 /**
- * Sessions Nexora did not start, seen only through Claude Code `http` hooks
- * (contracts/runtime-adapter.md → external_observed column). Nexora cannot control them, so every
+ * Sessions Ubuliera did not start, seen only through Claude Code `http` hooks
+ * (contracts/runtime-adapter.md → external_observed column). Ubuliera cannot control them, so every
  * control is off and the UI shows them as "observe-only".
  */
 export const EXTERNAL_OBSERVED_CAPABILITIES: RuntimeCapabilityProfile = {
@@ -32,8 +32,8 @@ export const EXTERNAL_OBSERVED_CAPABILITIES: RuntimeCapabilityProfile = {
   ],
   reportsUsage: "none",
   notes: [
-    "Observed through Claude Code hooks: this session was started outside Nexora.",
-    "Nexora cannot stop, interrupt, resume or message observed sessions — use the terminal that runs it.",
+    "Observed through Claude Code hooks: this session was started outside Ubuliera.",
+    "Ubuliera cannot stop, interrupt, resume or message observed sessions — use the terminal that runs it.",
     "Claude Code does not deliver SessionStart to http hooks; the session appears with its first event.",
     "Subagent parent links are derived from the latest Agent tool call (reliability: derived).",
     "Token usage and cost are not reported by hooks.",

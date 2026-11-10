@@ -64,12 +64,12 @@ interface EventSink { emit(e: RawRuntimeEvent): void } // → Event Manager norm
 | pause | ✘ | ✘ | ✘ | ✘ |
 | resume | ✔ resume id | ✔ `--resume` | ✘ | ✘ |
 | sendMessage | ✔ streamInput | ✔ stream-json stdin | lead_only (PTY) | ✘ |
-| permission approvals | ✔ canUseTool | ✔ `--permission-prompt-tool` via Nexora MCP | ✔ PreToolUse hook | observe only |
+| permission approvals | ✔ canUseTool | ✔ `--permission-prompt-tool` via Ubuliera MCP | ✔ PreToolUse hook | observe only |
 | usage | estimate | estimate | none | none |
 
 ## Hook ingest payload → normalised event (excerpt)
 
-| hook_event_name | NexoraEvent.type | Joins |
+| hook_event_name | UbulieraEvent.type | Joins |
 |---|---|---|
 | SessionStart | session.started | session_id, cwd — **not delivered to `http` hooks (S1)**; a session is created from the first event of any type for an unknown `session_id` |
 | UserPromptSubmit | message.sent (user → main agent) | session_id, prompt_id |

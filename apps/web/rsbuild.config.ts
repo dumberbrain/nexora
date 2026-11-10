@@ -15,7 +15,7 @@ export default defineConfig({
   },
   html: {
     template: "./index.html",
-    title: "Nexora",
+    title: "Ubuliera",
   },
   server: {
     host: "127.0.0.1",

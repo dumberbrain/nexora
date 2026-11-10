@@ -13,7 +13,7 @@ import {
   MCP_TOOL_INPUTS,
   MCP_TOOLS,
   type McpToolName,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { type Hono } from "hono";
 import { ZodError } from "zod";
 
@@ -176,11 +176,11 @@ export function createMcpServer(
   deps: McpDeps,
 ): McpServer {
   const mcp = new McpServer(
-    { name: "nexora", version: SERVER_VERSION },
+    { name: "ubuliera", version: SERVER_VERSION },
     {
       instructions:
-        "Nexora orchestrates Claude Code sessions. Risky tasks and approvals are decided by a " +
-        "human in the Nexora dashboard; start_execution never approves them.",
+        "Ubuliera orchestrates Claude Code sessions. Risky tasks and approvals are decided by a " +
+        "human in the Ubuliera dashboard; start_execution never approves them.",
     },
   );
   // low-level handlers so scope, validation and error codes follow the REST contract
@@ -207,8 +207,8 @@ export function mountMcp(app: Hono<AppBindings>, deps: McpDeps): void {
     const secret = bearerToken(c.req.header("authorization"));
     const identity = secret ? deps.tokens.verify(secret) : null;
     if (!identity) {
-      return c.json(errorBody("UNAUTHENTICATED", "A valid Nexora API token is required"), 401, {
-        "www-authenticate": 'Bearer realm="nexora-mcp"',
+      return c.json(errorBody("UNAUTHENTICATED", "A valid Ubuliera API token is required"), 401, {
+        "www-authenticate": 'Bearer realm="ubuliera-mcp"',
       });
     }
     if (c.req.method !== "POST") {

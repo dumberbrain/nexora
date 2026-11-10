@@ -12,7 +12,7 @@ import {
   type RuntimeCapabilityProfile,
   type RuntimeKind,
   type Usage,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 import { type EventInput } from "../event-manager";
 
@@ -42,7 +42,7 @@ export interface StartSessionInput {
   taskId: string | null;
   /** registered project root (never written to directly — FR-034) */
   projectRoot: string;
-  /** execution- or task-level git worktree; MUST be inside a Nexora worktree */
+  /** execution- or task-level git worktree; MUST be inside a Ubuliera worktree */
   cwd: string;
   prompt: string;
   /** globs (relative to cwd) the task may write; empty = whole worktree */
@@ -157,7 +157,7 @@ export interface RuntimeAdapter {
 export interface ManagedRuntime {
   environment(): Promise<RuntimeEnvironment>;
   /**
-   * Start a Nexora-managed session in `input.cwd` (a worktree). Events are persisted with
+   * Start a Ubuliera-managed session in `input.cwd` (a worktree). Events are persisted with
    * source agent_sdk/stream_json; the session row gets runtime, executionMode, currentTaskId,
    * observeOnly=false and the adapter's capabilities.
    */

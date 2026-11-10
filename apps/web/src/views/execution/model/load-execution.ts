@@ -1,5 +1,5 @@
-import { type NexoraEvent } from "@nexora/contracts";
 import { type QueryClient } from "@tanstack/react-query";
+import { type UbulieraEvent } from "@ubuliera/contracts";
 
 import { executionDetailQuery, executionKeys } from "@/entities/execution";
 import { sessionKeys, sessionListQuery } from "@/entities/session";
@@ -22,7 +22,7 @@ export function loadExecution(qc: QueryClient, executionId: string) {
  * Live `task.*` events change task statuses; `session.*` / `error` events can move the
  * execution itself. Refresh exactly the affected keys (team standard: narrow invalidation).
  */
-export function refreshOnEvents(qc: QueryClient, executionId: string, events: NexoraEvent[]) {
+export function refreshOnEvents(qc: QueryClient, executionId: string, events: UbulieraEvent[]) {
   const jobs: Promise<void>[] = [];
   if (events.some((e) => e.type.startsWith("task."))) {
     jobs.push(qc.invalidateQueries({ queryKey: taskKeys.byExecution(executionId) }));

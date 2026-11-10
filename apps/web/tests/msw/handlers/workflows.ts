@@ -11,7 +11,7 @@ import {
   type WorkflowRunDetail,
   type WorkflowSummary,
   type WorkflowVersion,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 
 const NOW = Date.UTC(2026, 10, 9, 12, 0, 0);

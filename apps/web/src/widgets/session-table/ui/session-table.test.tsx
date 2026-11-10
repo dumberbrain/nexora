@@ -24,7 +24,7 @@ describe("SessionTable", () => {
     renderWithProviders(<SessionTable />);
     const row = await rowFor(running!.id);
     expect(within(row).getByText("observe-only")).toBeInTheDocument();
-    expect(within(row).getByText("C:/work/nexora")).toBeInTheDocument();
+    expect(within(row).getByText("C:/work/ubuliera")).toBeInTheDocument();
     expect(within(row).getByText("observed")).toBeInTheDocument();
     expect(within(row).getByText("claude-opus-4-5")).toBeInTheDocument();
     expect(within(row).getByText("Running")).toBeInTheDocument();

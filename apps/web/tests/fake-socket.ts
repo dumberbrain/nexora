@@ -1,6 +1,6 @@
 import { EventEmitter } from "node:events";
 
-import { type NexoraEvent } from "@nexora/contracts";
+import { type UbulieraEvent } from "@ubuliera/contracts";
 
 /**
  * Minimal stand-in for the /live Socket.IO client, for component tests of live widgets:
@@ -26,7 +26,7 @@ export class FakeSocket {
     ack?.({ ok: true, replayed: 0, gap: false });
     return this;
   }
-  pushEvents(events: NexoraEvent[]) {
+  pushEvents(events: UbulieraEvent[]) {
     this.bus.emit("event", { events });
   }
 }

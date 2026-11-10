@@ -15,7 +15,7 @@ describe("loadEnv", () => {
     expect(env.host).toBe("127.0.0.1");
     expect(env.port).toBe(3022);
     expect(env.remote).toBe(false);
-    expect(env.dataDir).toBe(join(HOME, ".nexora"));
+    expect(env.dataDir).toBe(join(HOME, ".ubuliera"));
     expect(env.publicUrl).toBe("http://127.0.0.1:3022");
   });
 
@@ -27,73 +27,80 @@ describe("loadEnv", () => {
     expect(loadEnv({}, deps).nodeEnv).toBe("development");
   });
 
-  it("honours NEXORA_PORT and NEXORA_DATA_DIR", () => {
-    const env = loadEnv({ NEXORA_PORT: "4000", NEXORA_DATA_DIR: "/data/nx" }, deps);
+  it("honours UBULIERA_PORT and UBULIERA_DATA_DIR", () => {
+    const env = loadEnv({ UBULIERA_PORT: "4000", UBULIERA_DATA_DIR: "/data/nx" }, deps);
     expect(env.port).toBe(4000);
     expect(env.dataDir).toBe("/data/nx");
   });
 
   it("rejects an invalid port", () => {
-    expect(() => loadEnv({ NEXORA_PORT: "70000" }, deps)).toThrow(ConfigError);
-    expect(() => loadEnv({ NEXORA_PORT: "abc" }, deps)).toThrow(ConfigError);
+    expect(() => loadEnv({ UBULIERA_PORT: "70000" }, deps)).toThrow(ConfigError);
+    expect(() => loadEnv({ UBULIERA_PORT: "abc" }, deps)).toThrow(ConfigError);
   });
 
   it.each(["127.0.0.1", "::1", "localhost"])("accepts loopback host %s without a token", (host) => {
-    expect(loadEnv({ NEXORA_HOST: host }, deps).host).toBe(host);
+    expect(loadEnv({ UBULIERA_HOST: host }, deps).host).toBe(host);
   });
 
-  it("refuses a non-loopback host without NEXORA_REMOTE=1", () => {
-    expect(() => loadEnv({ NEXORA_HOST: "0.0.0.0", NEXORA_TOKEN: TOKEN }, deps)).toThrow(
-      /NEXORA_REMOTE=1/,
+  it("refuses a non-loopback host without UBULIERA_REMOTE=1", () => {
+    expect(() => loadEnv({ UBULIERA_HOST: "0.0.0.0", UBULIERA_TOKEN: TOKEN }, deps)).toThrow(
+      /UBULIERA_REMOTE=1/,
     );
   });
 
   it("refuses a non-loopback host without a token", () => {
-    expect(() => loadEnv({ NEXORA_HOST: "0.0.0.0", NEXORA_REMOTE: "1" }, deps)).toThrow(
-      /NEXORA_TOKEN/,
+    expect(() => loadEnv({ UBULIERA_HOST: "0.0.0.0", UBULIERA_REMOTE: "1" }, deps)).toThrow(
+      /UBULIERA_TOKEN/,
     );
   });
 
   it("refuses a token shorter than 32 chars", () => {
     expect(() =>
       loadEnv(
-        { NEXORA_HOST: "192.168.1.5", NEXORA_REMOTE: "1", NEXORA_TOKEN: "t".repeat(31) },
+        { UBULIERA_HOST: "192.168.1.5", UBULIERA_REMOTE: "1", UBULIERA_TOKEN: "t".repeat(31) },
         deps,
       ),
     ).toThrow(/32/);
   });
 
-  it("allows remote binding with NEXORA_REMOTE=1 and a ≥32-char token", () => {
-    const env = loadEnv({ NEXORA_HOST: "0.0.0.0", NEXORA_REMOTE: "1", NEXORA_TOKEN: TOKEN }, deps);
+  it("allows remote binding with UBULIERA_REMOTE=1 and a ≥32-char token", () => {
+    const env = loadEnv(
+      { UBULIERA_HOST: "0.0.0.0", UBULIERA_REMOTE: "1", UBULIERA_TOKEN: TOKEN },
+      deps,
+    );
     expect(env.remote).toBe(true);
     expect(env.token).toBe(TOKEN);
   });
 
   it("allows the fake runtime only when NODE_ENV=test", () => {
-    expect(loadEnv({ NODE_ENV: "test", NEXORA_TEST_FAKE_RUNTIME: "1" }, deps).testFakeRuntime).toBe(
-      true,
-    );
-    expect(() => loadEnv({ NODE_ENV: "production", NEXORA_TEST_FAKE_RUNTIME: "1" }, deps)).toThrow(
-      /NODE_ENV=test/,
-    );
-    expect(() => loadEnv({ NODE_ENV: "development", NEXORA_TEST_FAKE_RUNTIME: "1" }, deps)).toThrow(
-      /NODE_ENV=test/,
-    );
+    expect(
+      loadEnv({ NODE_ENV: "test", UBULIERA_TEST_FAKE_RUNTIME: "1" }, deps).testFakeRuntime,
+    ).toBe(true);
+    expect(() =>
+      loadEnv({ NODE_ENV: "production", UBULIERA_TEST_FAKE_RUNTIME: "1" }, deps),
+    ).toThrow(/NODE_ENV=test/);
+    expect(() =>
+      loadEnv({ NODE_ENV: "development", UBULIERA_TEST_FAKE_RUNTIME: "1" }, deps),
+    ).toThrow(/NODE_ENV=test/);
   });
 
-  it("defaults event retention to 30 days and honours NEXORA_RETENTION_DAYS", () => {
+  it("defaults event retention to 30 days and honours UBULIERA_RETENTION_DAYS", () => {
     expect(loadEnv({}, deps).retentionDays).toBe(30);
-    expect(loadEnv({ NEXORA_RETENTION_DAYS: "7" }, deps).retentionDays).toBe(7);
-    expect(() => loadEnv({ NEXORA_RETENTION_DAYS: "0" }, deps)).toThrow(/NEXORA_RETENTION_DAYS/);
-    expect(() => loadEnv({ NEXORA_RETENTION_DAYS: "abc" }, deps)).toThrow(/NEXORA_RETENTION_DAYS/);
+    expect(loadEnv({ UBULIERA_RETENTION_DAYS: "7" }, deps).retentionDays).toBe(7);
+    expect(() => loadEnv({ UBULIERA_RETENTION_DAYS: "0" }, deps)).toThrow(
+      /UBULIERA_RETENTION_DAYS/,
+    );
+    expect(() => loadEnv({ UBULIERA_RETENTION_DAYS: "abc" }, deps)).toThrow(
+      /UBULIERA_RETENTION_DAYS/,
+    );
   });
 
   it("uses a throw-away data dir under tmp in test mode when none is given", () => {
-    expect(loadEnv({ NODE_ENV: "test" }, deps).dataDir).toBe(join(TMP, "nexora-test-4242"));
+    expect(loadEnv({ NODE_ENV: "test" }, deps).dataDir).toBe(join(TMP, "ubuliera-test-4242"));
   });
 
-  it("honours NEXORA_PUBLIC_URL for hook targets", () => {
-    expect(loadEnv({ NEXORA_PUBLIC_URL: "http://127.0.0.1:9000/" }, deps).publicUrl).toBe(
+  it("honours UBULIERA_PUBLIC_URL for hook targets", () => {
+    expect(loadEnv({ UBULIERA_PUBLIC_URL: "http://127.0.0.1:9000/" }, deps).publicUrl).toBe(
       "http://127.0.0.1:9000",
     );
   });

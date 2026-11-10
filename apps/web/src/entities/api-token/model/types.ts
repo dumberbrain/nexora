@@ -4,4 +4,4 @@ export type {
   ApiTokenScope,
   CreateApiTokenInput,
   CreateApiTokenResult,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";

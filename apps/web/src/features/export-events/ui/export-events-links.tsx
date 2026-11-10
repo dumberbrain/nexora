@@ -32,7 +32,7 @@ export function ExportEventsLinks({ filters, className }: ExportEventsLinksProps
         <a
           key={format}
           href={eventExportUrl(filters, format)}
-          download={`nexora-events.${format}`}
+          download={`ubuliera-events.${format}`}
           aria-label={`Export ${scope} as ${format.toUpperCase()}`}
           className={cn(
             buttonVariants({ variant: "outline", size: "xs" }),

@@ -54,7 +54,7 @@ export function InstallHooksDialog({ project }: InstallHooksDialogProps) {
             Claude Code hooks · {project.name}
           </DialogTitle>
           <DialogDescription>
-            Nexora observes sessions through Claude Code http hooks. Review the change to the
+            Ubuliera observes sessions through Claude Code http hooks. Review the change to the
             project settings below — nothing is written until you confirm.
           </DialogDescription>
         </DialogHeader>

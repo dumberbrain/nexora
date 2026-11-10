@@ -1,1 +1,1 @@
-export type { Settings, UpdateMcpSettingsInput } from "@nexora/contracts";
+export type { Settings, UpdateMcpSettingsInput } from "@ubuliera/contracts";

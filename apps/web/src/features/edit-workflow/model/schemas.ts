@@ -1,4 +1,4 @@
-import { CreateWorkflowInputSchema, RunWorkflowInputSchema } from "@nexora/contracts";
+import { CreateWorkflowInputSchema, RunWorkflowInputSchema } from "@ubuliera/contracts";
 import { z } from "zod";
 
 /** Run dialog = RunWorkflowInputSchema with user-facing messages. */

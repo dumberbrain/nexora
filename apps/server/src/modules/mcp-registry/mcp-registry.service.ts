@@ -2,7 +2,7 @@ import { readFile, stat } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-import { type Integration, type IntegrationItem } from "@nexora/contracts";
+import { type Integration, type IntegrationItem } from "@ubuliera/contracts";
 import { z } from "zod";
 
 import { type DiscoveredMcpServer, discoverMcpServers } from "./discovery";
@@ -180,7 +180,7 @@ async function healthOf(
     return {
       health: "unknown",
       healthDetail:
-        "stdio server not checked: Nexora never spawns MCP server processes (process allowlist)",
+        "stdio server not checked: Ubuliera never spawns MCP server processes (process allowlist)",
       checkedAt: null,
     };
   }

@@ -1,6 +1,6 @@
 import { homedir } from "node:os";
 
-import { type IntegrationItem } from "@nexora/contracts";
+import { type IntegrationItem } from "@ubuliera/contracts";
 
 import { type DiscoveredItem, discoverSkills } from "./discovery";
 import { redact } from "../../lib/redactor";

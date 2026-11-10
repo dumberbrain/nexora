@@ -8,7 +8,7 @@ import {
   type TeamMessage,
   type TeamTask,
   type TeamView,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 import { type EventInput } from "../../../event-manager";
 import { type EventSink } from "../../runtime-adapter";
@@ -16,7 +16,7 @@ import { type EventSink } from "../../runtime-adapter";
 /*
  * Agent Teams observation (T137, research R3 + "S2 result"). Claude Code keeps the team in
  * `~/.claude/teams/<team>/config.json` (+ `inboxes/<member>.json`) and the shared task list in
- * `~/.claude/tasks/<team>/`. Nexora only READS these files — it never writes, renames or deletes
+ * `~/.claude/tasks/<team>/`. Ubuliera only READS these files — it never writes, renames or deletes
  * them — and inboxes are emptied within seconds, so everything here is `best_effort`.
  */
 
@@ -154,7 +154,7 @@ export function parseTeamTask(raw: unknown, fallbackId: string): TeamTask | null
   };
 }
 
-/** Where Nexora persists team agents (AgentRepository + entity bus in production). */
+/** Where Ubuliera persists team agents (AgentRepository + entity bus in production). */
 export interface TeamAgentSink {
   upsert(agent: Agent): void;
 }
@@ -172,7 +172,7 @@ const AGENT_STATUS: Record<TeamMember["status"], AgentStatus> = {
 };
 
 /**
- * The team of one Nexora-started lead session, folded from team-file snapshots and hook payloads.
+ * The team of one Ubuliera-started lead session, folded from team-file snapshots and hook payloads.
  * File-derived changes are emitted through the session's EventSink (source `team_files`,
  * `best_effort`); hook-derived changes only update state (the hook itself is ingested elsewhere).
  */
@@ -433,7 +433,7 @@ async function jsonFiles(dir: string): Promise<string[]> {
   }
 }
 
-/** Team whose `config.json` names `pid` as its lead process (how Nexora finds ITS team). */
+/** Team whose `config.json` names `pid` as its lead process (how Ubuliera finds ITS team). */
 export async function findTeamByPid(teamsDir: string, pid: number): Promise<string | null> {
   let dirs: string[];
   try {

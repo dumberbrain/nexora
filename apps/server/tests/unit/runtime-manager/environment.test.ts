@@ -15,8 +15,8 @@ let home: string;
 let project: string;
 
 beforeEach(() => {
-  home = mkdtempSync(join(tmpdir(), "nexora-home-"));
-  project = mkdtempSync(join(tmpdir(), "nexora-proj-"));
+  home = mkdtempSync(join(tmpdir(), "ubuliera-home-"));
+  project = mkdtempSync(join(tmpdir(), "ubuliera-proj-"));
 });
 afterEach(() => {
   rmSync(home, { recursive: true, force: true });

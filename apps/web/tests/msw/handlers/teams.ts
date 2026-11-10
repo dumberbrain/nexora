@@ -9,7 +9,7 @@ import {
   type RuntimeCapabilityProfile,
   type Session,
   type TeamView,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 
 import { planFixture } from "./executions";
@@ -48,7 +48,7 @@ export const teamLeadSessionFixture: Session = {
   currentTaskId: "T-1",
   runtime: "agent_team_pty",
   observeOnly: false,
-  worktreePath: "C:/work/nexora/.nexora/worktrees/X004/T-1",
+  worktreePath: "C:/work/ubuliera/.ubuliera/worktrees/X004/T-1",
   capabilities: teamPtyCapabilities,
   status: "running",
   pid: 6944,
@@ -108,7 +108,7 @@ export const teamViewFixture: TeamView = {
       isLead: true,
       status: "active",
       joinedAt: NOW - 30_000,
-      cwd: "C:/work/nexora",
+      cwd: "C:/work/ubuliera",
     },
     {
       agentId: `teammate-one@${TEAM}`,
@@ -117,7 +117,7 @@ export const teamViewFixture: TeamView = {
       isLead: false,
       status: "active",
       joinedAt: NOW - 12_000,
-      cwd: "C:/work/nexora",
+      cwd: "C:/work/ubuliera",
     },
     {
       agentId: `teammate-two@${TEAM}`,
@@ -126,7 +126,7 @@ export const teamViewFixture: TeamView = {
       isLead: false,
       status: "idle",
       joinedAt: NOW - 11_000,
-      cwd: "C:/work/nexora",
+      cwd: "C:/work/ubuliera",
     },
   ],
   tasks: [
@@ -167,7 +167,7 @@ export const hybridPlanFixture: ExecutionTasks = {
 
 export const enableResultFixture: EnableAgentTeamsResult = {
   projectId: "01JCXK0000000000000000P001",
-  settingsPath: "C:/work/nexora/.claude/settings.local.json",
+  settingsPath: "C:/work/ubuliera/.claude/settings.local.json",
   changed: true,
 };
 

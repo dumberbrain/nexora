@@ -1,7 +1,7 @@
 /**
  * Cache policy — Agent Teams (US6)
  * owner:        US6 web
- * keys:         teamKeys.* (["teams", ...]); bySession(id) = the TeamView of one Nexora-started
+ * keys:         teamKeys.* (["teams", ...]); bySession(id) = the TeamView of one Ubuliera-started
  *               Agent Teams lead session (GET /sessions/:id/team)
  * staleTime:    0 + refetchInterval 5 s while mounted — the server polls ~/.claude/teams files
  *               (best effort, inboxes are emptied within seconds) and nothing is pushed

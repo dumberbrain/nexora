@@ -1,5 +1,5 @@
-import { AGENT_TEAMS_ENABLE_CONFIRMATION } from "@nexora/contracts";
 import { screen, waitFor, within } from "@testing-library/react";
+import { AGENT_TEAMS_ENABLE_CONFIRMATION } from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 import { describe, expect, it, vi } from "vitest";
 
@@ -18,7 +18,7 @@ function captureEnable(changed = true) {
       bodies.push(body);
       return HttpResponse.json({
         projectId: body.projectId,
-        settingsPath: "C:/work/nexora/.claude/settings.local.json",
+        settingsPath: "C:/work/ubuliera/.claude/settings.local.json",
         changed,
       });
     }),
@@ -68,7 +68,7 @@ describe("ChooseModeForm — enable Agent Teams (FR-011)", () => {
     await user.type(within(region).getByLabelText(/to confirm/i), AGENT_TEAMS_ENABLE_CONFIRMATION);
     await user.click(within(region).getByRole("button", { name: "Enable for this project" }));
     expect(await within(region).findByRole("status")).toHaveTextContent(
-      "Agent Teams enabled — written to C:/work/nexora/.claude/settings.local.json",
+      "Agent Teams enabled — written to C:/work/ubuliera/.claude/settings.local.json",
     );
     expect(bodies).toEqual([
       { projectId: execution.projectId, confirmation: AGENT_TEAMS_ENABLE_CONFIRMATION },

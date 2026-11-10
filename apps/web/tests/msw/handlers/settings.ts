@@ -5,7 +5,7 @@ import {
   type ApiToken,
   type CreateApiTokenResult,
   type Settings,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 
 const NOW = Date.UTC(2026, 10, 10, 9, 0, 0);

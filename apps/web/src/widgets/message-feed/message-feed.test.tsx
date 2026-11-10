@@ -1,5 +1,5 @@
-import { type MessageList } from "@nexora/contracts";
 import { act, screen, waitFor, within } from "@testing-library/react";
+import { type MessageList } from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 import { describe, expect, it, vi } from "vitest";
 

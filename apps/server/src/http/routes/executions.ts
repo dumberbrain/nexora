@@ -11,7 +11,7 @@ import {
   UlidSchema,
   UpdateConfigInputSchema,
   type Verification,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { type Hono } from "hono";
 import { z } from "zod";
 

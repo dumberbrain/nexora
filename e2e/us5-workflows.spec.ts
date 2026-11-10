@@ -33,21 +33,21 @@ let api: APIRequestContext;
 let csrf = "";
 
 test.beforeAll(async ({ baseURL }) => {
-  root = mkdtempSync(join(tmpdir(), "nexora-e2e-us5-"));
+  root = mkdtempSync(join(tmpdir(), "ubuliera-e2e-us5-"));
   projectName = basename(root);
   const git = (...args: string[]) => execFileSync("git", args, { cwd: root });
   git("init", "-q", "-b", "main");
-  git("config", "user.email", "e2e@nexora.local");
-  git("config", "user.name", "nexora e2e");
+  git("config", "user.email", "e2e@ubuliera.local");
+  git("config", "user.name", "ubuliera e2e");
   writeFileSync(join(root, "package.json"), JSON.stringify({ name: "e2e-us5" }));
   git("add", ".");
   git("commit", "-q", "-m", "init");
 
   api = await playwrightRequest.newContext({ baseURL: baseURL! });
   expect((await api.get("/api/v1/auth/session")).ok()).toBeTruthy();
-  csrf = (await api.storageState()).cookies.find((c) => c.name === "nexora_csrf")!.value;
+  csrf = (await api.storageState()).cookies.find((c) => c.name === "ubuliera_csrf")!.value;
   const res = await api.post("/api/v1/projects", {
-    headers: { "x-nexora-csrf": csrf },
+    headers: { "x-ubuliera-csrf": csrf },
     data: { rootPath: root, name: projectName },
   });
   expect(res.status()).toBe(201);

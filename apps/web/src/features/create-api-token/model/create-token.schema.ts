@@ -1,4 +1,4 @@
-import { CreateApiTokenInputSchema } from "@nexora/contracts";
+import { CreateApiTokenInputSchema } from "@ubuliera/contracts";
 import { type z } from "zod";
 
 /** The form validates with the contract schema itself (trimmed name, charset, read|control). */

@@ -1,4 +1,4 @@
-import { EXECUTION_STATUSES, type ExecutionStatus } from "@nexora/contracts";
+import { EXECUTION_STATUSES, type ExecutionStatus } from "@ubuliera/contracts";
 import { describe, expect, it } from "vitest";
 
 import { AppError } from "../../../src/http/errors";

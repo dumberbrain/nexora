@@ -20,7 +20,7 @@ export function useInstallHooks(projectId: string) {
   });
 }
 
-/** DELETE /projects/:id/hooks — removes only Nexora's entries. */
+/** DELETE /projects/:id/hooks — removes only Ubuliera's entries. */
 export function useUninstallHooks(projectId: string) {
   const refresh = useRefreshProject(projectId);
   return useMutation({

@@ -11,7 +11,7 @@ import {
   SessionDetailSchema,
   SessionListSchema,
   StatsSchema,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
@@ -45,7 +45,7 @@ const send = (method: string, path: string, body?: unknown, csrf = true) =>
       ...HOST,
       cookie: auth.cookie,
       "content-type": "application/json",
-      ...(csrf ? { "x-nexora-csrf": auth.csrf } : {}),
+      ...(csrf ? { "x-ubuliera-csrf": auth.csrf } : {}),
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
@@ -132,7 +132,7 @@ describe("hook routes", () => {
     );
     expect(preview.exists).toBe(false);
     // the real secret is generated at install time and never returned by the API
-    expect(preview.after).toContain('"X-Nexora-Hook-Token": "<generated on install>"');
+    expect(preview.after).toContain('"X-Ubuliera-Hook-Token": "<generated on install>"');
 
     expect((await send("POST", `/projects/${id}/hooks/install`, {})).status).toBe(400);
     expect((await send("POST", `/projects/${id}/hooks/install`, { confirm: false })).status).toBe(
@@ -212,7 +212,7 @@ describe("read routes after ingesting the recorded session", () => {
     const jsonl = await get("/events/export?format=jsonl");
     expect(jsonl.status).toBe(200);
     expect(jsonl.headers.get("content-disposition")).toMatch(
-      /^attachment; filename="nexora-events-.+\.jsonl"$/,
+      /^attachment; filename="ubuliera-events-.+\.jsonl"$/,
     );
     const lines = (await jsonl.text()).trim().split("\n");
     expect(lines).toHaveLength(12);

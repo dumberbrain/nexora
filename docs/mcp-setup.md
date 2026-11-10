@@ -1,17 +1,17 @@
 # MCP setup
 
-Two separate things are called "MCP" in Nexora:
+Two separate things are called "MCP" in Ubuliera:
 
-1. **Nexora's own MCP server** at `/mcp`, so another agent (e.g. a Claude Code session) can read
-   Nexora's state and drive executions. Off by default.
-2. **External MCP servers** that your Claude Code sessions use. Nexora discovers and displays
+1. **Ubuliera's own MCP server** at `/mcp`, so another agent (e.g. a Claude Code session) can read
+   Ubuliera's state and drive executions. Off by default.
+2. **External MCP servers** that your Claude Code sessions use. Ubuliera discovers and displays
    them; it does not host or register them itself.
 
-## 1. Nexora's MCP endpoint
+## 1. Ubuliera's MCP endpoint
 
 - Transport: MCP **Streamable HTTP**, stateless, JSON responses, `POST` only
   (`GET`/`DELETE` answer 405).
-- URL: `NEXORA_PUBLIC_URL` + `/mcp` — `http://127.0.0.1:3022/mcp` by default. The Settings page
+- URL: `UBULIERA_PUBLIC_URL` + `/mcp` — `http://127.0.0.1:3022/mcp` by default. The Settings page
   shows the exact endpoint.
 - Auth: `Authorization: Bearer <API token>`. Missing, unknown or revoked token ⇒ 401.
 - Disabled ⇒ the endpoint answers 404, as if it did not exist.
@@ -25,7 +25,7 @@ Two separate things are called "MCP" in Nexora:
    audit actor `mcp_client:<name>`) and a scope:
    - `read` — status, sessions, agents, tasks and logs only;
    - `control` — can also plan, start, pause/resume and stop executions and send agent messages.
-3. Copy the secret from the dialog. It is shown **once**; Nexora keeps only its SHA-256 hash.
+3. Copy the secret from the dialog. It is shown **once**; Ubuliera keeps only its SHA-256 hash.
    If it is lost, revoke the token and create a new one. A revoked token's name stays reserved.
 
 ### Connect Claude Code
@@ -33,7 +33,7 @@ Two separate things are called "MCP" in Nexora:
 The token dialog shows the exact command, for example:
 
 ```bash
-claude mcp add --transport http nexora http://127.0.0.1:3022/mcp \
+claude mcp add --transport http ubuliera http://127.0.0.1:3022/mcp \
   --header "Authorization: Bearer <secret>"
 ```
 
@@ -82,11 +82,11 @@ Rules that hold for every call:
   secret redactor. Errors come back as `isError: true` with the REST error code.
 
 API tokens authenticate **only** `/mcp` and the read-only `/live` socket. They do not open the
-REST API (`/api/v1/*`), which uses the browser session cookie (or `NEXORA_TOKEN` in remote mode).
+REST API (`/api/v1/*`), which uses the browser session cookie (or `UBULIERA_TOKEN` in remote mode).
 
 ## 2. External MCP servers (your Claude Code configuration)
 
-Nexora reads, but never edits, the MCP servers Claude Code knows about:
+Ubuliera reads, but never edits, the MCP servers Claude Code knows about:
 
 - project scope: `<project>/.mcp.json` → `mcpServers`;
 - user scope: `~/.claude.json` → `mcpServers`, and its per-project `projects.<path>.mcpServers`.
@@ -98,15 +98,15 @@ claude mcp add --transport http my-api https://example.com/mcp          # user/l
 claude mcp add --scope project my-tool -- npx -y some-mcp-server         # writes .mcp.json
 ```
 
-Then open **Skills & MCP** in Nexora (or press refresh). For each server you see the name,
+Then open **Skills & MCP** in Ubuliera (or press refresh). For each server you see the name,
 scope, transport, command/URL (redacted), how many env vars/headers it has — **never their
 values** — the permission status derived from your `permissions.allow/deny/ask` rules, and a
 health status:
 
 - `http`/`sse` servers are probed with a request to their URL;
-- `stdio` servers show health `unknown`, because Nexora only ever spawns `claude`, `git` and
+- `stdio` servers show health `unknown`, because Ubuliera only ever spawns `claude`, `git` and
   `gh` and therefore does not start them to check.
 
-Managed sessions started by Nexora load your user/project/local Claude Code settings, so the same
+Managed sessions started by Ubuliera load your user/project/local Claude Code settings, so the same
 MCP servers are available to them. Workflow `mcp_tool` nodes call a tool through such a session;
-Nexora does not call third-party MCP servers directly.
+Ubuliera does not call third-party MCP servers directly.

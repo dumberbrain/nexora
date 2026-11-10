@@ -1,5 +1,5 @@
 /**
- * SC-004 / FR-052 (T160): known secret patterns seeded through every way data enters Nexora —
+ * SC-004 / FR-052 (T160): known secret patterns seeded through every way data enters Ubuliera —
  * Claude Code hook ingest, recorded Agent SDK stream messages and MCP server configs (env,
  * headers, URL credentials) — must never come back out: not in any DB row (nor in the raw DB
  * files), not over the /live socket, not in exports, not in REST or MCP responses.
@@ -12,16 +12,16 @@ import { join } from "node:path";
 
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
-import { HOOK_TOKEN_HEADER } from "@nexora/contracts";
+import { HOOK_TOKEN_HEADER } from "@ubuliera/contracts";
 import { io as ioc, type Socket } from "socket.io-client";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
-import { type NexoraEnv } from "../../src/config/env";
+import { type UbulieraEnv } from "../../src/config/env";
 import { createLogger } from "../../src/lib/logger";
 import { REDACTED } from "../../src/lib/redactor";
 import { type EventInput } from "../../src/modules/event-manager";
 import { MessageMapper } from "../../src/modules/runtime-manager/adapters/agent-sdk/message-mapper";
-import { createNexoraServer, type NexoraServer } from "../../src/server";
+import { createUbulieraServer, type UbulieraServer } from "../../src/server";
 
 // Fake credentials assembled at runtime so secret scanners don't flag this file.
 const fake = (...parts: string[]) => parts.join("");
@@ -50,7 +50,7 @@ const port = 40_000 + Math.floor(Math.random() * 10_000);
 
 let base: string;
 let root: string;
-let server: NexoraServer;
+let server: UbulieraServer;
 let cookie: string;
 let csrf: string;
 let socket: Socket;
@@ -69,7 +69,7 @@ async function api(path: string, init: RequestInit = {}): Promise<Response> {
     ...init,
     headers: {
       cookie,
-      "x-nexora-csrf": csrf,
+      "x-ubuliera-csrf": csrf,
       "content-type": "application/json",
       ...(init.headers as Record<string, string> | undefined),
     },
@@ -113,7 +113,7 @@ function sdkMessages(): Record<string, unknown>[] {
 }
 
 beforeAll(async () => {
-  base = mkdtempSync(join(tmpdir(), "nexora-leak-"));
+  base = mkdtempSync(join(tmpdir(), "ubuliera-leak-"));
   root = join(base, "repo");
   const home = join(base, "home");
   mkdirSync(home, { recursive: true });
@@ -140,7 +140,7 @@ beforeAll(async () => {
     mcpServers: { userwide: { command: "uvx", args: ["x"], env: { OPENAI_KEY: S.mcpApiKey } } },
   });
 
-  const env: NexoraEnv = {
+  const env: UbulieraEnv = {
     nodeEnv: "test",
     host: "127.0.0.1",
     port,
@@ -151,7 +151,7 @@ beforeAll(async () => {
     testFakeRuntime: true,
     retentionDays: 30,
   };
-  server = await createNexoraServer({
+  server = await createUbulieraServer({
     env,
     webDistDir: null,
     logger: createLogger({ level: "silent" }),
@@ -162,7 +162,7 @@ beforeAll(async () => {
     .getSetCookie()
     .map((c) => c.split(";")[0])
     .join("; ");
-  csrf = /nexora_csrf=([^;]+)/.exec(cookie)?.[1] ?? "";
+  csrf = /ubuliera_csrf=([^;]+)/.exec(cookie)?.[1] ?? "";
 
   socket = ioc(`${server.url}/live`, {
     transports: ["websocket"],

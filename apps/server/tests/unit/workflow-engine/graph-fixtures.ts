@@ -1,4 +1,4 @@
-import { type WorkflowEdge, type WorkflowGraph, type WorkflowNode } from "@nexora/contracts";
+import { type WorkflowEdge, type WorkflowGraph, type WorkflowNode } from "@ubuliera/contracts";
 
 /** Small builders for workflow graphs in tests. */
 export type NodeSpec = Partial<WorkflowNode> & Pick<WorkflowNode, "id" | "kind">;

@@ -4,7 +4,7 @@ import {
   type ApprovalRequest,
   ApprovalStatusSchema,
   UlidSchema,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { type Hono } from "hono";
 import { z } from "zod";
 

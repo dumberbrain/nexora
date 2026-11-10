@@ -1,4 +1,4 @@
-import { type Task } from "@nexora/contracts";
+import { type Task } from "@ubuliera/contracts";
 import { and, eq } from "drizzle-orm";
 
 import { type Db } from "../../db/client";

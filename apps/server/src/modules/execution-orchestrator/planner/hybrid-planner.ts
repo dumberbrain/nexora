@@ -1,4 +1,4 @@
-import { type ExecutionMode, type PlannedTask } from "@nexora/contracts";
+import { type ExecutionMode, type PlannedTask } from "@ubuliera/contracts";
 
 /*
  * Hybrid planning rules (T140, FR-011): every task of a hybrid plan gets ONE mechanism and a
@@ -30,7 +30,7 @@ function decide(t: PlannedTask, ctx: HybridContext): { mode: HybridMechanism; re
     if (ctx.agentTeams.available) {
       return {
         mode: "agent_teams",
-        reason: `Needs agents that talk to each other ("${team}"), so a native Agent Teams lead runs it in the execution worktree and spawns its own teammates; its terminal is shown in Nexora.`,
+        reason: `Needs agents that talk to each other ("${team}"), so a native Agent Teams lead runs it in the execution worktree and spawns its own teammates; its terminal is shown in Ubuliera.`,
       };
     }
     return {

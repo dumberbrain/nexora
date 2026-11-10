@@ -1,4 +1,4 @@
-import { TASK_STATUSES, type TaskStatus } from "@nexora/contracts";
+import { TASK_STATUSES, type TaskStatus } from "@ubuliera/contracts";
 import { describe, expect, it } from "vitest";
 
 import { AppError } from "../../../src/http/errors";

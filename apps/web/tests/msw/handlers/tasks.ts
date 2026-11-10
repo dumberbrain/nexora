@@ -4,7 +4,7 @@ import {
   type Task,
   type TaskList,
   USER_MOVABLE_STATUSES,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 
 import { executionFixtures } from "./executions";

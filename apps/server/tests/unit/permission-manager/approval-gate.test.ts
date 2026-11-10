@@ -1,4 +1,4 @@
-import { type EntityChanged, type NexoraEvent } from "@nexora/contracts";
+import { type EntityChanged, type UbulieraEvent } from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { closeDb, openDb, type Db } from "../../../src/db/client";
@@ -14,7 +14,7 @@ let db: Db;
 let store: EventStore;
 let audit: AuditService;
 let approvals: ApprovalService;
-let events: NexoraEvent[];
+let events: UbulieraEvent[];
 let changes: EntityChanged[];
 
 beforeEach(() => {

@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { ExecutionConfigSchema, type RuntimeKind, type SessionStatus } from "@nexora/contracts";
+import { ExecutionConfigSchema, type RuntimeKind, type SessionStatus } from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from "vitest";
 
 import { closeDb, openDb, type Db } from "../../../src/db/client";
@@ -119,9 +119,9 @@ beforeEach(() => {
   sessions = new SessionRepository(db);
   projects = new ProjectRepository(db);
   audit = new AuditService(db);
-  tmp = realpathSync(mkdtempSync(join(tmpdir(), "nexora-rm-")));
+  tmp = realpathSync(mkdtempSync(join(tmpdir(), "ubuliera-rm-")));
   repo = join(tmp, "repo");
-  worktree = join(repo, ".nexora", "worktrees", EXEC, "main");
+  worktree = join(repo, ".ubuliera", "worktrees", EXEC, "main");
   mkdirSync(worktree, { recursive: true });
   projects.insert({
     id: "01JD8X3Y4Z5A6B7C8D9E0F1G2P",

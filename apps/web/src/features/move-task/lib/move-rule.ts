@@ -1,4 +1,4 @@
-import { boardColumnOf, USER_MOVABLE_STATUSES } from "@nexora/contracts";
+import { boardColumnOf, USER_MOVABLE_STATUSES } from "@ubuliera/contracts";
 
 import {
   BOARD_COLUMN_LABEL,

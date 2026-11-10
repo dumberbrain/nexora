@@ -1,4 +1,4 @@
-import { type NexoraEvent, type WorkflowRunDetail } from "@nexora/contracts";
+import { type UbulieraEvent, type WorkflowRunDetail } from "@ubuliera/contracts";
 import { describe, expect, it } from "vitest";
 
 import { ApiError } from "@/shared/api";
@@ -38,7 +38,7 @@ const detail: WorkflowRunDetail = {
   ],
 };
 
-const event = (payload: unknown): NexoraEvent =>
+const event = (payload: unknown): UbulieraEvent =>
   makeEvent({
     id: "01JCXK0000000000000000E001",
     type: "workflow.node_changed",

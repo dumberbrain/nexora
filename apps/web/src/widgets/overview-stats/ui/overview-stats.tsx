@@ -36,7 +36,7 @@ function toCards(s: Stats): Card[] {
       label: "Current mode",
       value: s.currentMode ? s.currentMode.replaceAll("_", " ") : "none",
       tone: s.currentMode ? "live" : "default",
-      ...(s.currentMode ? {} : { hint: "no Nexora execution" }),
+      ...(s.currentMode ? {} : { hint: "no Ubuliera execution" }),
     },
   ];
 }

@@ -8,7 +8,7 @@ import { EmptyState, ErrorState, LoadingState } from "@/shared/ui/state";
 import { EventLine } from "./event-line";
 import { eventFeedQuery } from "../api/event.queries";
 import { flattenFeed } from "../lib/event-feed";
-import { type EventFilters, type NexoraEvent } from "../model/types";
+import { type EventFilters, type UbulieraEvent } from "../model/types";
 import { useLiveEventFeed } from "../model/use-live-event-feed";
 
 type View = "all" | "tools" | "errors";
@@ -18,7 +18,7 @@ const VIEWS: Array<{ id: View; label: string }> = [
   { id: "errors", label: "errors" },
 ];
 
-const KEEP: Record<View, (e: NexoraEvent) => boolean> = {
+const KEEP: Record<View, (e: UbulieraEvent) => boolean> = {
   all: () => true,
   tools: (e) => e.type.startsWith("tool."),
   errors: (e) => e.severity === "error" || e.type === "error" || e.type.endsWith(".failed"),
@@ -28,7 +28,7 @@ interface EventTimelineProps {
   /** scope, e.g. { sessionId } or { agentId } — the live room is derived from it */
   filters: EventFilters;
   label: string;
-  onLiveEvents?: (events: NexoraEvent[]) => void;
+  onLiveEvents?: (events: UbulieraEvent[]) => void;
   className?: string;
 }
 

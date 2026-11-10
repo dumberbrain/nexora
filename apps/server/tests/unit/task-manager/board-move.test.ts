@@ -7,7 +7,7 @@ import {
   type Task,
   TASK_STATUSES,
   type TaskStatus,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { describe, expect, it, vi } from "vitest";
 
 import { AppError } from "../../../src/http/errors";

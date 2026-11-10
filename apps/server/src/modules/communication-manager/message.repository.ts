@@ -1,4 +1,4 @@
-import { type Message, type MessageList, type MessageListQuery } from "@nexora/contracts";
+import { type Message, type MessageList, type MessageListQuery } from "@ubuliera/contracts";
 import { and, asc, desc, eq, lt, type SQL } from "drizzle-orm";
 
 import { type Db } from "../../db/client";

@@ -5,7 +5,7 @@ import {
   type WorkflowNodeChangedPayload,
   type WorkflowNodeRun,
   type WorkflowRun,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 import { compileCondition, type FinishedNode } from "./condition-evaluator";
 import { indexGraph } from "./graph-validator";

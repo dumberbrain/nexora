@@ -1,4 +1,4 @@
-import { type EntityChanged, type Session, type SessionStatus } from "@nexora/contracts";
+import { type EntityChanged, type Session, type SessionStatus } from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { EXTERNAL_OBSERVED_CAPABILITIES } from "../../../src/modules/session-manager";

@@ -31,7 +31,7 @@ export const EventSchema = z.object({
   payload: z.unknown(),
   truncated: z.boolean(),
 });
-export type NexoraEvent = z.infer<typeof EventSchema>;
+export type UbulieraEvent = z.infer<typeof EventSchema>;
 
 const csv = <T extends z.ZodType>(item: T) =>
   z.preprocess(

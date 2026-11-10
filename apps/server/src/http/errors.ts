@@ -1,4 +1,4 @@
-import { type ApiErrorBody, ERROR_STATUS, type ErrorCode } from "@nexora/contracts";
+import { type ApiErrorBody, ERROR_STATUS, type ErrorCode } from "@ubuliera/contracts";
 
 /** Throw from any handler/middleware; the error mapper turns it into the single error shape. */
 export class AppError extends Error {

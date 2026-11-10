@@ -1,5 +1,5 @@
-import { type AgentDetail } from "@nexora/contracts";
 import { screen, within } from "@testing-library/react";
+import { type AgentDetail } from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
 
@@ -70,7 +70,7 @@ describe("AgentDetailsPanel", () => {
     );
   });
 
-  it("offers live controls and messaging for an agent of a Nexora-managed session", async () => {
+  it("offers live controls and messaging for an agent of a Ubuliera-managed session", async () => {
     const detail: AgentDetail = {
       agent: { ...reviewer, sessionId: managedSessionFixture.id },
       session: managedSessionFixture,

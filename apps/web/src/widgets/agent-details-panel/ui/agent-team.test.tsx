@@ -1,5 +1,5 @@
-import { type AgentDetail, type Session } from "@nexora/contracts";
 import { screen, within } from "@testing-library/react";
+import { type AgentDetail, type Session } from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 import { describe, expect, it, vi } from "vitest";
 
@@ -100,7 +100,7 @@ describe("AgentDetailsPanel — Agent Teams (US6)", () => {
     expect(await within(team).findByText(/no team has been created yet/i)).toBeInTheDocument();
   });
 
-  it("embeds the lead terminal for a Nexora-started team lead", async () => {
+  it("embeds the lead terminal for a Ubuliera-started team lead", async () => {
     serveDetail(teamLeadDetailFixture);
     renderPanel(lead.id);
     const section = await screen.findByRole("region", { name: /lead terminal/i });

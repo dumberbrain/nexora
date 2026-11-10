@@ -16,8 +16,8 @@ function write(path: string, text: string) {
 }
 
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), "nexora-disc-"));
-  home = mkdtempSync(join(tmpdir(), "nexora-home-"));
+  root = mkdtempSync(join(tmpdir(), "ubuliera-disc-"));
+  home = mkdtempSync(join(tmpdir(), "ubuliera-home-"));
 });
 afterEach(() => {
   rmSync(root, { recursive: true, force: true });

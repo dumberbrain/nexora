@@ -1,5 +1,5 @@
-import { MESSAGE_TYPES } from "@nexora/contracts";
 import { useQuery } from "@tanstack/react-query";
+import { MESSAGE_TYPES } from "@ubuliera/contracts";
 import { useId } from "react";
 
 import {
@@ -73,7 +73,7 @@ export function MessageFeed({ filters, onFiltersChange, className }: MessageFeed
       {messages.data?.items.length === 0 ? (
         <EmptyState
           title="No messages yet"
-          description="Messages appear when you, the coordinator or agents of a Nexora execution talk to each other."
+          description="Messages appear when you, the coordinator or agents of a Ubuliera execution talk to each other."
         />
       ) : null}
       {messages.data && messages.data.items.length > 0 ? (

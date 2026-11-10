@@ -3,10 +3,10 @@ import {
   EventExportQuerySchema,
   EventQuerySchema,
   MAX_EXPORT_ROWS,
-  type NexoraEvent,
+  type UbulieraEvent,
   type Page,
   type Stats,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { type Hono } from "hono";
 
 import { csvRow } from "../../lib/csv";
@@ -26,11 +26,11 @@ const CSV_COLUMNS = [
   "agentId",
   "taskId",
   "summary",
-] as const satisfies readonly (keyof NexoraEvent)[];
+] as const satisfies readonly (keyof UbulieraEvent)[];
 
 const EXPORT_PAGE = 500;
 
-function serialize(format: EventExportQuery["format"], e: NexoraEvent): string {
+function serialize(format: EventExportQuery["format"], e: UbulieraEvent): string {
   return format === "csv" ? csvRow(CSV_COLUMNS.map((k) => e[k])) : `${JSON.stringify(e)}\n`;
 }
 
@@ -70,7 +70,7 @@ export function registerEventRoutes(
 ): void {
   api.get("/events", (c) => {
     const q = EventQuerySchema.parse(c.req.query());
-    return c.json<Page<NexoraEvent>>(deps.store.list(q));
+    return c.json<Page<UbulieraEvent>>(deps.store.list(q));
   });
 
   api.get("/events/export", (c) => {
@@ -79,7 +79,7 @@ export function registerEventRoutes(
     return c.body(exportStream(deps.store, q), 200, {
       "content-type":
         q.format === "csv" ? "text/csv; charset=utf-8" : "application/x-ndjson; charset=utf-8",
-      "content-disposition": `attachment; filename="nexora-events-${stamp}.${q.format}"`,
+      "content-disposition": `attachment; filename="ubuliera-events-${stamp}.${q.format}"`,
       "cache-control": "no-store",
     });
   });

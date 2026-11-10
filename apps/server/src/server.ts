@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 
 import { createAdaptorServer } from "@hono/node-server";
 
-import { type NexoraEnv } from "./config/env";
+import { type UbulieraEnv } from "./config/env";
 import { closeDb, type Db, openDb } from "./db/client";
 import { createApp } from "./http/app";
 import { SessionKeys } from "./http/middleware/session-cookie";
@@ -34,7 +34,7 @@ function defaultWebDist(): string {
   return resolve(here, "..", "..", "web", "dist");
 }
 
-export interface NexoraServer {
+export interface UbulieraServer {
   url: string;
   port: number;
   http: HttpServer;
@@ -51,14 +51,14 @@ export interface NexoraServer {
 }
 
 export interface CreateServerOptions {
-  env: NexoraEnv;
+  env: UbulieraEnv;
   logger?: Logger;
   /** override SPA location; `null` disables static serving */
   webDistDir?: string | null;
 }
 
 /** Wire config → DB → modules → Hono + Socket.IO on one HTTP server and start listening. */
-export async function createNexoraServer(opts: CreateServerOptions): Promise<NexoraServer> {
+export async function createUbulieraServer(opts: CreateServerOptions): Promise<UbulieraServer> {
   const { env } = opts;
   const log = opts.logger ?? defaultLogger;
   const startedAt = Date.now();
@@ -143,7 +143,7 @@ export async function createNexoraServer(opts: CreateServerOptions): Promise<Nex
     verifyApiToken: tokens.verifier,
   });
   live.gateway = gateway;
-  // US6: /terminal namespace for Nexora-started Agent Teams leads (same io, auth and origin check)
+  // US6: /terminal namespace for Ubuliera-started Agent Teams leads (same io, auth and origin check)
   const terminal = us2.agentTeams
     ? createTerminalGateway({
         io: gateway.io,
@@ -160,10 +160,11 @@ export async function createNexoraServer(opts: CreateServerOptions): Promise<Nex
   });
   const port = (http.address() as AddressInfo).port;
   const url = `http://${env.host.includes(":") ? `[${env.host}]` : env.host}:${port}`;
-  if (env.testFakeRuntime) log.warn("NEXORA_TEST_FAKE_RUNTIME=1 — test-only fake runtime enabled");
+  if (env.testFakeRuntime)
+    log.warn("UBULIERA_TEST_FAKE_RUNTIME=1 — test-only fake runtime enabled");
   log.info(
     { url, dataDir: env.dataDir, remote: env.remote, nodeEnv: env.nodeEnv },
-    "nexora listening",
+    "ubuliera listening",
   );
 
   let closed = false;
@@ -190,7 +191,7 @@ export async function createNexoraServer(opts: CreateServerOptions): Promise<Nex
       await services.sessionProjection.settled();
       store.close();
       closeDb(db);
-      log.info("nexora stopped");
+      log.info("ubuliera stopped");
     },
   };
 }

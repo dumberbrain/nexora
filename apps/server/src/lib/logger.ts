@@ -10,8 +10,8 @@ export function createLogger(
   opts: { level?: string; destination?: DestinationStream } = {},
 ): Logger {
   const options: LoggerOptions = {
-    level: opts.level ?? process.env.NEXORA_LOG_LEVEL ?? "info",
-    base: { app: "nexora" },
+    level: opts.level ?? process.env.UBULIERA_LOG_LEVEL ?? "info",
+    base: { app: "ubuliera" },
     formatters: {
       log: (obj) => redact(obj) as Record<string, unknown>,
     },

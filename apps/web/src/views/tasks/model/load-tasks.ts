@@ -1,5 +1,5 @@
-import { UlidSchema } from "@nexora/contracts";
 import { type QueryClient } from "@tanstack/react-query";
+import { UlidSchema } from "@ubuliera/contracts";
 import { z } from "zod";
 
 import { executionListQuery } from "@/entities/execution";

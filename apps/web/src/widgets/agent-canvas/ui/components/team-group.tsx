@@ -7,7 +7,7 @@ import { TEAM_HEADER, type TeamGroupFlowNode } from "../../lib/team-groups";
 
 /**
  * Agent Teams frame (US6, T142): the lead and its teammates drawn as one team, with every
- * member's status in the header. Membership comes from the agents Nexora observed.
+ * member's status in the header. Membership comes from the agents Ubuliera observed.
  */
 export function TeamGroup({ data }: NodeProps<TeamGroupFlowNode>) {
   const { lead, members } = data;

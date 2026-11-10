@@ -2,8 +2,8 @@ import { isInsideRoot, PathGuardError } from "../../../lib/path-guard";
 import { type StartSessionInput } from "../runtime-adapter";
 
 /**
- * A managed session's `cwd` must be the project root or inside it (its Nexora worktree lives at
- * `<repo>/.nexora/worktrees/...`). Lexical check only — the scope guard does the symlink-safe
+ * A managed session's `cwd` must be the project root or inside it (its Ubuliera worktree lives at
+ * `<repo>/.ubuliera/worktrees/...`). Lexical check only — the scope guard does the symlink-safe
  * checks for every write. Throws PathGuardError.
  */
 export function assertSessionCwd(input: Pick<StartSessionInput, "projectRoot" | "cwd">): void {

@@ -1,4 +1,4 @@
-import { type EventType, type RuntimeCapabilityProfile } from "@nexora/contracts";
+import { type EventType, type RuntimeCapabilityProfile } from "@ubuliera/contracts";
 
 /** Events both managed runtimes derive from the SDK / stream-json message stream. */
 const MANAGED_EVENTS: EventType[] = [
@@ -27,7 +27,7 @@ export const AGENT_SDK_CAPABILITIES: RuntimeCapabilityProfile = {
   emitsEvents: MANAGED_EVENTS,
   reportsUsage: "estimate",
   notes: [
-    "Started and controlled by Nexora through the Claude Agent SDK.",
+    "Started and controlled by Ubuliera through the Claude Agent SDK.",
     "No pause: Interrupt & hold = interrupt + resume.",
     "Token usage and cost come from the runtime; cost is Claude Code's client-side estimate.",
     "Tool calls are checked by the task scope guard; shell commands always need approval.",
@@ -48,14 +48,14 @@ export const CLI_HEADLESS_CAPABILITIES: RuntimeCapabilityProfile = {
   emitsEvents: MANAGED_EVENTS,
   reportsUsage: "estimate",
   notes: [
-    "Started by Nexora as a headless claude CLI process (stream-json).",
+    "Started by Ubuliera as a headless claude CLI process (stream-json).",
     "No interrupt: the CLI only supports stopping the process; resume continues the session.",
     "The permission mode is fixed for the lifetime of the process.",
     "Token usage and cost come from the runtime; cost is Claude Code's client-side estimate.",
   ],
 };
 
-/** Test-only deterministic runtime (NEXORA_TEST_FAKE_RUNTIME=1 with NODE_ENV=test). */
+/** Test-only deterministic runtime (UBULIERA_TEST_FAKE_RUNTIME=1 with NODE_ENV=test). */
 export const FAKE_RUNTIME_CAPABILITIES: RuntimeCapabilityProfile = {
   ...AGENT_SDK_CAPABILITIES,
   notes: ["Test-only simulated runtime (NODE_ENV=test).", ...AGENT_SDK_CAPABILITIES.notes],
@@ -88,7 +88,7 @@ export const AGENT_TEAM_PTY_CAPABILITIES: RuntimeCapabilityProfile = {
   ],
   reportsUsage: "none",
   notes: [
-    "Native Claude Code Agent Teams: an interactive lead started by Nexora in a terminal.",
+    "Native Claude Code Agent Teams: an interactive lead started by Ubuliera in a terminal.",
     "Messages reach the team lead only (typed into its terminal, best effort).",
     "Interrupt sends Ctrl-C to the lead; teammates cannot be paused or resumed.",
     "Team members, tasks and inbox messages are polled from team files (best effort).",

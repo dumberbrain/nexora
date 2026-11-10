@@ -1,4 +1,4 @@
-import { type IntegrationItem } from "@nexora/contracts";
+import { type IntegrationItem } from "@ubuliera/contracts";
 import { asc, eq, isNull } from "drizzle-orm";
 
 import { type Db } from "../../db/client";

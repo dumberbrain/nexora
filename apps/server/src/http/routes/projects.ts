@@ -5,7 +5,7 @@ import {
   type ProjectList,
   RegisterProjectInputSchema,
   UlidSchema,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { type Hono } from "hono";
 
 import { type HookInstaller, type ProjectService } from "../../modules/project-registry";

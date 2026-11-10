@@ -38,7 +38,7 @@ const TOKEN_PATTERNS: RegExp[] = [
   /\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/g, // AWS access key id
   /\bxox[abprs]-[A-Za-z0-9-]{10,}/g, // Slack
   /\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/g, // JWT
-  /\bnxr_[A-Za-z0-9_-]{32,}/g, // Nexora API token (US8)
+  /\bnxr_[A-Za-z0-9_-]{32,}/g, // Ubuliera API token (US8)
 ];
 
 /**

@@ -5,7 +5,7 @@ import {
   type SessionDetail,
   SessionListQuerySchema,
   type SessionList,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { type Hono } from "hono";
 
 import { type AgentRepository } from "../../modules/agent-registry";

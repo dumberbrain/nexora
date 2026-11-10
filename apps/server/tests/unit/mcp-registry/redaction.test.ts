@@ -22,8 +22,8 @@ function write(path: string, value: unknown) {
 }
 
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), "nexora-mcp-"));
-  home = mkdtempSync(join(tmpdir(), "nexora-mcp-home-"));
+  root = mkdtempSync(join(tmpdir(), "ubuliera-mcp-"));
+  home = mkdtempSync(join(tmpdir(), "ubuliera-mcp-home-"));
 });
 afterEach(() => {
   rmSync(root, { recursive: true, force: true });

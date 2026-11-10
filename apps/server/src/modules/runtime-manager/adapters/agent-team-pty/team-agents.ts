@@ -1,4 +1,4 @@
-import { type Agent } from "@nexora/contracts";
+import { type Agent } from "@ubuliera/contracts";
 
 import { type TeamAgentSink } from "./team-files-watcher";
 import { type AgentRepository } from "../../../agent-registry";

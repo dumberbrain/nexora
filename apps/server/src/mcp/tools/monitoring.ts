@@ -3,7 +3,7 @@ import {
   type ExecutionTasks,
   SessionListQuerySchema,
   type TaskStatus,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 import { executionUrl, type ToolDefs } from "./types";
 import { AppError } from "../../http/errors";

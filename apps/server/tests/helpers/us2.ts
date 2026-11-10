@@ -122,8 +122,8 @@ export async function createUs2Harness(opts: Us2HarnessOptions = {}): Promise<Us
     gitBranch: () => Promise.resolve("main"),
     statsIntervalMs: 0,
   });
-  const root = mkdtempSync(join(tmpdir(), "nexora-us2-"));
-  const home = mkdtempSync(join(tmpdir(), "nexora-us2-home-"));
+  const root = mkdtempSync(join(tmpdir(), "ubuliera-us2-"));
+  const home = mkdtempSync(join(tmpdir(), "ubuliera-us2-home-"));
   seedProject(root);
   const runtime = new FakeManagedRuntime();
   if (opts.sessionRows) runtime.rows = services.sessions;

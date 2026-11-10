@@ -1,4 +1,4 @@
-import { type Execution, type Task } from "@nexora/contracts";
+import { type Execution, type Task } from "@ubuliera/contracts";
 import picomatch from "picomatch";
 
 /**

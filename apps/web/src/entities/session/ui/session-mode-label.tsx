@@ -3,7 +3,7 @@ import { UnavailableBadge } from "@/shared/ui/state";
 import { type Session } from "../model/types";
 
 /**
- * Execution mode column (FR-026). Observed sessions have no Nexora execution, so their mode is
+ * Execution mode column (FR-026). Observed sessions have no Ubuliera execution, so their mode is
  * literally "observed"; the Session payload does not carry a managed execution's mode yet.
  */
 export function SessionModeLabel({

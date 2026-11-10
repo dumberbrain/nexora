@@ -6,7 +6,7 @@
 
 ## Summary
 
-Nexora is a local, single-user control center that analyses a natural-language development task,
+Ubuliera is a local, single-user control center that analyses a natural-language development task,
 recommends and runs one of five Claude Code execution modes (Multi-Session, Agent Teams,
 Subagents, Workflow, Hybrid), and shows all activity live at `http://localhost:3022`.
 Technical approach (see [research.md](research.md)): one Node process (Hono API + Socket.IO +
@@ -26,9 +26,9 @@ React Flow).
 - Frontend: React 19, Rsbuild (`@rsbuild/plugin-react`), TanStack Router (rspack plugin) + Query,
   Zustand, Tailwind CSS v4, shadcn/ui, `@xyflow/react`, `@dnd-kit`, `socket.io-client`, axios,
   react-hook-form + zod, `@xterm/xterm`
-- Shared: `@nexora/contracts` (zod schemas)
+- Shared: `@ubuliera/contracts` (zod schemas)
 
-**Storage**: SQLite file `~/.nexora/nexora.db` (WAL, FTS5 for event search)
+**Storage**: SQLite file `~/.ubuliera/ubuliera.db` (WAL, FTS5 for event search)
 
 **Testing**: Vitest (server unit/contract/integration; web components with Testing Library + MSW),
 Playwright + `@axe-core/playwright` (E2E on production build)
@@ -53,7 +53,7 @@ production views; ≤ 150-line components; permission bypass never default
 | Principle | Gate | Pre-research | Post-design |
 |---|---|---|---|
 | I. Spec-Driven | spec → plan → tasks before code; testable acceptance criteria | ✔ spec has 8 independent stories, 10 SCs | ✔ quickstart maps V1–V12 to stories |
-| II. Human Control & Agent Safety (v2.0.0) | least privilege, approvals for destructive/outward actions, Nexora-started work stoppable, interrupt/pause/resume only where supported else shown unavailable, observed sessions labelled observe-only, secrets never exposed | ✔ FR-030–034, FR-050–054 | ✔ ApprovalGate never auto-approves; capability-gated controls; "Interrupt & hold" instead of fake pause; redaction before persist/emit/export/MCP; `bypassPermissions` opt-in only |
+| II. Human Control & Agent Safety (v2.0.0) | least privilege, approvals for destructive/outward actions, Ubuliera-started work stoppable, interrupt/pause/resume only where supported else shown unavailable, observed sessions labelled observe-only, secrets never exposed | ✔ FR-030–034, FR-050–054 | ✔ ApprovalGate never auto-approves; capability-gated controls; "Interrupt & hold" instead of fake pause; redaction before persist/emit/export/MCP; `bypassPermissions` opt-in only |
 | III. Observability | structured events for every state change, audit trail, visible staleness | ✔ FR-020–029 | ✔ Event entity w/ source+reliability; AuditEntry append-only; replay protocol |
 | IV. Contract-Based Integrations | typed adapters, isolation, contract tests | ✔ | ✔ RuntimeAdapter interface + capability matrix; adapter failures isolated per session; fixtures-based contract tests |
 | V. Test-First Quality | TDD for core logic, integration tests on boundaries, CI gate, YAGNI | ✔ | ✔ state machines/scheduler/permission/redactor test-first; own workflow engine instead of Temporal (YAGNI) |
@@ -141,7 +141,7 @@ built SPA on port 3022.
 | 2 Dashboard + Observation | hook install/ingest, event pipeline + replay, Overview, Sessions, Agent Canvas, Agent Details, Live Logs | US1 (MVP) |
 | 3 Claude integration | runtime adapters (SDK, CLI), capability profiles, session lifecycle, spikes S1–S3 | US1/US2 |
 | 4 Execution modes | analysis, mode advisor, questions, planner, approvals, Multi-Session (worktrees), Subagents, Agent Teams (PTY), Hybrid | US2, US3, US6 |
-| 5 Advanced | Task board, Workflow engine + editor, Skills/MCP/GitHub views, Communication center, Nexora MCP server | US4, US5, US7, US8 |
+| 5 Advanced | Task board, Workflow engine + editor, Skills/MCP/GitHub views, Communication center, Ubuliera MCP server | US4, US5, US7, US8 |
 | 6 Reliability | error recovery, restart re-attach, load test (SC-007), security review, E2E suite | all |
 | 7 Docs | install, config, runtime setup, MCP setup, examples, troubleshooting | FR-063 |
 

@@ -1,8 +1,8 @@
 {
-  "name": "@nexora/contracts",
+  "name": "@ubuliera/contracts",
   "version": "0.1.0",
   "private": true,
-  "description": "Shared zod schemas and types for Nexora server, web and MCP",
+  "description": "Shared zod schemas and types for Ubuliera server, web and MCP",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"

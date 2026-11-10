@@ -1,4 +1,4 @@
-import { type PlanConflict } from "@nexora/contracts";
+import { type PlanConflict } from "@ubuliera/contracts";
 import picomatch from "picomatch";
 
 import { ancestorsByNode, type DagNode } from "../../task-manager/task-state";

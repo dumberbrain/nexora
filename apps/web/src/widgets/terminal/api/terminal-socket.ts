@@ -7,7 +7,7 @@ import {
   type TerminalInput,
   type TerminalOutput,
   type TerminalResize,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { io, type Socket } from "socket.io-client";
 
 import { ensureSession } from "@/shared/api";

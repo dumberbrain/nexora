@@ -1,4 +1,4 @@
-# Nexora Constitution
+# Ubuliera Constitution
 
 ## Core Principles
 
@@ -9,7 +9,7 @@
 - A feature MUST NOT be implemented until its spec, plan, and tasks exist and are consistent.
 - Specs MUST contain testable acceptance criteria and independently deliverable user stories.
 
-Rationale: Nexora coordinates many autonomous agents; ambiguous intent multiplies into wasted or
+Rationale: Ubuliera coordinates many autonomous agents; ambiguous intent multiplies into wasted or
 conflicting agent work. Written specs are the single source of truth for humans and agents alike.
 
 ### II. Human Control & Agent Safety (NON-NEGOTIABLE)
@@ -19,11 +19,11 @@ conflicting agent work. Written specs are the single source of truth for humans 
 - Destructive or outward-facing actions (deleting data, force-pushing, deploying, publishing,
   spending money, sending messages) MUST require explicit human approval unless a user has
   durably pre-authorized that exact action class.
-- Every agent, session, or workflow started by Nexora MUST be stoppable from the dashboard;
+- Every agent, session, or workflow started by Ubuliera MUST be stoppable from the dashboard;
   a stop MUST take effect without waiting for the task to finish.
 - Interrupt, pause, and resume MUST be offered wherever the runtime supports them; where it
   does not, the dashboard MUST show the control as unavailable with the reason.
-- Sessions Nexora only observes (not started by Nexora) follow Claude Code's own controls and
+- Sessions Ubuliera only observes (not started by Ubuliera) follow Claude Code's own controls and
   MUST be labelled "observe-only" in the dashboard.
 - Secrets and credentials MUST NOT appear in prompts sent to third parties, logs, events, or UI.
 
@@ -51,7 +51,7 @@ product promise, not an afterthought.
   orchestrator core.
 - Contract changes MUST be versioned and covered by contract tests before release.
 
-Rationale: the set of agents and tools changes fast. Stable contracts let Nexora add or swap
+Rationale: the set of agents and tools changes fast. Stable contracts let Ubuliera add or swap
 integrations without rewriting the core.
 
 ### V. Test-First Quality

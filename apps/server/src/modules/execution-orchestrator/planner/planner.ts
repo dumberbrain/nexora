@@ -1,4 +1,4 @@
-import { type PlannedTask, PlannedTaskSchema, type RiskClass } from "@nexora/contracts";
+import { type PlannedTask, PlannedTaskSchema, type RiskClass } from "@ubuliera/contracts";
 import { z } from "zod";
 
 import { AppError } from "../../../http/errors";

@@ -3,7 +3,7 @@ import {
   LIVE_NAMESPACE,
   type ServerToClientEvents,
   SOCKET_PATH,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { io, type Socket } from "socket.io-client";
 import { create } from "zustand";
 

@@ -7,7 +7,7 @@ import {
   TerminalInputSchema,
   type TerminalOutput,
   TerminalResizeSchema,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { type Namespace, type Server, type Socket } from "socket.io";
 
 import { socketAuth, type SocketAuthData, type SocketAuthOptions } from "./gateway";
@@ -53,7 +53,7 @@ interface Attachment {
 
 /**
  * Socket.IO namespace `/terminal` (T139): a live view of — and keyboard into — the terminal of an
- * Agent Teams lead that Nexora started (runtime `agent_team_pty`). Observed sessions and other
+ * Agent Teams lead that Ubuliera started (runtime `agent_team_pty`). Observed sessions and other
  * runtimes are refused. Auth is the /live handshake; one audit entry per attach (not per key);
  * API tokens with `read` scope may watch but not type.
  */
@@ -68,7 +68,7 @@ export function createTerminalGateway(opts: TerminalGatewayOptions): TerminalGat
     const session = opts.sessions.get(sessionId);
     if (!session) return "Session not found";
     if (session.runtime !== "agent_team_pty" || session.observeOnly) {
-      return "Only Agent Teams leads started by Nexora have a terminal";
+      return "Only Agent Teams leads started by Ubuliera have a terminal";
     }
     return opts.terminals.terminal(sessionId) ?? "The lead's terminal is no longer running";
   };

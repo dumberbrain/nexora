@@ -12,20 +12,20 @@
   "tool_name": "ListAgents",
   "tool_input": {},
   "tool_response": {
-    "listing": "This session is nexora-spike-s2-91js4n-b5 [933c3e] — the name other sessions use to message it (it is not listed below; a message to it would be a message to yourself).\n\nPeer sessions (2):\n  nexora-52 [7f4ad4]  ·  interactive  ·  idle  ·  started 3h ago\n  nexora-e3 [4dba78]  ·  interactive  ·  busy  ·  started 8h ago",
+    "listing": "This session is ubuliera-spike-s2-91js4n-b5 [933c3e] — the name other sessions use to message it (it is not listed below; a message to it would be a message to yourself).\n\nPeer sessions (2):\n  ubuliera-52 [7f4ad4]  ·  interactive  ·  idle  ·  started 3h ago\n  ubuliera-e3 [4dba78]  ·  interactive  ·  busy  ·  started 8h ago",
     "sections": [
       {
         "kind": "sessions",
         "total": 2,
         "rows": [
           {
-            "name": "nexora-52",
+            "name": "ubuliera-52",
             "ref": "7f4ad4",
             "type": "interactive",
             "status": "idle"
           },
           {
-            "name": "nexora-e3",
+            "name": "ubuliera-e3",
             "ref": "4dba78",
             "type": "interactive",
             "status": "busy"

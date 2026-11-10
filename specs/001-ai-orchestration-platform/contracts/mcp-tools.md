@@ -1,4 +1,4 @@
-# Contract: Nexora MCP server (optional, disabled by default)
+# Contract: Ubuliera MCP server (optional, disabled by default)
 
 Transport: Streamable HTTP mounted on the same Hono app at `/mcp` (same process ⇒ same service
 layer, FR-043). Auth: `Authorization: Bearer <token>` generated in Settings; tokens are scoped

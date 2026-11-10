@@ -53,7 +53,7 @@ describe("InstallHooksDialog", () => {
   it("offers uninstall when hooks are already installed", async () => {
     const { install, uninstall } = spyWrites();
     const { user } = renderWithProviders(<InstallHooksDialog project={installed} />);
-    await user.click(await screen.findByRole("button", { name: /manage hooks for nexora/i }));
+    await user.click(await screen.findByRole("button", { name: /manage hooks for ubuliera/i }));
     await user.click(await screen.findByRole("button", { name: /uninstall hooks/i }));
     await waitFor(() => expect(uninstall).toHaveBeenCalledOnce());
     expect(install).not.toHaveBeenCalled();

@@ -1,4 +1,4 @@
-import { BOARD_COLUMNS, boardColumnOf } from "@nexora/contracts";
+import { BOARD_COLUMNS, boardColumnOf } from "@ubuliera/contracts";
 
 import { type BoardColumn, type Task, type TaskList } from "../model/types";
 

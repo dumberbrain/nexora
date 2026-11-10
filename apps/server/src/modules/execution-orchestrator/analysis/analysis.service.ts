@@ -1,4 +1,4 @@
-import { COMPLEXITIES, type TaskAnalysis } from "@nexora/contracts";
+import { COMPLEXITIES, type TaskAnalysis } from "@ubuliera/contracts";
 import { z } from "zod";
 
 import { discoverMcpServers } from "../../mcp-registry/discovery";

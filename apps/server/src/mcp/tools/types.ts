@@ -1,4 +1,4 @@
-import { type MCP_TOOL_INPUTS, type McpToolName } from "@nexora/contracts";
+import { type MCP_TOOL_INPUTS, type McpToolName } from "@ubuliera/contracts";
 import { type z } from "zod";
 
 import { type AgentRepository } from "../../modules/agent-registry";

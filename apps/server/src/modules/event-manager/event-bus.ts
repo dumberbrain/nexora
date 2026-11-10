@@ -1,6 +1,6 @@
 import { EventEmitter } from "node:events";
 
-import { type EntityChanged, type NexoraEvent } from "@nexora/contracts";
+import { type EntityChanged, type UbulieraEvent } from "@ubuliera/contracts";
 
 /**
  * In-process pub/sub between modules and the realtime gateway. Listener errors are isolated so
@@ -13,7 +13,7 @@ export class EventBus {
     this.emitter.setMaxListeners(100);
   }
 
-  onEvent(listener: (e: NexoraEvent) => void): () => void {
+  onEvent(listener: (e: UbulieraEvent) => void): () => void {
     return this.on("event", listener);
   }
 
@@ -21,7 +21,7 @@ export class EventBus {
     return this.on("entity", listener);
   }
 
-  publishEvent(e: NexoraEvent): void {
+  publishEvent(e: UbulieraEvent): void {
     this.emitter.emit("event", e);
   }
 

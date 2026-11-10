@@ -1,4 +1,4 @@
-import { type Stats } from "@nexora/contracts";
+import { type Stats } from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 
 export const statsFixture: Stats = {

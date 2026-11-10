@@ -1,4 +1,4 @@
-import { RegisterProjectInputSchema, type RegisterProjectInput } from "@nexora/contracts";
+import { RegisterProjectInputSchema, type RegisterProjectInput } from "@ubuliera/contracts";
 import { z } from "zod";
 
 /**

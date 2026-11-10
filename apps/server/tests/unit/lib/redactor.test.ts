@@ -10,7 +10,7 @@ const GH_PAT = fake("ghp_", "c".repeat(36));
 const GH_FINE = fake("github_pat_", "D".repeat(30));
 const AWS_ID = fake("AKIA", "ABCDEFGHIJKLMNOP");
 const AWS_SECRET = fake("wJalrXUtnFEMI/K7MDENG/", "bPxRfiCY", "EXAMPLEKEY");
-const NEXORA = fake("nxr_", "E".repeat(20), "f".repeat(23));
+const UBULIERA = fake("nxr_", "E".repeat(20), "f".repeat(23));
 
 describe("redactString", () => {
   it.each([
@@ -19,11 +19,11 @@ describe("redactString", () => {
     ["GitHub PAT", `token ${GH_PAT}`],
     ["GitHub fine-grained PAT", GH_FINE],
     ["AWS access key id", `id ${AWS_ID}`],
-    ["Nexora API token", `mcp ${NEXORA} used`],
+    ["Ubuliera API token", `mcp ${UBULIERA} used`],
   ])("removes %s", (_name, input) => {
     const out = redactString(input);
     expect(out).toContain(REDACTED);
-    for (const secret of [ANTHROPIC, OPENAI, GH_PAT, GH_FINE, AWS_ID, NEXORA]) {
+    for (const secret of [ANTHROPIC, OPENAI, GH_PAT, GH_FINE, AWS_ID, UBULIERA]) {
       expect(out).not.toContain(secret);
     }
   });

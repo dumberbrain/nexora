@@ -10,7 +10,7 @@ import {
   SessionSchema,
   TaskSchema,
   VerificationSchema,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EXTERNAL_OBSERVED_CAPABILITIES } from "../../src/modules/session-manager/capabilities";
@@ -40,7 +40,7 @@ const send = (method: string, path: string, body?: unknown) =>
       ...HOST,
       cookie: auth.cookie,
       "content-type": "application/json",
-      "x-nexora-csrf": auth.csrf,
+      "x-ubuliera-csrf": auth.csrf,
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });

@@ -1,5 +1,5 @@
-import { MESSAGE_TYPES, TaskIdSchema, UlidSchema } from "@nexora/contracts";
 import { type QueryClient } from "@tanstack/react-query";
+import { MESSAGE_TYPES, TaskIdSchema, UlidSchema } from "@ubuliera/contracts";
 import { z } from "zod";
 
 import { messageListQuery, type MessageFilters } from "@/entities/message";

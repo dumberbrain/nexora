@@ -4,7 +4,7 @@ import {
   type PlanConflict,
   type Priority,
   type Task,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 import { ACTIVE_TASK_STATUSES } from "../task-manager/task-state";
 

@@ -1,4 +1,4 @@
-import { type ExecutionConfig, type McpStartExecutionResult } from "@nexora/contracts";
+import { type ExecutionConfig, type McpStartExecutionResult } from "@ubuliera/contracts";
 
 import { executionUrl, type ToolDefs } from "./types";
 

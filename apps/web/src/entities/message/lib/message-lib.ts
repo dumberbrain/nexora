@@ -1,11 +1,11 @@
-import { MESSAGE_TYPES, ParticipantSchema } from "@nexora/contracts";
+import { MESSAGE_TYPES, ParticipantSchema } from "@ubuliera/contracts";
 import { z } from "zod";
 
 import {
   type Message,
   type MessageFilters,
   type MessageList,
-  type NexoraEvent,
+  type UbulieraEvent,
   type Participant,
 } from "../model/types";
 
@@ -29,7 +29,7 @@ const MessagePayloadSchema = z.object({
  * private reasoning (FR-027). Returns null for other events and for hook-sourced prompts that
  * carry no Message payload (the caller refetches instead).
  */
-export function messageFromEvent(e: NexoraEvent): Message | null {
+export function messageFromEvent(e: UbulieraEvent): Message | null {
   if (e.type !== "message.sent") return null;
   const p = MessagePayloadSchema.safeParse(e.payload);
   if (!p.success) return null;

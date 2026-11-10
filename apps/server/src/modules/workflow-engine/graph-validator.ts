@@ -5,7 +5,7 @@ import {
   type WorkflowGraph,
   WorkflowGraphSchema,
   type WorkflowNode,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 import { compileCondition, ConditionError } from "./condition-evaluator";
 

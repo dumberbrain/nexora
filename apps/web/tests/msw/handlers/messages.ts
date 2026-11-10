@@ -1,4 +1,4 @@
-import { type Message, type MessageList } from "@nexora/contracts";
+import { type Message, type MessageList } from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 
 const NOW = Date.UTC(2026, 10, 8, 12, 0, 0);

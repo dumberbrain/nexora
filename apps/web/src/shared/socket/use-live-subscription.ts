@@ -1,4 +1,4 @@
-import { type EventBatch, type NexoraEvent, type SubscribeScope } from "@nexora/contracts";
+import { type EventBatch, type UbulieraEvent, type SubscribeScope } from "@ubuliera/contracts";
 import { useEffect, useEffectEvent } from "react";
 
 import { getLiveSocket, type LiveSocket } from "./client";
@@ -7,7 +7,7 @@ import { getLiveSocket, type LiveSocket } from "./client";
 const cursors = new Map<string, string>();
 const MAX_SEEN = 5000;
 
-function matches(scope: SubscribeScope, id: string | undefined, e: NexoraEvent): boolean {
+function matches(scope: SubscribeScope, id: string | undefined, e: UbulieraEvent): boolean {
   if (scope === "global") return true;
   if (scope === "execution") return e.executionId === id;
   if (scope === "session") return e.sessionId === id;
@@ -18,7 +18,7 @@ export interface LiveSubscriptionOptions {
   scope: SubscribeScope;
   id?: string;
   /** new (deduped) events, oldest first */
-  onEvents: (events: NexoraEvent[]) => void;
+  onEvents: (events: UbulieraEvent[]) => void;
   /** too many events missed while offline — refetch lists via REST */
   onGap?: () => void;
   enabled?: boolean;
@@ -33,7 +33,7 @@ export interface LiveSubscriptionOptions {
  */
 export function useLiveSubscription(opts: LiveSubscriptionOptions): void {
   const { scope, id, enabled = true } = opts;
-  const deliver = useEffectEvent((events: NexoraEvent[]) => opts.onEvents(events));
+  const deliver = useEffectEvent((events: UbulieraEvent[]) => opts.onEvents(events));
   const gap = useEffectEvent(() => opts.onGap?.());
   const injected = opts.socket;
 

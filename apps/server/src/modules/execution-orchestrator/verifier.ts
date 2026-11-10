@@ -1,10 +1,10 @@
-import { type Task, type Verification } from "@nexora/contracts";
+import { type Task, type Verification } from "@ubuliera/contracts";
 
 import { type WorktreeProvider } from "./worktree-provider";
 
 /**
  * Verifier (T101): completed/failed tasks and every changed file across the execution's
- * worktrees. Test results are reported only when tests actually ran; Nexora's process allowlist
+ * worktrees. Test results are reported only when tests actually ran; Ubuliera's process allowlist
  * (claude, git, gh — FR-051) does not include package-manager test runners yet, so
  * `testResults` stays null instead of being guessed.
  */

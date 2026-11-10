@@ -25,7 +25,7 @@ occur. They click any agent on a visual graph to open its details.
 on (control, planning, workflows all need trustworthy live state). It delivers value on its own:
 users finally see what their agents are doing.
 
-**Independent Test**: Start one or more Claude Code sessions in a project connected to Nexora, run
+**Independent Test**: Start one or more Claude Code sessions in a project connected to Ubuliera, run
 a task that spawns a subagent and edits a file, and confirm the dashboard shows the session, the
 agent hierarchy, tool events, the changed file, and the completion — all from real data.
 
@@ -56,7 +56,7 @@ skills, agents, MCP servers), estimates complexity, recommends an execution mode
 asks only the relevant follow-up questions, produces a structured plan of tasks, and starts
 execution only after the user approves.
 
-**Why this priority**: This is what turns Nexora from a monitor into an orchestrator — the core
+**Why this priority**: This is what turns Ubuliera from a monitor into an orchestrator — the core
 product promise.
 
 **Independent Test**: Submit a task against a sample repository, verify the analysis lists the
@@ -203,9 +203,9 @@ secrets appear.
 
 ---
 
-### User Story 8 - Drive Nexora from another agent via MCP (Priority: P4)
+### User Story 8 - Drive Ubuliera from another agent via MCP (Priority: P4)
 
-The user enables Nexora's optional MCP server so another AI client can analyse tasks, recommend
+The user enables Ubuliera's optional MCP server so another AI client can analyse tasks, recommend
 modes, create plans, start/stop executions, list sessions/agents/tasks, send agent messages, and
 read logs — subject to the same permissions and approvals as the dashboard.
 
@@ -326,9 +326,9 @@ match the dashboard and that a destructive action still requires human approval.
   distinct.
 - **FR-033**: System MUST require explicit user approval before destructive operations, expensive
   strategies, production deployments, and major architectural changes; no timeout may auto-approve.
-  This applies to Nexora-managed executions; sessions Nexora only observes keep Claude Code's own
+  This applies to Ubuliera-managed executions; sessions Ubuliera only observes keep Claude Code's own
   permission settings and are labelled observe-only.
-- **FR-034**: Every Nexora-managed session MUST run in an isolated workspace and MUST be blocked
+- **FR-034**: Every Ubuliera-managed session MUST run in an isolated workspace and MUST be blocked
   from writing outside its assigned scope; idle and per-turn timeouts MUST be configurable per
   execution with safe defaults, and a session exceeding them MUST be surfaced as unresponsive.
 
@@ -371,7 +371,7 @@ match the dashboard and that a destructive action still requires human approval.
 
 ### Key Entities *(include if feature involves data)*
 
-- **Project**: a local repository root Nexora may act in; holds detected stack, instructions,
+- **Project**: a local repository root Ubuliera may act in; holds detected stack, instructions,
   integrations.
 - **Execution**: one run of a user task; mode, strategy, configuration answers, plan, status,
   approvals, final verification summary.
@@ -423,7 +423,7 @@ match the dashboard and that a destructive action still requires human approval.
 
 - Single local user on their own machine is the primary audience for v1; multi-user teams and
   hosted deployment are out of scope. Remote access is an opt-in mode protected by authentication.
-- Claude Code (detected: 2.1.319) is installed and authenticated by the user; Nexora does not
+- Claude Code (detected: 2.1.319) is installed and authenticated by the user; Ubuliera does not
   manage Anthropic accounts or billing.
 - Agent Teams availability depends on the installed Claude Code version and configuration and is
   detected at runtime; it may be unavailable on some machines.

@@ -1,4 +1,4 @@
-import { type EventFilters, type NexoraEvent } from "../model/types";
+import { type EventFilters, type UbulieraEvent } from "../model/types";
 
 /** API base the shared axios instance uses — export links are plain same-origin GETs. */
 const API_BASE = "/api/v1";
@@ -31,7 +31,7 @@ export function eventExportUrl(filters: EventFilters, format: ExportFormat): str
  * current list. Events carry no execution mode, so a mode filter never matches live events —
  * those lists refresh from REST instead of guessing.
  */
-export function matchesEventFilters(e: NexoraEvent, f: EventFilters): boolean {
+export function matchesEventFilters(e: UbulieraEvent, f: EventFilters): boolean {
   if (f.mode) return false;
   if (f.executionId && e.executionId !== f.executionId) return false;
   if (f.sessionId && e.sessionId !== f.sessionId) return false;

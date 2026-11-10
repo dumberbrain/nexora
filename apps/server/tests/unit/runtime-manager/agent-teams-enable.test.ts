@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-import { EnableAgentTeamsResultSchema, type TeamView, TeamViewSchema } from "@nexora/contracts";
+import { EnableAgentTeamsResultSchema, type TeamView, TeamViewSchema } from "@ubuliera/contracts";
 import { Hono } from "hono";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -19,7 +19,7 @@ const PID = "01JPRJ00000000000000000000";
 let root: string;
 
 beforeEach(() => {
-  root = mkdtempSync(path.join(tmpdir(), "nexora-teams-enable-"));
+  root = mkdtempSync(path.join(tmpdir(), "ubuliera-teams-enable-"));
 });
 afterEach(() => rmSync(root, { recursive: true, force: true }));
 
@@ -184,7 +184,7 @@ describe("POST /runtime/agent-teams/enable", () => {
 });
 
 describe("GET /sessions/:id/team", () => {
-  it("returns the TeamView of a Nexora-started lead", async () => {
+  it("returns the TeamView of a Ubuliera-started lead", async () => {
     const res = await app().api.request(`/sessions/${VIEW.sessionId}/team`);
     expect(res.status).toBe(200);
     expect(TeamViewSchema.parse(await res.json())).toEqual(VIEW);

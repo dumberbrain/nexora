@@ -1,4 +1,4 @@
-import { AgentNodeConfigSchema } from "@nexora/contracts";
+import { AgentNodeConfigSchema } from "@ubuliera/contracts";
 
 import { runSessionNode, type SessionNodeDeps, stepContext } from "./session";
 import { BUILT_IN_ROLES } from "../../execution-orchestrator/agents/roles";

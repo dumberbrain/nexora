@@ -7,7 +7,7 @@ import {
   type RuntimeCapabilityProfile,
   type RuntimeEnvironment,
   type RuntimeKind,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 import {
   type ApprovalGate,

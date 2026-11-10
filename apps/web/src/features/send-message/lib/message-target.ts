@@ -24,7 +24,7 @@ export function messageBlockedReason(t: MessageTarget): string | null {
   const session = t.session;
   if (!session) return "The agent's session is unknown, so it cannot receive messages";
   if (session.observeOnly || session.capabilities.runtime === "external_observed") {
-    return "Observe-only session — Nexora did not start it, so it cannot receive messages";
+    return "Observe-only session — Ubuliera did not start it, so it cannot receive messages";
   }
   const can = session.capabilities.canSendMessage;
   if (can === "no") {

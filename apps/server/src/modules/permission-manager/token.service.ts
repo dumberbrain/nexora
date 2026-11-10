@@ -6,7 +6,7 @@ import {
   type CreateApiTokenInput,
   type CreateApiTokenResult,
   UlidSchema,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { desc, eq } from "drizzle-orm";
 
 import { type AuditService } from "./audit.service";

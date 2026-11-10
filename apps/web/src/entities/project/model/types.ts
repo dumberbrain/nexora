@@ -5,4 +5,4 @@ export type {
   Project,
   ProjectList,
   RegisterProjectInput,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";

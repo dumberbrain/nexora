@@ -1,4 +1,4 @@
-import { type TerminalAttach } from "@nexora/contracts";
+import { type TerminalAttach } from "@ubuliera/contracts";
 import { type ITerminalOptions } from "@xterm/xterm";
 
 /** Key that moves focus out of the terminal (Claude Code does not use F6; Esc and Tab it does). */
@@ -32,7 +32,7 @@ export function terminalSize(sessionId: string, cols: number, rows: number): Ter
 /**
  * The PTY lead stops at Claude Code's workspace-trust dialog (default "No, exit") before any hook
  * fires, so a lead that has not reported a running state yet may be waiting for that answer;
- * Nexora never answers it (research.md "S2 result").
+ * Ubuliera never answers it (research.md "S2 result").
  */
 export function mayAwaitWorkspaceTrust(status: string): boolean {
   return status === "starting" || status === "waiting_for_approval";

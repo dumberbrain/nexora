@@ -17,7 +17,7 @@ let projectId = "";
 let api: APIRequestContext;
 
 test.beforeAll(async ({ baseURL }) => {
-  root = mkdtempSync(join(tmpdir(), "nexora-e2e-us7-"));
+  root = mkdtempSync(join(tmpdir(), "ubuliera-e2e-us7-"));
   mkdirSync(join(root, ".claude", "skills", "release-notes"), { recursive: true });
   writeFileSync(
     join(root, ".claude", "skills", "release-notes", "SKILL.md"),
@@ -43,9 +43,9 @@ test.beforeAll(async ({ baseURL }) => {
 
   api = await playwrightRequest.newContext({ baseURL: baseURL! });
   expect((await api.get("/api/v1/auth/session")).ok()).toBeTruthy();
-  const csrf = (await api.storageState()).cookies.find((c) => c.name === "nexora_csrf")!.value;
+  const csrf = (await api.storageState()).cookies.find((c) => c.name === "ubuliera_csrf")!.value;
   const res = await api.post("/api/v1/projects", {
-    headers: { "x-nexora-csrf": csrf },
+    headers: { "x-ubuliera-csrf": csrf },
     data: { rootPath: root, name: basename(root) },
   });
   expect(res.status()).toBe(201);

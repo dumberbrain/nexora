@@ -1,11 +1,11 @@
-import { CSRF_HEADER } from "@nexora/contracts";
+import { CSRF_HEADER } from "@ubuliera/contracts";
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { toast } from "sonner";
 
 import { toApiError } from "./api-error";
 
 const MUTATING = new Set(["post", "put", "patch", "delete"]);
-const CSRF_COOKIE = "nexora_csrf";
+const CSRF_COOKIE = "ubuliera_csrf";
 const SESSION_PATH = "/auth/session";
 
 function readCookie(name: string): string | undefined {

@@ -27,7 +27,7 @@ describe("RegisterProjectForm", () => {
 
   it("shows a 409 from the server on the path field", async () => {
     const { user } = renderWithProviders(<RegisterProjectForm />);
-    await user.type(await screen.findByLabelText(/project folder/i), "C:/work/nexora");
+    await user.type(await screen.findByLabelText(/project folder/i), "C:/work/ubuliera");
     await user.click(screen.getByRole("button", { name: /register project/i }));
     expect(await screen.findByText("This folder is already registered.")).toBeInTheDocument();
   });

@@ -1,4 +1,4 @@
-import { CreateExecutionInputSchema } from "@nexora/contracts";
+import { CreateExecutionInputSchema } from "@ubuliera/contracts";
 import { z } from "zod";
 
 /** Execution.prompt limit ("1–20 000 chars", PromptSchema). */

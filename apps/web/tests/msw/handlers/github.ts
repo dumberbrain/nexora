@@ -8,7 +8,7 @@ import {
   type GithubPullList,
   type GithubRepoList,
   type GithubStatus,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 
 const P1 = "01JCXK0000000000000000P001";
@@ -32,7 +32,12 @@ export const githubStatusFixtures = {
 
 export const githubRepoFixtures: GithubRepoList = {
   items: [
-    { owner: "acme", repo: "nexora", projectId: P1, remote: "https://github.com/acme/nexora.git" },
+    {
+      owner: "acme",
+      repo: "ubuliera",
+      projectId: P1,
+      remote: "https://github.com/acme/ubuliera.git",
+    },
     {
       owner: "acme",
       repo: "billing-api",
@@ -58,7 +63,7 @@ export const githubCommitFixtures: GithubCommitList = {
       message: "feat(web): integrations view\n\nLong body",
       author: "octo-dev",
       date: "2026-11-09T10:00:00Z",
-      url: "https://github.com/acme/nexora/commit/a1b2c3d",
+      url: "https://github.com/acme/ubuliera/commit/a1b2c3d",
     },
   ],
 };
@@ -73,7 +78,7 @@ const pull = (n: number, over: Partial<GithubPull>): GithubPull => ({
   base: "main",
   reviewStatus: "none",
   updatedAt: "2026-11-09T11:00:00Z",
-  url: `https://github.com/acme/nexora/pull/${n}`,
+  url: `https://github.com/acme/ubuliera/pull/${n}`,
   ...over,
 });
 

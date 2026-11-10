@@ -1,4 +1,4 @@
-import { type McpToolName } from "@nexora/contracts";
+import { type McpToolName } from "@ubuliera/contracts";
 
 import { controlTools } from "./control";
 import { monitoringTools } from "./monitoring";

@@ -14,7 +14,7 @@ export function AppHeader() {
         <span className="text-phosphor" aria-hidden="true">
           ▲
         </span>
-        nexora
+        ubuliera
       </Link>
       <div className="ms-auto flex items-center gap-3">
         <ConnectionIndicator />

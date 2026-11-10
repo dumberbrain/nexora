@@ -1,8 +1,8 @@
-import { type Health } from "@nexora/contracts";
+import { type Health } from "@ubuliera/contracts";
 import { Hono } from "hono";
 import { secureHeaders } from "hono/secure-headers";
 
-import { type NexoraEnv } from "../config/env";
+import { type UbulieraEnv } from "../config/env";
 import { type Db, pingDb } from "../db/client";
 import { logger as defaultLogger, type Logger } from "../lib/logger";
 import { SERVER_VERSION } from "../version";
@@ -16,7 +16,7 @@ import { clearSession, issueSession, safeEqual, SessionKeys } from "./middleware
 import { registerStaticSpa } from "./static-spa";
 
 export interface AppDeps {
-  env: NexoraEnv;
+  env: UbulieraEnv;
   db: Db;
   startedAt: number;
   logger?: Logger;
@@ -26,7 +26,7 @@ export interface AppDeps {
   registerRoutes?: (api: Hono<AppBindings>) => void;
   /**
    * registers PUBLIC routes under /api/v1, mounted before session/CSRF auth — only for callers
-   * that bring their own credential check (e.g. hook ingest with X-Nexora-Hook-Token)
+   * that bring their own credential check (e.g. hook ingest with X-Ubuliera-Hook-Token)
    */
   registerPublicRoutes?: (api: Hono<AppBindings>) => void;
   /**

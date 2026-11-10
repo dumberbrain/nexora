@@ -1,5 +1,5 @@
-import { GITHUB_AUTH_HINT, GITHUB_INSTALL_HINT, type GithubStatus } from "@nexora/contracts";
 import { screen, waitFor, within } from "@testing-library/react";
+import { GITHUB_AUTH_HINT, GITHUB_INSTALL_HINT, type GithubStatus } from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 import { useState } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -52,7 +52,7 @@ describe("GithubView", () => {
     expect(within(status).getByText("octo-dev")).toBeInTheDocument();
 
     const picker = await screen.findByRole("combobox", { name: "Repository" });
-    await waitFor(() => expect(picker).toHaveValue("acme/nexora"));
+    await waitFor(() => expect(picker).toHaveValue("acme/ubuliera"));
 
     const branches = await screen.findByRole("list", { name: "Branches" });
     expect(within(branches).getByText("main")).toBeInTheDocument();
@@ -77,7 +77,7 @@ describe("GithubView", () => {
     const { user } = renderWithProviders(<Harness onChange={onChange} />);
     const pulls = await screen.findByRole("list", { name: "Pull requests" });
     await user.click(within(pulls).getByRole("button", { name: "Show files of #12" }));
-    expect(onChange).toHaveBeenLastCalledWith({ repo: "acme/nexora", pull: 12 });
+    expect(onChange).toHaveBeenLastCalledWith({ repo: "acme/ubuliera", pull: 12 });
 
     const files = await screen.findByRole("list", { name: "Changed files of #12" });
     expect(within(files).getByText("README.md")).toBeInTheDocument();
@@ -90,7 +90,7 @@ describe("GithubView", () => {
     const { user } = renderWithProviders(<Harness onChange={onChange} />);
     const branches = await screen.findByRole("list", { name: "Branches" });
     await user.click(within(branches).getByRole("button", { name: "feat/us7-web" }));
-    expect(onChange).toHaveBeenLastCalledWith({ repo: "acme/nexora", branch: "feat/us7-web" });
+    expect(onChange).toHaveBeenLastCalledWith({ repo: "acme/ubuliera", branch: "feat/us7-web" });
     expect(await screen.findByRole("heading", { name: "Commits on feat/us7-web" })).toBeVisible();
   });
 

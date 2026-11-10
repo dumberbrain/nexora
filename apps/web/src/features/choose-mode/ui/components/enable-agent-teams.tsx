@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AGENT_TEAMS_ENABLE_CONFIRMATION } from "@nexora/contracts";
+import { AGENT_TEAMS_ENABLE_CONFIRMATION } from "@ubuliera/contracts";
 import { UsersIcon } from "lucide-react";
 import { useId } from "react";
 import { useForm } from "react-hook-form";
@@ -54,13 +54,13 @@ export function EnableAgentTeams({ execution }: { execution: Execution }) {
           Agent Teams are an experimental Claude Code feature, off until the project opts in. To
           enable them, add this to{" "}
           <code className="text-foreground">{AGENT_TEAMS_SETTINGS_FILE}</code> in the project root
-          (or let Nexora write it):
+          (or let Ubuliera write it):
         </p>
         <pre className="overflow-x-auto border border-border bg-terminal p-2 font-mono text-[11px] text-phosphor">
           {AGENT_TEAMS_SETTINGS_SNIPPET}
         </pre>
         <p>
-          Teams run on the installed Claude Code&apos;s native feature — Nexora never simulates a
+          Teams run on the installed Claude Code&apos;s native feature — Ubuliera never simulates a
           team with subagents.
         </p>
       </div>

@@ -1,7 +1,7 @@
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 
-import { type EntityChanged, RuntimeCapabilityProfileSchema } from "@nexora/contracts";
+import { type EntityChanged, RuntimeCapabilityProfileSchema } from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { EXTERNAL_OBSERVED_CAPABILITIES } from "../../../src/modules/session-manager";

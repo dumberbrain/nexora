@@ -1,4 +1,4 @@
-import { EventTypeSchema, ExecutionModeSchema, SeveritySchema } from "@nexora/contracts";
+import { EventTypeSchema, ExecutionModeSchema, SeveritySchema } from "@ubuliera/contracts";
 import { z } from "zod";
 
 /** The router's JSON search parser turns "123" into a number — accept both for text ids. */

@@ -10,7 +10,7 @@ import {
   MCP_TOOLS,
   McpStartExecutionResultSchema,
   SessionSchema,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 
@@ -66,7 +66,7 @@ function token(name: string, scope: "read" | "control"): string {
 }
 
 async function connect(secret: string): Promise<Client> {
-  const client = new Client({ name: "nexora-test", version: "1.0.0" });
+  const client = new Client({ name: "ubuliera-test", version: "1.0.0" });
   const transport = new StreamableHTTPClientTransport(new URL(MCP_URL), {
     requestInit: { headers: { authorization: `Bearer ${secret}` } },
     fetch: inProcessFetch,

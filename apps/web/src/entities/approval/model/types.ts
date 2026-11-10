@@ -1,11 +1,11 @@
-import { type ApprovalStatus } from "@nexora/contracts";
+import { type ApprovalStatus } from "@ubuliera/contracts";
 
 export type {
   ApprovalDecisionInput,
   ApprovalList,
   ApprovalRequest,
   ApprovalStatus,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 export interface ApprovalListFilters {
   status?: ApprovalStatus;

@@ -1,4 +1,4 @@
-import { type RuntimeEnvironment } from "@nexora/contracts";
+import { type RuntimeEnvironment } from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 
 import { observedCapabilities } from "./sessions";

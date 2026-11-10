@@ -9,7 +9,7 @@ import { expect, test } from "./fixtures/axe";
 import { removeTempRepo } from "./support/temp-repo";
 
 // US2 — task → plan → approval → execution (quickstart V2), on the test-only fake runtime
-// (NEXORA_TEST_FAKE_RUNTIME=1, NODE_ENV=test) with real git worktrees.
+// (UBULIERA_TEST_FAKE_RUNTIME=1, NODE_ENV=test) with real git worktrees.
 test.describe.configure({ mode: "serial" });
 
 let PROJECT = "";
@@ -22,22 +22,22 @@ const PROMPT = [
 let root = "";
 
 test.beforeAll(async ({ baseURL }) => {
-  root = mkdtempSync(join(tmpdir(), "nexora-e2e-us2-"));
+  root = mkdtempSync(join(tmpdir(), "ubuliera-e2e-us2-"));
   // unique per run: CI runs every browser project (and retries) against one server
   PROJECT = basename(root);
   const git = (...args: string[]) => execFileSync("git", args, { cwd: root });
   git("init", "-q", "-b", "main");
-  git("config", "user.email", "e2e@nexora.local");
-  git("config", "user.name", "nexora e2e");
+  git("config", "user.email", "e2e@ubuliera.local");
+  git("config", "user.name", "ubuliera e2e");
   writeFileSync(join(root, "package.json"), JSON.stringify({ name: "e2e-us2" }));
   git("add", ".");
   git("commit", "-q", "-m", "init");
 
   const api = await playwrightRequest.newContext({ baseURL: baseURL! });
   expect((await api.get("/api/v1/auth/session")).ok()).toBeTruthy();
-  const csrf = (await api.storageState()).cookies.find((c) => c.name === "nexora_csrf")?.value;
+  const csrf = (await api.storageState()).cookies.find((c) => c.name === "ubuliera_csrf")?.value;
   const res = await api.post("/api/v1/projects", {
-    headers: { "x-nexora-csrf": csrf! },
+    headers: { "x-ubuliera-csrf": csrf! },
     data: { rootPath: root, name: PROJECT },
   });
   expect(res.status()).toBe(201);

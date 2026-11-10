@@ -11,7 +11,7 @@ import { S1, seedObservedSession } from "./support/us1-seed";
  * workflow id are covered by the story specs (us2/us5); here the observed session and its
  * subagent from the recorded hook fixtures stand in for the dynamic routes.
  *
- * Screenshots: set NEXORA_SCREENSHOTS=1 to (re)write docs/screenshots/*.png from chromium.
+ * Screenshots: set UBULIERA_SCREENSHOTS=1 to (re)write docs/screenshots/*.png from chromium.
  */
 const ROUTES = [
   { path: "/", name: "dashboard" },
@@ -46,7 +46,7 @@ for (const theme of THEMES) {
   test.describe(`${theme} theme`, () => {
     test.beforeEach(async ({ page }) => {
       await page.addInitScript((pref) => {
-        localStorage.setItem("nexora-theme:v1", JSON.stringify({ state: { pref }, version: 1 }));
+        localStorage.setItem("ubuliera-theme:v1", JSON.stringify({ state: { pref }, version: 1 }));
       }, theme);
     });
 
@@ -63,7 +63,7 @@ for (const theme of THEMES) {
         await expect(page.getByRole("status", { name: /realtime connected/i })).toBeVisible();
         await expectNoA11yViolations();
 
-        if (process.env.NEXORA_SCREENSHOTS === "1" && browserName === "chromium") {
+        if (process.env.UBULIERA_SCREENSHOTS === "1" && browserName === "chromium") {
           mkdirSync(SCREENSHOT_DIR, { recursive: true });
           await page.screenshot({ path: `${SCREENSHOT_DIR}${route.name}-${theme}.png` });
         }

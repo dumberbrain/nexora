@@ -4,11 +4,11 @@ import { type AddressInfo } from "node:net";
 import {
   type ClientToServerEvents,
   type EventBatch,
-  type NexoraEvent,
+  type UbulieraEvent,
   type ReplayDone,
   type ServerToClientEvents,
   type SubscribeAck,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { io as ioc, type Socket } from "socket.io-client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -65,7 +65,7 @@ afterEach(async () => {
   closeDb(db);
 });
 
-function connect(headers: Record<string, string> = { cookie: `nexora_session=${keys.session}` }) {
+function connect(headers: Record<string, string> = { cookie: `ubuliera_session=${keys.session}` }) {
   const c: Client = ioc(`http://127.0.0.1:${port}/live`, {
     transports: ["websocket"],
     extraHeaders: headers,
@@ -100,7 +100,10 @@ describe("realtime gateway", () => {
   });
 
   it("rejects a foreign origin even with a valid session", async () => {
-    const c = connect({ cookie: `nexora_session=${keys.session}`, origin: "http://evil.example" });
+    const c = connect({
+      cookie: `ubuliera_session=${keys.session}`,
+      origin: "http://evil.example",
+    });
     await expect(connected(c)).rejects.toThrow();
   });
 
@@ -112,7 +115,7 @@ describe("realtime gateway", () => {
   });
 
   it("replays events after the cursor in order, then replay.done, then live", async () => {
-    const before: NexoraEvent[] = [store.append(ev()), store.append(ev()), store.append(ev())];
+    const before: UbulieraEvent[] = [store.append(ev()), store.append(ev()), store.append(ev())];
     store.append(ev({ sessionId: "other" }));
     const c = connect();
     const log = collect(c);

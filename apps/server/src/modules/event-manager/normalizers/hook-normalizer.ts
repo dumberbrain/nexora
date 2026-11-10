@@ -1,13 +1,13 @@
 import path from "node:path";
 
-import { type EventType, type Severity } from "@nexora/contracts";
+import { type EventType, type Severity } from "@ubuliera/contracts";
 
 import { isInsideRoot } from "../../../lib/path-guard";
 import { type EventInput } from "../event-store";
 import { type HookPayload, obj, str } from "./hook-payload";
 
 /**
- * Claude Code hook → NexoraEvent normaliser (T057, contracts/runtime-adapter.md table). Pure:
+ * Claude Code hook → UbulieraEvent normaliser (T057, contracts/runtime-adapter.md table). Pure:
  * source "hook", reliability "authoritative"; PostToolUse of a file-editing tool adds a
  * "derived" file.modified. Payload = the hook body (EventStore redacts and caps it).
  */
@@ -173,7 +173,7 @@ export function normalizeHook(p: HookPayload, ctx: NormalizeContext = {}): Event
 
   const payload =
     p.hook_event_name === "SubagentStart" && ctx.parentAgentId
-      ? { ...p, nexora: { parentAgentId: ctx.parentAgentId, parentLinkReliability: "derived" } }
+      ? { ...p, ubuliera: { parentAgentId: ctx.parentAgentId, parentLinkReliability: "derived" } }
       : p;
   const events: EventInput[] = [
     {

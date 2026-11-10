@@ -36,7 +36,7 @@ import type {
   Usage,
   Verification,
   WorkflowGraph,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 const ts = (name: string) => integer(name);
 const json = <T>(name: string) => text(name, { mode: "json" }).$type<T>();

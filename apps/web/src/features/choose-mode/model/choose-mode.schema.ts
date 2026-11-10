@@ -1,4 +1,4 @@
-import { EXECUTION_MODES, STRATEGIES, type SetModeInput } from "@nexora/contracts";
+import { EXECUTION_MODES, STRATEGIES, type SetModeInput } from "@ubuliera/contracts";
 import { z } from "zod";
 
 import { type Execution, type ModeOption } from "@/entities/execution";

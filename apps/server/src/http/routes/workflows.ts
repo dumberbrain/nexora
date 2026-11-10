@@ -9,7 +9,7 @@ import {
   type WorkflowRunDetail,
   type WorkflowVersion,
   type WorkflowVersionList,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { type Hono } from "hono";
 import { z } from "zod";
 

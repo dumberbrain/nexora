@@ -1,9 +1,9 @@
-import { type SubscribeScope } from "@nexora/contracts";
 import { useQueryClient } from "@tanstack/react-query";
+import { type SubscribeScope } from "@ubuliera/contracts";
 
 import { useLiveSubscription } from "@/shared/socket/use-live-subscription";
 
-import { type EventFilters, type NexoraEvent } from "./types";
+import { type EventFilters, type UbulieraEvent } from "./types";
 import { eventFeedQuery } from "../api/event.queries";
 import { prependEvents } from "../lib/event-feed";
 import { matchesEventFilters } from "../lib/event-params";
@@ -18,7 +18,7 @@ function scopeOf(f: EventFilters): { scope: SubscribeScope; id?: string } {
 
 interface LiveEventFeedOptions {
   /** called with every matching live event batch (after the cache was updated) */
-  onEvents?: (events: NexoraEvent[]) => void;
+  onEvents?: (events: UbulieraEvent[]) => void;
   enabled?: boolean;
 }
 

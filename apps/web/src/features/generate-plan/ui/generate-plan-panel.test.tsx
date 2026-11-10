@@ -34,7 +34,7 @@ describe("GeneratePlanPanel", () => {
     const bodies = capturePlanRequests();
     const onGenerated = vi.fn();
     const { user, queryClient } = renderWithProviders(
-      <GeneratePlanPanel executionId={id} projectName="nexora" onGenerated={onGenerated} />,
+      <GeneratePlanPanel executionId={id} projectName="ubuliera" onGenerated={onGenerated} />,
     );
     await user.click(await screen.findByRole("button", { name: /generate plan/i }));
     await waitFor(() => expect(onGenerated).toHaveBeenCalledWith(planFixture));
@@ -49,7 +49,7 @@ describe("GeneratePlanPanel", () => {
     const bodies = capturePlanRequests();
     const onGenerated = vi.fn();
     const { user } = renderWithProviders(
-      <GeneratePlanPanel executionId={id} projectName="nexora" onGenerated={onGenerated} />,
+      <GeneratePlanPanel executionId={id} projectName="ubuliera" onGenerated={onGenerated} />,
     );
     await user.click(await screen.findByRole("switch", { name: /model-assisted planning/i }));
     await user.click(screen.getByRole("button", { name: /generate plan/i }));
@@ -67,7 +67,7 @@ describe("GeneratePlanPanel", () => {
   it("runs nothing more when consent is cancelled", async () => {
     const bodies = capturePlanRequests();
     const { user } = renderWithProviders(
-      <GeneratePlanPanel executionId={id} projectName="nexora" />,
+      <GeneratePlanPanel executionId={id} projectName="ubuliera" />,
     );
     await user.click(await screen.findByRole("switch", { name: /model-assisted planning/i }));
     await user.click(screen.getByRole("button", { name: /generate plan/i }));

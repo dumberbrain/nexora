@@ -22,8 +22,8 @@ let root: string;
 let home: string;
 
 beforeEach(() => {
-  root = mkdtempSync(path.join(tmpdir(), "nexora-pty-"));
-  home = mkdtempSync(path.join(tmpdir(), "nexora-home-"));
+  root = mkdtempSync(path.join(tmpdir(), "ubuliera-pty-"));
+  home = mkdtempSync(path.join(tmpdir(), "ubuliera-home-"));
 });
 afterEach(() => {
   rmSync(root, { recursive: true, force: true });
@@ -64,7 +64,7 @@ function setup(opts: Partial<AgentTeamPtyAdapterOptions> = {}) {
     executionId: "01JEXEC0000000000000000000",
     taskId: null,
     projectRoot: root,
-    cwd: path.join(root, ".nexora", "worktrees", "e1"),
+    cwd: path.join(root, ".ubuliera", "worktrees", "e1"),
     prompt: "Build it\nwith a team",
     ownedPaths: [],
     permissionMode: "acceptEdits",
@@ -124,7 +124,7 @@ describe("AgentTeamPtyAdapter", () => {
       "sonnet",
     ]);
     expect(p.args).not.toContain("-p");
-    expect(p.opts.cwd).toBe(path.join(root, ".nexora", "worktrees", "e1"));
+    expect(p.opts.cwd).toBe(path.join(root, ".ubuliera", "worktrees", "e1"));
     expect(p.opts.env).toEqual({
       PATH: "/usr/bin",
       ANTHROPIC_MODEL: "keep",

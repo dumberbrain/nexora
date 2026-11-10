@@ -2,16 +2,16 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { HOOK_TOKEN_HEADER, HookPreviewSchema } from "@nexora/contracts";
+import { HOOK_TOKEN_HEADER, HookPreviewSchema } from "@ubuliera/contracts";
 import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { projects } from "../../../src/db/schema";
 import {
-  NEXORA_HOOK_EVENTS,
-  hasNexoraHooks,
-  mergeNexoraHooks,
-  removeNexoraHooks,
+  UBULIERA_HOOK_EVENTS,
+  hasUbulieraHooks,
+  mergeUbulieraHooks,
+  removeUbulieraHooks,
 } from "../../../src/modules/project-registry/hook-installer";
 import { createHarness, type Harness } from "../../helpers/us1";
 
@@ -42,14 +42,14 @@ const writeSettings = (value: unknown) => {
   writeFileSync(settingsPath, JSON.stringify(value, null, 2));
 };
 const readSettings = () => JSON.parse(readFileSync(settingsPath, "utf8")) as typeof existing;
-const nexoraEntries = (settings: unknown) =>
+const ubulieraEntries = (settings: unknown) =>
   JSON.stringify(settings).split("/api/v1/hooks/ingest").length - 1;
 const row = () => h.db.select().from(projects).where(eq(projects.id, projectId)).get();
 
 describe("pure merge", () => {
   it("adds one http hook per event and keeps existing hooks", () => {
-    const merged = mergeNexoraHooks(existing, URL_, "tok");
-    expect(nexoraEntries(merged)).toBe(NEXORA_HOOK_EVENTS.length);
+    const merged = mergeUbulieraHooks(existing, URL_, "tok");
+    expect(ubulieraEntries(merged)).toBe(UBULIERA_HOOK_EVENTS.length);
     const pre = (merged.hooks as Record<string, unknown[]>).PreToolUse;
     expect(pre?.[0]).toEqual(existing.hooks.PreToolUse[0]);
     expect(pre?.[1]).toMatchObject({
@@ -61,18 +61,18 @@ describe("pure merge", () => {
   });
 
   it("is idempotent and removal restores the original", () => {
-    const twice = mergeNexoraHooks(mergeNexoraHooks(existing, URL_, "a"), URL_, "b");
-    expect(nexoraEntries(twice)).toBe(NEXORA_HOOK_EVENTS.length);
+    const twice = mergeUbulieraHooks(mergeUbulieraHooks(existing, URL_, "a"), URL_, "b");
+    expect(ubulieraEntries(twice)).toBe(UBULIERA_HOOK_EVENTS.length);
     expect(JSON.stringify(twice)).not.toContain('"a"');
-    expect(removeNexoraHooks(twice)).toEqual(existing);
-    expect(hasNexoraHooks(twice)).toBe(true);
-    expect(hasNexoraHooks(existing)).toBe(false);
+    expect(removeUbulieraHooks(twice)).toEqual(existing);
+    expect(hasUbulieraHooks(twice)).toBe(true);
+    expect(hasUbulieraHooks(existing)).toBe(false);
   });
 
   it("never registers WorktreeCreate/WorktreeRemove (http hooks would replace git behaviour)", () => {
-    expect(NEXORA_HOOK_EVENTS).not.toContain("WorktreeCreate");
-    expect(NEXORA_HOOK_EVENTS).not.toContain("WorktreeRemove");
-    expect(NEXORA_HOOK_EVENTS).toContain("SubagentStart");
+    expect(UBULIERA_HOOK_EVENTS).not.toContain("WorktreeCreate");
+    expect(UBULIERA_HOOK_EVENTS).not.toContain("WorktreeRemove");
+    expect(UBULIERA_HOOK_EVENTS).toContain("SubagentStart");
   });
 });
 
@@ -84,7 +84,7 @@ describe("HookInstaller", () => {
     expect(preview.exists).toBe(true);
     expect(preview.before).toBe(before);
     expect(preview.alreadyInstalled).toBe(false);
-    expect(preview.events).toEqual([...NEXORA_HOOK_EVENTS]);
+    expect(preview.events).toEqual([...UBULIERA_HOOK_EVENTS]);
     const after = JSON.parse(preview.after) as typeof existing;
     expect(after.hooks.PreToolUse[0]).toEqual(existing.hooks.PreToolUse[0]);
     expect(after.hooks.SessionStart).toEqual(existing.hooks.SessionStart);
@@ -118,14 +118,14 @@ describe("HookInstaller", () => {
     const hash1 = row()?.hookTokenHash;
     await h.services.hookInstaller.install(projectId, "user");
     const settings = readSettings();
-    expect(nexoraEntries(settings)).toBe(NEXORA_HOOK_EVENTS.length);
+    expect(ubulieraEntries(settings)).toBe(UBULIERA_HOOK_EVENTS.length);
     expect(settings.permissions).toEqual(existing.permissions);
     expect(settings.hooks.PreToolUse[0]).toEqual(existing.hooks.PreToolUse[0]);
     expect(row()?.hookTokenHash).not.toBe(hash1);
     expect((await h.services.hookInstaller.preview(projectId)).alreadyInstalled).toBe(true);
   });
 
-  it("uninstall removes only Nexora entries", async () => {
+  it("uninstall removes only Ubuliera entries", async () => {
     writeSettings(existing);
     await h.services.hookInstaller.install(projectId, "user");
     const project = await h.services.hookInstaller.uninstall(projectId, "user");
@@ -145,7 +145,9 @@ describe("HookInstaller", () => {
 
   it("audits install and uninstall without the token", async () => {
     await h.services.hookInstaller.install(projectId, "user");
-    const token = /"X-Nexora-Hook-Token": "([^"]+)"/.exec(readFileSync(settingsPath, "utf8"))?.[1];
+    const token = /"X-Ubuliera-Hook-Token": "([^"]+)"/.exec(
+      readFileSync(settingsPath, "utf8"),
+    )?.[1];
     expect(token).toBeTruthy();
     await h.services.hookInstaller.uninstall(projectId, "user");
     const actions = h.audit.list({ limit: 10 }).items.map((a) => a.action);

@@ -16,7 +16,7 @@ export const REVIEW_STATUS_TONE: Record<GithubPull["reviewStatus"], string> = {
   none: "border-border text-muted-foreground",
 };
 
-/** "acme/nexora" — the repo picker value and URL search param. */
+/** "acme/ubuliera" — the repo picker value and URL search param. */
 export const repoSlug = ({ owner, repo }: RepoCoords) => `${owner}/${repo}`;
 
 /** Parse "owner/repo"; anything else is not a repo reference. */

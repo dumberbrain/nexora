@@ -1,4 +1,4 @@
-import { AuditActorSchema, type AuditEntry, type Page } from "@nexora/contracts";
+import { AuditActorSchema, type AuditEntry, type Page } from "@ubuliera/contracts";
 import { desc, lt } from "drizzle-orm";
 
 import { type Db } from "../../db/client";

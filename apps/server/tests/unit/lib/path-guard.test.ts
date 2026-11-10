@@ -47,7 +47,7 @@ describe("resolveInsideRoot (real filesystem, follows symlinks)", () => {
   let canSymlink = true;
 
   beforeAll(() => {
-    base = mkdtempSync(join(tmpdir(), "nexora-pathguard-"));
+    base = mkdtempSync(join(tmpdir(), "ubuliera-pathguard-"));
     root = join(base, "root");
     outside = join(base, "outside");
     mkdirSync(join(root, "src"), { recursive: true });

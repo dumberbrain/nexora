@@ -10,7 +10,7 @@ import {
   type Task,
   TaskControlInputSchema,
   TaskRefSchema,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { type Context, type Hono } from "hono";
 
 import { type CommunicationService } from "../../modules/communication-manager/communication.service";

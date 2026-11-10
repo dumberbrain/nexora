@@ -1,7 +1,7 @@
 import { createServer, type Server as HttpServer } from "node:http";
 import { type AddressInfo } from "node:net";
 
-import { type Session, type TerminalAttachAck } from "@nexora/contracts";
+import { type Session, type TerminalAttachAck } from "@ubuliera/contracts";
 import { Server } from "socket.io";
 import { io as ioc, type Socket } from "socket.io-client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -99,7 +99,7 @@ function connect(opts: { cookie?: boolean; token?: string } = { cookie: true }) 
   const c = ioc(`http://127.0.0.1:${port}/terminal`, {
     path: "/socket.io",
     transports: ["websocket"],
-    extraHeaders: opts.cookie ? { cookie: `nexora_session=${keys.session}` } : {},
+    extraHeaders: opts.cookie ? { cookie: `ubuliera_session=${keys.session}` } : {},
     ...(opts.token ? { auth: { token: opts.token } } : {}),
     reconnection: false,
     forceNew: true,
@@ -127,7 +127,7 @@ describe("/terminal gateway", () => {
     await expect(connected(connect({ token: "nope" }))).rejects.toThrow(/auth/i);
   });
 
-  it("refuses sessions that are not Nexora-started Agent Teams leads", async () => {
+  it("refuses sessions that are not Ubuliera-started Agent Teams leads", async () => {
     const c = connect();
     await connected(c);
     expect(await attach(c, "sdk")).toMatchObject({ ok: false });

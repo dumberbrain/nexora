@@ -1,4 +1,4 @@
-import { MAX_RETRY_ATTEMPTS, NODE_CONFIG_SCHEMAS } from "@nexora/contracts";
+import { MAX_RETRY_ATTEMPTS, NODE_CONFIG_SCHEMAS } from "@ubuliera/contracts";
 import { z } from "zod";
 
 import { type OnError, type WorkflowNode, type WorkflowNodeKind } from "@/entities/workflow";

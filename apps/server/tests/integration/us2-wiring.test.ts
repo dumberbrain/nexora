@@ -8,7 +8,7 @@ import {
   ExecutionTasksSchema,
   RuntimeEnvironmentSchema,
   VerificationSchema,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { closeDb, openDb, type Db } from "../../src/db/client";
@@ -34,10 +34,10 @@ const git = (cwd: string, ...args: string[]) =>
   execFileSync("git", args, { cwd, encoding: "utf8" }).trim();
 
 beforeEach(async () => {
-  root = mkdtempSync(join(tmpdir(), "nexora-wiring-"));
+  root = mkdtempSync(join(tmpdir(), "ubuliera-wiring-"));
   git(root, "init", "-q", "-b", "main");
-  git(root, "config", "user.email", "test@nexora.local");
-  git(root, "config", "user.name", "nexora test");
+  git(root, "config", "user.email", "test@ubuliera.local");
+  git(root, "config", "user.name", "ubuliera test");
   writeFileSync(join(root, "package.json"), JSON.stringify({ name: "demo" }));
   git(root, "add", ".");
   git(root, "commit", "-q", "-m", "init");
@@ -89,7 +89,7 @@ const send = (method: string, path: string, body?: unknown) =>
       ...HOST,
       cookie: auth.cookie,
       "content-type": "application/json",
-      "x-nexora-csrf": auth.csrf,
+      "x-ubuliera-csrf": auth.csrf,
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
@@ -121,9 +121,9 @@ describe("US2 server wiring (fake runtime, real git)", () => {
       await (await send("POST", `/executions/${id}/approve`, {})).json(),
     );
     const wt = approved.worktreePath ?? "";
-    expect(wt).toBe(join(root, ".nexora", "worktrees", id, "main"));
+    expect(wt).toBe(join(root, ".ubuliera", "worktrees", id, "main"));
     expect(existsSync(wt)).toBe(true);
-    expect(git(root, "branch", "--list", `nexora/${id}`)).toContain(`nexora/${id}`);
+    expect(git(root, "branch", "--list", `ubuliera/${id}`)).toContain(`ubuliera/${id}`);
 
     await vi.waitFor(
       async () => {
@@ -145,7 +145,7 @@ describe("US2 server wiring (fake runtime, real git)", () => {
     expect(sessions.length).toBeGreaterThan(0);
     for (const s of sessions) {
       expect(s.observeOnly).toBe(false);
-      expect(s.cwd.startsWith(`${root}${sep}.nexora${sep}worktrees`)).toBe(true);
+      expect(s.cwd.startsWith(`${root}${sep}.ubuliera${sep}worktrees`)).toBe(true);
     }
   }, 30_000);
 });

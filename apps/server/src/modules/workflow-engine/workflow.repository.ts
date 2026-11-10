@@ -5,7 +5,7 @@ import {
   type WorkflowRun,
   type WorkflowSummary,
   type WorkflowVersion,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { and, asc, desc, eq, max } from "drizzle-orm";
 
 import { type WorkflowRunStore } from "./executor";

@@ -1,4 +1,4 @@
-import { type Stats } from "@nexora/contracts";
+import { type Stats } from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { closeDb, openDb, type Db } from "../../../src/db/client";

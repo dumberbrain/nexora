@@ -2,7 +2,7 @@
 
 Endpoint: same origin, path `/socket.io`, namespace `/live`. Auth during handshake: session
 cookie (loopback web) or `auth: { token }` (remote). Payloads validated with zod schemas from
-`@nexora/contracts` on both ends.
+`@ubuliera/contracts` on both ends.
 
 ## Client → server
 
@@ -17,7 +17,7 @@ Rooms: `global`, `execution:<id>`, `session:<id>`, `agent:<id>`.
 
 | Event | Payload |
 |---|---|
-| `event` | `NexoraEvent` (see data-model Event) — the only stream for logs/timelines |
+| `event` | `UbulieraEvent` (see data-model Event) — the only stream for logs/timelines |
 | `entity.changed` | `{ kind: "execution"\|"task"\|"session"\|"agent"\|"approval"\|"workflowRun", id, patch }` — clients update TanStack Query cache via `setQueryData` or invalidate the exact key |
 | `stats` | Overview counters, throttled to ≤ 2/s |
 | `replay.done` | `{ lastEventId }` |

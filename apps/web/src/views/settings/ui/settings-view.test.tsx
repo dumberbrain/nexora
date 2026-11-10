@@ -108,7 +108,7 @@ describe("SettingsView — API tokens", () => {
     await user.click(within(dialog).getByRole("button", { name: "Copy token secret" }));
     expect(await navigator.clipboard.readText()).toBe(CREATED_TOKEN_SECRET);
 
-    const command = `claude mcp add --transport http nexora ${MCP_ENDPOINT} --header "Authorization: Bearer ${CREATED_TOKEN_SECRET}"`;
+    const command = `claude mcp add --transport http ubuliera ${MCP_ENDPOINT} --header "Authorization: Bearer ${CREATED_TOKEN_SECRET}"`;
     expect(within(dialog).getByText(command)).toBeInTheDocument();
     await user.click(within(dialog).getByRole("button", { name: "Copy MCP client command" }));
     expect(await navigator.clipboard.readText()).toBe(command);
@@ -189,7 +189,7 @@ describe("SettingsView — remote access", () => {
     expect(within(facts).getByText("127.0.0.1")).toBeInTheDocument();
     expect(within(facts).getByText("3021")).toBeInTheDocument();
     expect(within(facts).getByText("not configured")).toBeInTheDocument();
-    for (const name of ["NEXORA_REMOTE", "NEXORA_HOST", "NEXORA_PORT", "NEXORA_TOKEN"]) {
+    for (const name of ["UBULIERA_REMOTE", "UBULIERA_HOST", "UBULIERA_PORT", "UBULIERA_TOKEN"]) {
       expect(within(remote).getByText(name)).toBeInTheDocument();
     }
     expect(within(remote).queryByRole("switch")).not.toBeInTheDocument();

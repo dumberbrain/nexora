@@ -1,8 +1,8 @@
-import { MCP_ENDPOINT_PATH, type Settings } from "@nexora/contracts";
+import { MCP_ENDPOINT_PATH, type Settings } from "@ubuliera/contracts";
 import { eq } from "drizzle-orm";
 
 import { type AuditService } from "./audit.service";
-import { type NexoraEnv } from "../../config/env";
+import { type UbulieraEnv } from "../../config/env";
 import { type Db } from "../../db/client";
 import { settings } from "../../db/schema";
 
@@ -11,7 +11,7 @@ export const MCP_ENABLED_KEY = "mcp.enabled";
 export interface SettingsServiceDeps {
   db: Db;
   audit: AuditService;
-  env: Pick<NexoraEnv, "remote" | "host" | "port" | "token" | "publicUrl">;
+  env: Pick<UbulieraEnv, "remote" | "host" | "port" | "token" | "publicUrl">;
   now?: () => number;
 }
 

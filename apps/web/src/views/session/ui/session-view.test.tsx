@@ -6,7 +6,7 @@ import { managedSessionFixture, sessionFixtures } from "../../../../tests/msw/ha
 import { renderWithProviders } from "../../../../tests/render";
 
 describe("SessionView controls", () => {
-  it("offers capability-derived controls and messaging for a Nexora-managed session", async () => {
+  it("offers capability-derived controls and messaging for a Ubuliera-managed session", async () => {
     renderWithProviders(<SessionView sessionId={managedSessionFixture.id} />);
     const controls = await screen.findByRole("region", { name: "Controls" });
     const bar = await within(controls).findByRole("toolbar", { name: /session controls/i });

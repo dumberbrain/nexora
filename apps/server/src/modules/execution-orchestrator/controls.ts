@@ -14,7 +14,7 @@ import {
   type Task,
   type TaskControlInput,
   type TaskRef,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { ZodError } from "zod";
 
 import { isTerminalExecution } from "./execution-state";
@@ -445,7 +445,7 @@ export class ControlService {
 
   private handleOf(s: Session) {
     const h = this.deps.runtime.getHandle(s.id);
-    if (!h) throw conflict("Session is not running under this Nexora server");
+    if (!h) throw conflict("Session is not running under this Ubuliera server");
     return h;
   }
 

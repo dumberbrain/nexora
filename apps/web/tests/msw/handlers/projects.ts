@@ -5,7 +5,7 @@ import {
   type ModelConsentInput,
   type Project,
   type ProjectList,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 
 const NOW = Date.UTC(2026, 10, 8, 12, 0, 0);
@@ -13,8 +13,8 @@ const NOW = Date.UTC(2026, 10, 8, 12, 0, 0);
 export const projectFixtures: Project[] = [
   {
     id: "01JCXK0000000000000000P001",
-    name: "nexora",
-    rootPath: "C:/work/nexora",
+    name: "ubuliera",
+    rootPath: "C:/work/ubuliera",
     detectedStack: {
       languages: ["typescript"],
       frameworks: ["react", "hono"],
@@ -95,7 +95,7 @@ export const projectHandlers = [
   http.delete("*/api/v1/projects/:id/hooks", ({ params }) =>
     HttpResponse.json<Project>({ ...projectById(params.id), hooksInstalled: false }),
   ),
-  // FR-008: "nexora" (P001) has "always allow model usage" on; every other project is off
+  // FR-008: "ubuliera" (P001) has "always allow model usage" on; every other project is off
   http.get("*/api/v1/projects/:id/model-consent", ({ params }) =>
     HttpResponse.json<ModelConsent>({
       projectId: String(params.id),

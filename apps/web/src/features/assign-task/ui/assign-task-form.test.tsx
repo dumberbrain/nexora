@@ -1,5 +1,5 @@
-import { type ExecutionTasks } from "@nexora/contracts";
 import { screen, waitFor } from "@testing-library/react";
+import { type ExecutionTasks } from "@ubuliera/contracts";
 import { http } from "msw";
 import { describe, expect, it, vi } from "vitest";
 

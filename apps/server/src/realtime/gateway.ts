@@ -6,7 +6,7 @@ import {
   EVENT_BATCH_MS,
   LIVE_NAMESPACE,
   MAX_REPLAY_EVENTS,
-  type NexoraEvent,
+  type UbulieraEvent,
   roomOf,
   type ServerToClientEvents,
   SOCKET_PATH,
@@ -14,7 +14,7 @@ import {
   SubscribePayloadSchema,
   type SubscribeScope,
   UnsubscribePayloadSchema,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { Server, type Socket } from "socket.io";
 
 import { type ApiTokenVerifier, bearerToken } from "../http/middleware/bearer-auth";
@@ -98,7 +98,7 @@ export function readCookie(header: string | undefined, name: string): string | u
 }
 
 /** Rooms an event belongs to. */
-function roomsFor(e: NexoraEvent): string[] {
+function roomsFor(e: UbulieraEvent): string[] {
   const rooms = ["global"];
   if (e.executionId) rooms.push(roomOf("execution", e.executionId));
   if (e.sessionId) rooms.push(roomOf("session", e.sessionId));
@@ -177,7 +177,7 @@ export function createGateway(opts: GatewayOptions): Gateway {
   });
 
   // ---- live batching ----
-  const pending = new Map<string, NexoraEvent[]>();
+  const pending = new Map<string, UbulieraEvent[]>();
   let timer: NodeJS.Timeout | undefined;
   const flush = () => {
     timer = undefined;

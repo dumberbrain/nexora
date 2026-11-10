@@ -1,4 +1,4 @@
-import { type ExecutionStatus, type TaskStatus } from "@nexora/contracts";
+import { type ExecutionStatus, type TaskStatus } from "@ubuliera/contracts";
 
 /** Exact task status names from US2-AS6 — each one stays distinguishable by its text. */
 export const TASK_STATUS_LABEL: Record<TaskStatus, string> = {

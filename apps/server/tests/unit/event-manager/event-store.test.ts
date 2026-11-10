@@ -1,4 +1,4 @@
-import { type NexoraEvent } from "@nexora/contracts";
+import { type UbulieraEvent } from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { closeDb, openDb, type Db } from "../../../src/db/client";
@@ -40,7 +40,7 @@ afterEach(() => {
 
 describe("EventStore.append", () => {
   it("returns the event immediately and publishes it on the bus", () => {
-    const seen: NexoraEvent[] = [];
+    const seen: UbulieraEvent[] = [];
     bus.onEvent((e) => seen.push(e));
     const e = store.append(ev());
     expect(e.id).toHaveLength(26);

@@ -1,4 +1,4 @@
-import { ApiErrorBodySchema, type ErrorCode } from "@nexora/contracts";
+import { ApiErrorBodySchema, type ErrorCode } from "@ubuliera/contracts";
 import { isAxiosError } from "axios";
 
 /** Typed error for every failed API call. `status` is null for network/timeout failures. */

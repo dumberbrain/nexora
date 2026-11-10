@@ -6,14 +6,14 @@ import {
   type SessionDetail,
   type SessionList,
   type SessionStatus,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 
 import { agentFixtures } from "./agents";
 
 const NOW = Date.UTC(2026, 10, 8, 12, 0, 0);
 
-/** Capability profile of a session Nexora only observes through hooks. */
+/** Capability profile of a session Ubuliera only observes through hooks. */
 export const observedCapabilities: RuntimeCapabilityProfile = {
   runtime: "external_observed",
   canStart: false,
@@ -36,7 +36,7 @@ const base: Omit<Session, "id" | "status" | "lastActivityAt" | "startedAt"> = {
   projectId: "01JCXK0000000000000000P001",
   runtime: "external_observed",
   observeOnly: true,
-  cwd: "C:/work/nexora",
+  cwd: "C:/work/ubuliera",
   gitBranch: "feat/us1-web",
   worktreePath: null,
   model: "claude-opus-4-5",
@@ -76,7 +76,7 @@ export const sessionFixtures: Session[] = [
   },
 ];
 
-/** Capability profile of an Agent SDK session Nexora started (runtime-adapter.md matrix). */
+/** Capability profile of an Agent SDK session Ubuliera started (runtime-adapter.md matrix). */
 export const managedCapabilities: RuntimeCapabilityProfile = {
   runtime: "agent_sdk",
   canStart: true,
@@ -93,7 +93,7 @@ export const managedCapabilities: RuntimeCapabilityProfile = {
 };
 
 /**
- * A Nexora-managed session of the running execution X002. Reachable by id and by the
+ * A Ubuliera-managed session of the running execution X002. Reachable by id and by the
  * `executionId` list filter only, so US1 list fixtures stay unchanged.
  */
 export const managedSessionFixture: Session = {
@@ -104,7 +104,7 @@ export const managedSessionFixture: Session = {
   currentTaskId: "T-1",
   runtime: "agent_sdk",
   observeOnly: false,
-  worktreePath: "C:/work/nexora/.nexora/worktrees/X002/T-1",
+  worktreePath: "C:/work/ubuliera/.ubuliera/worktrees/X002/T-1",
   capabilities: managedCapabilities,
   status: "running",
   lastActivityAt: NOW - 5_000,
@@ -122,7 +122,7 @@ const CONTROL_STATUS: Record<string, SessionStatus> = {
 
 const notFound: ApiErrorBody = { error: { code: "NOT_FOUND", message: "session not found" } };
 const observeOnly: ApiErrorBody = {
-  error: { code: "CONFLICT", message: "observe-only session — Nexora did not start it" },
+  error: { code: "CONFLICT", message: "observe-only session — Ubuliera did not start it" },
 };
 
 /** POST /sessions/:id/messages and /agents/:id/messages answer with the recorded Message. */

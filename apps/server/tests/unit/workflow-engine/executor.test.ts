@@ -3,7 +3,7 @@ import {
   type WorkflowNodeChangedPayload,
   type WorkflowNodeRun,
   type WorkflowRun,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { describe, expect, it } from "vitest";
 
 import { forkJoin, graph, linear } from "./graph-fixtures";

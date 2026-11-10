@@ -1,4 +1,4 @@
-import { GITHUB_AUTH_HINT, GITHUB_INSTALL_HINT, GithubStatusSchema } from "@nexora/contracts";
+import { GITHUB_AUTH_HINT, GITHUB_INSTALL_HINT, GithubStatusSchema } from "@ubuliera/contracts";
 import { describe, expect, it } from "vitest";
 
 import { ProcessNotAllowedError, type RunResult } from "../../../src/lib/process";

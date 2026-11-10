@@ -8,7 +8,7 @@ import {
   type SDKUserMessage,
   type SettingSource,
 } from "@anthropic-ai/claude-agent-sdk";
-import { type RuntimeCapabilityProfile } from "@nexora/contracts";
+import { type RuntimeCapabilityProfile } from "@ubuliera/contracts";
 
 import { InputQueue } from "./input-queue";
 import { MessageMapper } from "./message-mapper";
@@ -123,7 +123,7 @@ export class AgentSdkAdapter implements RuntimeAdapter {
       });
       return answer === "allow"
         ? { behavior: "allow", updatedInput: toolInput }
-        : { behavior: "deny", message: "Denied by the user in Nexora" };
+        : { behavior: "deny", message: "Denied by the user in Ubuliera" };
     };
 
     const preToolUse: HookCallback = (hookInput) => {
@@ -204,7 +204,7 @@ export class AgentSdkAdapter implements RuntimeAdapter {
           taskId: input.taskId,
           sessionId,
           agentId: null,
-          summary: "Session stopped by Nexora",
+          summary: "Session stopped by Ubuliera",
           payload: { reason: "stopped" },
         });
         return Promise.resolve();

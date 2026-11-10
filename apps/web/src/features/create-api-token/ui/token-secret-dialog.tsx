@@ -34,7 +34,7 @@ export function TokenSecretDialog({ created, mcpEndpoint, onDone }: TokenSecretD
             <DialogTitle className="text-display text-lg">Token created</DialogTitle>
             <DialogDescription>
               Secret of <span className="font-mono text-foreground">{created.token.name}</span>{" "}
-              (scope {created.token.scope}). Nexora stores only its sha-256 hash.
+              (scope {created.token.scope}). Ubuliera stores only its sha-256 hash.
             </DialogDescription>
           </DialogHeader>
           <p

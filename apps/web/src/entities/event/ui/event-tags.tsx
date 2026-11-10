@@ -23,7 +23,7 @@ export function EventTypeTag({ type, className }: { type: EventType; className?:
 
 const RELIABILITY_HINT: Record<Reliability, string> = {
   authoritative: "reported by the runtime",
-  derived: "inferred by Nexora from other events",
+  derived: "inferred by Ubuliera from other events",
   best_effort: "polled from files — may lag or miss changes",
 };
 

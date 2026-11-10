@@ -1,4 +1,4 @@
-import { type IntegrationList, IntegrationListQuerySchema } from "@nexora/contracts";
+import { type IntegrationList, IntegrationListQuerySchema } from "@ubuliera/contracts";
 import { type Hono } from "hono";
 
 import { type IntegrationsService } from "../../modules/skill-registry/integrations.service";

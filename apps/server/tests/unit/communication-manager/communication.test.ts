@@ -1,4 +1,8 @@
-import { MessageSchema, type NexoraEvent, type RuntimeCapabilityProfile } from "@nexora/contracts";
+import {
+  MessageSchema,
+  type UbulieraEvent,
+  type RuntimeCapabilityProfile,
+} from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { closeDb, openDb, type Db } from "../../../src/db/client";
@@ -19,14 +23,14 @@ let store: EventStore;
 let runtime: FakeManagedRuntime;
 let caps: RuntimeCapabilityProfile | null;
 let comm: CommunicationService;
-let events: NexoraEvent[];
+let events: UbulieraEvent[];
 let sessionId: string;
 
 const START: StartInput = {
   executionId: EXEC,
   taskId: "T-1",
   projectRoot: "/repo",
-  cwd: "/repo/.nexora/worktrees/x/main",
+  cwd: "/repo/.ubuliera/worktrees/x/main",
   prompt: "p",
   ownedPaths: [],
   permissionMode: "default",
@@ -113,7 +117,7 @@ describe("CommunicationService", () => {
     expect(events.some((e) => e.type === "message.sent")).toBe(false);
   });
 
-  it("refuses sessions Nexora does not manage (observe-only)", async () => {
+  it("refuses sessions Ubuliera does not manage (observe-only)", async () => {
     await expect(send("hi", "external-session")).rejects.toMatchObject({
       code: "CAPABILITY_UNSUPPORTED",
     });

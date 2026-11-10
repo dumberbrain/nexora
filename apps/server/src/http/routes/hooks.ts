@@ -1,4 +1,4 @@
-import { HOOK_TOKEN_HEADER } from "@nexora/contracts";
+import { HOOK_TOKEN_HEADER } from "@ubuliera/contracts";
 import { type Context, type Hono } from "hono";
 import { bodyLimit } from "hono/body-limit";
 
@@ -26,7 +26,7 @@ export function isLoopbackAddress(addr: string): boolean {
 
 /**
  * POST /hooks/ingest (T057) — PUBLIC: Claude Code has no session cookie, so it authenticates with
- * the per-project X-Nexora-Hook-Token instead, and only loopback peers are accepted. Observed
+ * the per-project X-Ubuliera-Hook-Token instead, and only loopback peers are accepted. Observed
  * sessions are never steered: the answer is always `{}` (no hook decision).
  */
 export function registerHookIngestRoute(api: Hono<AppBindings>, ingest: HookIngestService): void {

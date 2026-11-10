@@ -1,4 +1,4 @@
-import { AGENT_TEAMS_ENABLE_CONFIRMATION } from "@nexora/contracts";
+import { AGENT_TEAMS_ENABLE_CONFIRMATION } from "@ubuliera/contracts";
 import { z } from "zod";
 
 /** FR-011: enabling Agent Teams needs the exact phrase typed — no checkbox, no default. */

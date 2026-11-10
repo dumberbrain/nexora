@@ -9,7 +9,7 @@ import {
   type TaskRef,
   type TaskStatus,
   USER_MOVABLE_STATUSES,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 import { type TaskService } from "./task.service";
 import { AppError } from "../../http/errors";

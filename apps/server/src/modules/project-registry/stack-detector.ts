@@ -1,7 +1,7 @@
 import { readFile, stat } from "node:fs/promises";
 import { join } from "node:path";
 
-import { type DetectedStack } from "@nexora/contracts";
+import { type DetectedStack } from "@ubuliera/contracts";
 import { z } from "zod";
 
 /**

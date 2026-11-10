@@ -3,7 +3,7 @@ import {
   type ApprovalRequest,
   type ApprovalStatus,
   type RiskClass,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 import { ApprovalRepository } from "./approval.repository";
 import { type AuditService } from "./audit.service";

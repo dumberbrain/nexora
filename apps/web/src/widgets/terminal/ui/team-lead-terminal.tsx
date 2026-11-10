@@ -1,6 +1,6 @@
 import "@xterm/xterm/css/xterm.css";
 
-import { type Session } from "@nexora/contracts";
+import { type Session } from "@ubuliera/contracts";
 import { ShieldQuestionIcon, TerminalSquareIcon } from "lucide-react";
 import { useId, useRef } from "react";
 
@@ -10,7 +10,7 @@ import { mayAwaitWorkspaceTrust, RELEASE_FOCUS_KEY } from "../lib/terminal-confi
 import { type TerminalState, useTerminalSession } from "../model/use-terminal-session";
 
 interface TeamLeadTerminalProps {
-  /** a Nexora-started agent_team_pty lead session */
+  /** a Ubuliera-started agent_team_pty lead session */
   session: Session;
 }
 
@@ -64,7 +64,7 @@ export function TeamLeadTerminal({ session }: TeamLeadTerminalProps) {
         >
           <ShieldQuestionIcon aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
           Claude Code may be waiting for the workspace-trust answer — answer the prompt in the
-          terminal. Nexora never accepts it for you.
+          terminal. Ubuliera never accepts it for you.
         </p>
       ) : null}
       {state.phase === "failed" ? (

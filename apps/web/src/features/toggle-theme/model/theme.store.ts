@@ -41,7 +41,7 @@ export const useThemeStore = createResettableStore<ThemeState, [["zustand/persis
       },
     }),
     {
-      name: "nexora-theme:v1",
+      name: "ubuliera-theme:v1",
       version: 1,
       storage: createJSONStorage(() => safeLocalStorage),
       partialize: (s) => ({ pref: s.pref }),

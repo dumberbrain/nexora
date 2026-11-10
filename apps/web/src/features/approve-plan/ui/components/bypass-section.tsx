@@ -1,4 +1,4 @@
-import { BYPASS_CONFIRMATION_PHRASE } from "@nexora/contracts";
+import { BYPASS_CONFIRMATION_PHRASE } from "@ubuliera/contracts";
 import { useId, type ComponentProps } from "react";
 
 import { Input } from "@/shared/ui/input";

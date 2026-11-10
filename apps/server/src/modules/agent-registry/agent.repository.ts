@@ -1,4 +1,4 @@
-import { type Agent, type AgentListQuery } from "@nexora/contracts";
+import { type Agent, type AgentListQuery } from "@ubuliera/contracts";
 import { and, asc, desc, eq, inArray, type SQL } from "drizzle-orm";
 
 import { type Db } from "../../db/client";

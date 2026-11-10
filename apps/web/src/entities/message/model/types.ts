@@ -1,12 +1,12 @@
-import { type Message } from "@nexora/contracts";
+import { type Message } from "@ubuliera/contracts";
 
 export type {
   Message,
   MessageList,
-  NexoraEvent,
+  UbulieraEvent,
   Participant,
   SendMessageInput,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 export type MessageType = Message["type"];
 

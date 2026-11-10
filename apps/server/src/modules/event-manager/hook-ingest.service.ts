@@ -45,7 +45,7 @@ export class HookIngestService {
     this.now = deps.now ?? Date.now;
   }
 
-  /** Project owning the X-Nexora-Hook-Token (only its sha-256 is stored). */
+  /** Project owning the X-Ubuliera-Hook-Token (only its sha-256 is stored). */
   authenticate(token: string | undefined): ProjectRow | undefined {
     if (!token || token.length > MAX_TOKEN_LENGTH) return undefined;
     return this.deps.projects.findByTokenHash(hashToken(token));

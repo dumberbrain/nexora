@@ -4,10 +4,10 @@ import { cn } from "@/shared/lib/cn";
 import { formatClock, formatDateTime } from "@/shared/lib/format-time";
 
 import { EventTypeTag, ReliabilityTag, SeverityTag, SourceTag } from "./event-tags";
-import { type NexoraEvent } from "../model/types";
+import { type UbulieraEvent } from "../model/types";
 
 interface EventLineProps {
-  event: NexoraEvent;
+  event: UbulieraEvent;
   /** extra context rendered after the summary (e.g. session / agent links in the log viewer) */
   meta?: ReactNode;
   className?: string;

@@ -7,8 +7,8 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { BOARD_COLUMNS } from "@nexora/contracts";
 import { useQuery } from "@tanstack/react-query";
+import { BOARD_COLUMNS } from "@ubuliera/contracts";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 

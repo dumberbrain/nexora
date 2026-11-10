@@ -1,4 +1,4 @@
-import { PlannedTaskSchema } from "@nexora/contracts";
+import { PlannedTaskSchema } from "@ubuliera/contracts";
 import { describe, expect, it } from "vitest";
 
 import {

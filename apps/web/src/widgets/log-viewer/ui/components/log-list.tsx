@@ -2,13 +2,13 @@ import { Link } from "@tanstack/react-router";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useRef } from "react";
 
-import { EventLine, type NexoraEvent } from "@/entities/event";
+import { EventLine, type UbulieraEvent } from "@/entities/event";
 
 const ROW_ESTIMATE = 30;
 const LINK =
   "font-mono text-[10px] text-muted-foreground hover:text-phosphor focus-visible:text-phosphor";
 
-function Meta({ event }: { event: NexoraEvent }) {
+function Meta({ event }: { event: UbulieraEvent }) {
   return (
     <span className="flex shrink-0 gap-2">
       {event.sessionId ? (
@@ -36,7 +36,7 @@ function Meta({ event }: { event: NexoraEvent }) {
 }
 
 interface LogListProps {
-  events: NexoraEvent[];
+  events: UbulieraEvent[];
 }
 
 /** Virtualised newest-first log (only visible rows are in the DOM; rows measure their height). */

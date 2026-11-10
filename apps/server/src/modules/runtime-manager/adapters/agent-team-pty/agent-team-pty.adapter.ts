@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { homedir } from "node:os";
 import path from "node:path";
 
-import { type RuntimeCapabilityProfile, type TeamView } from "@nexora/contracts";
+import { type RuntimeCapabilityProfile, type TeamView } from "@ubuliera/contracts";
 
 import { TeamFilesWatcher, TeamState, type TeamAgentSink } from "./team-files-watcher";
 import { resolveExecutable, runCommand } from "../../../../lib/process";
@@ -43,7 +43,7 @@ export interface PtyModule {
   spawn(file: string, args: string[], opts: PtySpawnOptions): PtyProcess;
 }
 
-/** Terminal of one Nexora-started lead, for the /terminal gateway (T139). */
+/** Terminal of one Ubuliera-started lead, for the /terminal gateway (T139). */
 export interface TerminalChannel {
   /** recent output (bounded) so a late viewer sees the current screen */
   backlog(): string;
@@ -87,7 +87,7 @@ const PASTE_START = "\x1b[200~";
 const PASTE_END = "\x1b[201~";
 const CTRL_C = "\x03";
 
-/** Start-up dialogs that need a human answer (S2): never answered by Nexora. */
+/** Start-up dialogs that need a human answer (S2): never answered by Ubuliera. */
 const DIALOGS: { dialog: string; re: RegExp }[] = [
   {
     dialog: "workspace_trust",
@@ -174,7 +174,7 @@ interface LeadSession {
 
 /**
  * Agent Teams runtime (T137, research R3 + S2): the team lead is an INTERACTIVE `claude` process
- * in a pseudo-terminal — Agent Teams do not exist in `-p` or SDK sessions. Nexora types the
+ * in a pseudo-terminal — Agent Teams do not exist in `-p` or SDK sessions. Ubuliera types the
  * initial prompt once the input box is ready, never answers start-up dialogs (workspace trust
  * defaults to "No, exit"; the session waits for the user in the terminal), observes the team
  * through hooks and read-only team files, and stops the process tree on demand. Never emulated
@@ -403,7 +403,7 @@ export class AgentTeamPtyAdapter implements RuntimeAdapter {
             }
           }
         }
-        emit("session.stopped", "info", "Team lead stopped by Nexora", { reason: "stopped" });
+        emit("session.stopped", "info", "Team lead stopped by Ubuliera", { reason: "stopped" });
       },
       interrupt: () => {
         if (gone()) return Promise.reject(new Error("session is stopped"));

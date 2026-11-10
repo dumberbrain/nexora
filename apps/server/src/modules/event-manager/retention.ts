@@ -1,4 +1,4 @@
-import { type EventType } from "@nexora/contracts";
+import { type EventType } from "@ubuliera/contracts";
 
 import { DEFAULT_RETENTION_DAYS } from "../../config/env";
 import { type Db } from "../../db/client";

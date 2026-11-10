@@ -1,4 +1,4 @@
-import { type ModelConsent, ModelConsentInputSchema, UlidSchema } from "@nexora/contracts";
+import { type ModelConsent, ModelConsentInputSchema, UlidSchema } from "@ubuliera/contracts";
 import { type Hono } from "hono";
 
 import { type ConsentService } from "../../modules/execution-orchestrator";

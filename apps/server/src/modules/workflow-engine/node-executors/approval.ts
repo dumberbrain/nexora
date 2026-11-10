@@ -1,4 +1,4 @@
-import { ApprovalNodeConfigSchema } from "@nexora/contracts";
+import { ApprovalNodeConfigSchema } from "@ubuliera/contracts";
 
 import { type ApprovalService } from "../../permission-manager/approval.service";
 import { type NodeExecutor } from "../executor";

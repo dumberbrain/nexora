@@ -7,16 +7,16 @@ import { server } from "../../../tests/msw/server";
 
 afterEach(() => {
   __resetSessionForTests();
-  document.cookie = "nexora_csrf=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+  document.cookie = "ubuliera_csrf=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
 });
 
 describe("http", () => {
-  it("sends the CSRF cookie value as X-Nexora-CSRF on mutating requests only", async () => {
-    document.cookie = "nexora_csrf=tok123; path=/";
+  it("sends the CSRF cookie value as X-Ubuliera-CSRF on mutating requests only", async () => {
+    document.cookie = "ubuliera_csrf=tok123; path=/";
     const seen: Array<string | null> = [];
     server.use(
       mswHttp.all("*/api/v1/echo", ({ request }) => {
-        seen.push(request.headers.get("x-nexora-csrf"));
+        seen.push(request.headers.get("x-ubuliera-csrf"));
         return HttpResponse.json({ ok: true });
       }),
     );

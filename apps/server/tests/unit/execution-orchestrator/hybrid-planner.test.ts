@@ -1,4 +1,4 @@
-import { type PlannedTask } from "@nexora/contracts";
+import { type PlannedTask } from "@ubuliera/contracts";
 import { describe, expect, it } from "vitest";
 
 import {

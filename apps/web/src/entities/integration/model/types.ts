@@ -1,4 +1,4 @@
-import { type Integration } from "@nexora/contracts";
+import { type Integration } from "@ubuliera/contracts";
 
 export type {
   Integration,
@@ -6,7 +6,7 @@ export type {
   IntegrationList,
   IntegrationListQuery,
   McpToolSummary,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 export type IntegrationKind = Integration["kind"];
 export type IntegrationHealth = Integration["health"];

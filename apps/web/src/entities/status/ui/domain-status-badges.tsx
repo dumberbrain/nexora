@@ -1,4 +1,4 @@
-import { type ExecutionStatus, type TaskStatus } from "@nexora/contracts";
+import { type ExecutionStatus, type TaskStatus } from "@ubuliera/contracts";
 
 import { StatusBadge } from "./status-badge";
 import { toStatusKind } from "../model/status-kind";

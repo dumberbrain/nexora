@@ -1,6 +1,6 @@
-import { type Stats } from "@nexora/contracts";
+import { type Stats } from "@ubuliera/contracts";
 
-import { type NexoraEnv } from "./config/env";
+import { type UbulieraEnv } from "./config/env";
 import { type Db } from "./db/client";
 import { type Logger } from "./lib/logger";
 import { AgentRepository, AgentTree } from "./modules/agent-registry";
@@ -23,7 +23,7 @@ import {
 
 export interface ServicesDeps {
   db: Db;
-  env: NexoraEnv;
+  env: UbulieraEnv;
   bus: EventBus;
   store: EventStore;
   audit: AuditService;

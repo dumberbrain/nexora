@@ -1,4 +1,4 @@
-import { type NexoraEvent, type Session } from "@nexora/contracts";
+import { type UbulieraEvent, type Session } from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EventBus, type EventInput } from "../../../src/modules/event-manager";
@@ -14,7 +14,7 @@ let entityChanges: unknown[];
 let status: Session["status"];
 let monitor: LivenessMonitor;
 
-function event(sessionId: string, type: NexoraEvent["type"] = "tool.invoked"): NexoraEvent {
+function event(sessionId: string, type: UbulieraEvent["type"] = "tool.invoked"): UbulieraEvent {
   return {
     id: "01H",
     ts: Date.now(),

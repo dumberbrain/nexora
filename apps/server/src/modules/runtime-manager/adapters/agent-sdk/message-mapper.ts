@@ -1,4 +1,4 @@
-import { type Usage } from "@nexora/contracts";
+import { type Usage } from "@ubuliera/contracts";
 import { z } from "zod";
 
 import { type EventInput } from "../../../event-manager";
@@ -6,7 +6,7 @@ import { displayPath, toolSummary } from "../../../event-manager/normalizers/hoo
 import { type EventSink, FILE_WRITE_TOOLS, type SessionResult } from "../../runtime-adapter";
 
 /**
- * SDK / stream-json message → NexoraEvent mapper (T085, research S3). Shared by the Agent SDK and
+ * SDK / stream-json message → UbulieraEvent mapper (T085, research S3). Shared by the Agent SDK and
  * the CLI headless adapter: both emit the same message shapes. Messages are untrusted JSON and
  * parsed defensively; unknown types (rate_limit_event, system/commands_changed, hook/task
  * progress …) are ignored.

@@ -1,4 +1,4 @@
-import { SettingsSchema } from "@nexora/contracts";
+import { SettingsSchema } from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { closeDb, openDb, type Db } from "../../../src/db/client";
@@ -56,11 +56,11 @@ describe("SettingsService (US8)", () => {
         remote: true,
         host: "0.0.0.0",
         token: "x".repeat(40),
-        publicUrl: "https://nexora.example",
+        publicUrl: "https://ubuliera.example",
       },
     });
     expect(remote.view()).toEqual({
-      mcp: { enabled: false, endpoint: "https://nexora.example/mcp" },
+      mcp: { enabled: false, endpoint: "https://ubuliera.example/mcp" },
       remote: { enabled: true, host: "0.0.0.0", port: 3022, envTokenConfigured: true },
     });
     expect(JSON.stringify(remote.view())).not.toContain("xxxx");

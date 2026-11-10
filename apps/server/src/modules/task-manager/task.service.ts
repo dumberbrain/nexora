@@ -5,7 +5,7 @@ import {
   type Severity,
   type Task,
   type TaskStatus,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 import { assertTaskTransition, isTerminalTask, validateDag } from "./task-state";
 import { type TaskPatch, type TaskRepository } from "./task.repository";

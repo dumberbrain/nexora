@@ -12,7 +12,7 @@ import {
   type SetModeInput,
   type Task,
   type Verification,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 
 const NOW = Date.UTC(2026, 10, 8, 12, 0, 0);
@@ -76,7 +76,7 @@ export const executionFixtures: Execution[] = [
     mode: "multi_session",
     strategy: "plan_first",
     status: "running",
-    worktreePath: "C:/work/nexora/.nexora/worktrees/X002",
+    worktreePath: "C:/work/ubuliera/.ubuliera/worktrees/X002",
     createdAt: NOW - 600_000,
     startedAt: NOW - 500_000,
   },
@@ -119,7 +119,7 @@ export const modeFixtures: ModeOption[] = [
     recommended: false,
     reason: "Teammates could split UI and tests.",
     unavailableReason: "Agent Teams are disabled in this environment",
-    howToEnable: "Set CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 and restart Nexora",
+    howToEnable: "Set CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 and restart Ubuliera",
     runtimes: ["agent_team_pty"],
   },
 ];

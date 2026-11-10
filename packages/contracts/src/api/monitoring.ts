@@ -8,7 +8,7 @@ import { AgentStatusSchema, SessionStatusSchema } from "../enums";
 import { UlidSchema } from "../primitives";
 
 /** Header carrying the per-project hook ingest secret (S1: custom headers are supported). */
-export const HOOK_TOKEN_HEADER = "X-Nexora-Hook-Token";
+export const HOOK_TOKEN_HEADER = "X-Ubuliera-Hook-Token";
 
 const csv = <T extends z.ZodType>(item: T) =>
   z.preprocess(

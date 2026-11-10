@@ -2,7 +2,7 @@ import {
   ApprovalListSchema,
   ExecutionSchema,
   GraphValidationSchema,
-  type NexoraEvent,
+  type UbulieraEvent,
   RunWorkflowResultSchema,
   type WorkflowGraph,
   WorkflowDetailSchema,
@@ -11,7 +11,7 @@ import {
   WorkflowRunDetailSchema,
   WorkflowVersionListSchema,
   WorkflowVersionSchema,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { HOST, login } from "../helpers/us1";
@@ -20,7 +20,7 @@ import { createUs5Harness, type Us5Harness } from "../helpers/us5";
 let h: Us5Harness;
 let auth: { cookie: string; csrf: string };
 let projectId: string;
-let events: NexoraEvent[];
+let events: UbulieraEvent[];
 
 beforeEach(async () => {
   h = await createUs5Harness({ sessionRows: true });
@@ -40,7 +40,7 @@ const post = (path: string, body?: unknown) =>
       ...HOST,
       cookie: auth.cookie,
       "content-type": "application/json",
-      "x-nexora-csrf": auth.csrf,
+      "x-ubuliera-csrf": auth.csrf,
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });

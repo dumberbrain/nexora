@@ -1,4 +1,4 @@
-import { AgentListSchema, type EventType, type NexoraEvent } from "@nexora/contracts";
+import { AgentListSchema, type EventType, type UbulieraEvent } from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
@@ -31,7 +31,7 @@ const SUBAGENT = "ae0883f726e201b87";
 
 let h: Harness;
 let token: string;
-let seen: NexoraEvent[];
+let seen: UbulieraEvent[];
 
 beforeEach(async () => {
   h = createHarness();
@@ -41,8 +41,8 @@ beforeEach(async () => {
 });
 afterEach(() => h.close());
 
-async function replayAll(): Promise<Map<string, NexoraEvent[]>> {
-  const byFixture = new Map<string, NexoraEvent[]>();
+async function replayAll(): Promise<Map<string, UbulieraEvent[]>> {
+  const byFixture = new Map<string, UbulieraEvent[]>();
   for (const { name, body } of hookFixtures()) {
     const before = seen.length;
     const res = await postHook(h, body, token);

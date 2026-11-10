@@ -1,4 +1,4 @@
-import { STRATEGIES } from "@nexora/contracts";
+import { STRATEGIES } from "@ubuliera/contracts";
 import { useId, type ComponentProps } from "react";
 
 import { STRATEGY_LABEL } from "@/entities/execution";

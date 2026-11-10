@@ -3,7 +3,7 @@ import {
   type ExecutionStatus,
   type SessionStatus,
   type TaskStatus,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 /** Visual status vocabulary shared by every view (FR-032). */
 export type StatusKind =

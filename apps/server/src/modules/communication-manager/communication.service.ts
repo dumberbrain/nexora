@@ -5,7 +5,7 @@ import {
   type MessageListQuery,
   type Participant,
   type RuntimeCapabilityProfile,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 import { type MessageRepository } from "./message.repository";
 import { AppError } from "../../http/errors";
@@ -58,7 +58,7 @@ export function messageSummary(text: string): string {
 const unsupported = (message: string) => new AppError("CAPABILITY_UNSUPPORTED", message);
 
 /**
- * Communication manager (T099, FR-027). Delivers user-visible text to Nexora-managed sessions
+ * Communication manager (T099, FR-027). Delivers user-visible text to Ubuliera-managed sessions
  * through the runtime's `sendMessage` only, and records a Message + `message.sent` event. Only
  * the redacted summary is stored; the agent receives the full text.
  */
@@ -73,7 +73,7 @@ export class CommunicationService {
     const handle = this.deps.runtime.getHandle(input.sessionId);
     if (!handle) {
       throw unsupported(
-        "Messages can only be sent to sessions Nexora started (this one is observe-only)",
+        "Messages can only be sent to sessions Ubuliera started (this one is observe-only)",
       );
     }
     const caps = this.deps.capabilityOf(input.sessionId);

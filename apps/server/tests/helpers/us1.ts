@@ -2,10 +2,10 @@ import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { HOOK_TOKEN_HEADER, type Stats } from "@nexora/contracts";
+import { HOOK_TOKEN_HEADER, type Stats } from "@ubuliera/contracts";
 import { expect } from "vitest";
 
-import { type NexoraEnv } from "../../src/config/env";
+import { type UbulieraEnv } from "../../src/config/env";
 import { closeDb, openDb, type Db } from "../../src/db/client";
 import { createApp } from "../../src/http/app";
 import { registerApiRoutes, registerPublicApiRoutes } from "../../src/http/routes";
@@ -16,7 +16,7 @@ import { createServices, type Services } from "../../src/services";
 
 export const HOST = { host: "127.0.0.1:3022" };
 
-export const testEnv: NexoraEnv = {
+export const testEnv: UbulieraEnv = {
   nodeEnv: "test",
   host: "127.0.0.1",
   port: 3022,
@@ -88,7 +88,7 @@ export function createHarness(
     registerPublicRoutes: (api) => registerPublicApiRoutes(api, services),
     registerRoutes: (api) => registerApiRoutes(api, services),
   });
-  const tmp = mkdtempSync(join(tmpdir(), "nexora-us1-"));
+  const tmp = mkdtempSync(join(tmpdir(), "ubuliera-us1-"));
   return {
     db,
     bus,
@@ -116,7 +116,7 @@ export async function login(app: Harness["app"]): Promise<{ cookie: string; csrf
     .getSetCookie()
     .map((c) => c.split(";")[0])
     .join("; ");
-  const csrf = /nexora_csrf=([^;]+)/.exec(cookie)?.[1];
+  const csrf = /ubuliera_csrf=([^;]+)/.exec(cookie)?.[1];
   expect(csrf).toBeTruthy();
   return { cookie, csrf: csrf ?? "" };
 }

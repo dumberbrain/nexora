@@ -1,4 +1,4 @@
-import { BYPASS_CONFIRMATION_PHRASE, TaskIdSchema } from "@nexora/contracts";
+import { BYPASS_CONFIRMATION_PHRASE, TaskIdSchema } from "@ubuliera/contracts";
 import { z } from "zod";
 
 import { type ApproveExecutionInput } from "@/entities/execution";

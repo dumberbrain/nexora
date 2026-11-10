@@ -20,7 +20,7 @@ export const MIGRATIONS_DIR = here.endsWith(join("src", "db"))
   : resolve(here, "..", "drizzle");
 
 export interface OpenDbOptions {
-  /** directory for nexora.db; the literal ":memory:" opens an in-memory database (tests) */
+  /** directory for ubuliera.db; the literal ":memory:" opens an in-memory database (tests) */
   dataDir: string;
   migrate?: boolean;
 }
@@ -32,7 +32,7 @@ export function openDb(opts: OpenDbOptions): Db {
     file = ":memory:";
   } else {
     mkdirSync(opts.dataDir, { recursive: true });
-    file = join(opts.dataDir, "nexora.db");
+    file = join(opts.dataDir, "ubuliera.db");
   }
   const sqlite = new Database(file);
   sqlite.pragma("journal_mode = WAL");

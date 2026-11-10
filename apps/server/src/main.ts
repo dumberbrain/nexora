@@ -1,6 +1,6 @@
 import { ConfigError, loadEnv } from "./config/env";
 import { logger } from "./lib/logger";
-import { createNexoraServer } from "./server";
+import { createUbulieraServer } from "./server";
 
 async function main(): Promise<void> {
   let env;
@@ -14,7 +14,7 @@ async function main(): Promise<void> {
     throw err;
   }
 
-  const server = await createNexoraServer({ env });
+  const server = await createUbulieraServer({ env });
 
   let stopping = false;
   const shutdown = (signal: string) => {

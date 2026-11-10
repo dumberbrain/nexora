@@ -1,4 +1,4 @@
-import { type Project } from "@nexora/contracts";
+import { type Project } from "@ubuliera/contracts";
 import { asc, eq } from "drizzle-orm";
 
 import { type Db } from "../../db/client";

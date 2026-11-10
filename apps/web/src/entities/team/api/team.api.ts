@@ -9,7 +9,7 @@ import {
 type Opts = { signal?: AbortSignal };
 
 export const teamApi = {
-  /** TeamView of a Nexora-started Agent Teams lead session — 404 while there is no team */
+  /** TeamView of a Ubuliera-started Agent Teams lead session — 404 while there is no team */
   bySession: (sessionId: string, opts: Opts = {}) =>
     http.get<TeamView>(`/sessions/${encodeURIComponent(sessionId)}/team`, opts).then((r) => r.data),
 

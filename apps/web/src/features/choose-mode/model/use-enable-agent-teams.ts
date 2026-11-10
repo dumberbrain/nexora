@@ -1,5 +1,5 @@
-import { AGENT_TEAMS_ENABLE_CONFIRMATION } from "@nexora/contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AGENT_TEAMS_ENABLE_CONFIRMATION } from "@ubuliera/contracts";
 
 import { executionKeys, runtimeKeys } from "@/entities/execution";
 import { teamApi } from "@/entities/team";

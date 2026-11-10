@@ -98,7 +98,7 @@ describe("normalizeHook", () => {
     );
     expect(e).toMatchObject({ type: "agent.spawned", agentId: "a1" });
     expect(e?.payload).toMatchObject({
-      nexora: { parentAgentId: "s-1", parentLinkReliability: "derived" },
+      ubuliera: { parentAgentId: "s-1", parentLinkReliability: "derived" },
     });
   });
 

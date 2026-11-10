@@ -1,7 +1,7 @@
 import { realpath, stat } from "node:fs/promises";
 import { basename } from "node:path";
 
-import { type Project, type RegisterProjectInput } from "@nexora/contracts";
+import { type Project, type RegisterProjectInput } from "@ubuliera/contracts";
 
 import { type ProjectRepository, type ProjectRow, toProject } from "./project.repository";
 import { detectInstructionFiles, detectStack } from "./stack-detector";

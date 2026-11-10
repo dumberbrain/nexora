@@ -16,7 +16,7 @@ import {
   type SetModeInput,
   type Task,
   type Verification,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 import { BUILT_IN_ROLE_NAMES } from "./agents/roles";
 import { type AnalysisService } from "./analysis/analysis.service";
@@ -101,7 +101,7 @@ type SessionStart = Pick<
 };
 
 export const RESTART_PROMPT =
-  "Nexora restarted this session. Continue with your task from where you left off.";
+  "Ubuliera restarted this session. Continue with your task from where you left off.";
 
 export interface ConsentInput {
   consent: boolean;
@@ -160,7 +160,7 @@ const SUBAGENTS_KEY = "*";
 /**
  * Execution orchestrator (T097): the execution state machine, consent-gated analysis/planning,
  * approval of the plan, and the scheduler loop that starts managed sessions (only through
- * ManagedRuntime, always inside a Nexora worktree) and reacts to their outcome.
+ * ManagedRuntime, always inside a Ubuliera worktree) and reacts to their outcome.
  *
  * All mutations of one execution run on a per-execution serial chain, so HTTP requests, approval
  * decisions and session completions never interleave.
@@ -1017,7 +1017,7 @@ export class Orchestrator {
   }
 
   /**
-   * An interactive lead shows a start-up dialog (workspace trust, new MCP servers): Nexora never
+   * An interactive lead shows a start-up dialog (workspace trust, new MCP servers): Ubuliera never
    * answers it, so the lead's tasks wait for the user (in the terminal) until it is answered.
    */
   private onWaitingForInput(

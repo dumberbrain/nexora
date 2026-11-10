@@ -6,7 +6,7 @@ import {
   type GithubPullList,
   type GithubRepoList,
   type GithubStatus,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { type Hono } from "hono";
 import { z } from "zod";
 

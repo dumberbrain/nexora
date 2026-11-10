@@ -42,7 +42,7 @@ describe("MessageMapper — recorded SDK stream (S3 phase 1)", () => {
     const { m, events } = mapper();
     const signals = [];
     for (const raw of lines("sdk/phase1.jsonl")) {
-      if (raw.nexora === "interrupt() returned") {
+      if (raw.ubuliera === "interrupt() returned") {
         m.markInterrupted();
         continue;
       }
@@ -98,7 +98,7 @@ describe("MessageMapper — recorded SDK stream (S3 phase 1)", () => {
 
   it("an error result without our own interrupt is a failure", () => {
     const { m } = mapper();
-    const all = lines("sdk/phase1.jsonl").filter((r) => r.nexora === undefined);
+    const all = lines("sdk/phase1.jsonl").filter((r) => r.ubuliera === undefined);
     let last = null;
     for (const raw of all) last = m.map(raw) ?? last;
     expect(last).toMatchObject({ kind: "result", result: { outcome: "failed" } });

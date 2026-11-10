@@ -1,4 +1,4 @@
-import { McpToolNodeConfigSchema } from "@nexora/contracts";
+import { McpToolNodeConfigSchema } from "@ubuliera/contracts";
 
 import { runSessionNode, type SessionNodeDeps, stepContext } from "./session";
 import { type NodeExecutor } from "../executor";
@@ -13,7 +13,7 @@ export const mcpToolName = (server: string, tool: string) => `mcp__${server}__${
 
 /**
  * `mcp_tool` node → managed session in the worktree (where the project's MCP servers are
- * configured) with only that MCP tool pre-allowed. Nexora never calls MCP servers itself (R6).
+ * configured) with only that MCP tool pre-allowed. Ubuliera never calls MCP servers itself (R6).
  */
 export function mcpToolExecutor(deps: McpToolNodeDeps): NodeExecutor {
   return async (ctx) => {

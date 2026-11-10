@@ -5,7 +5,7 @@ const fmt = new Intl.NumberFormat("en-US");
 
 /**
  * FR-029: token usage and cost only when the runtime reported them (session-level), otherwise an
- * explicit "not available" — never 0, never an estimate made by Nexora.
+ * explicit "not available" — never 0, never an estimate made by Ubuliera.
  */
 export function UsageSummary({ usage }: { usage: Usage | null }) {
   if (usage === null) return <UnavailableBadge reason="runtime does not report usage" />;

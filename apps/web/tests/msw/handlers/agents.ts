@@ -4,7 +4,7 @@ import {
   type AgentList,
   type ApiErrorBody,
   type Message,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 
 import { sentMessage, sessionFixtures } from "./sessions";

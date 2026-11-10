@@ -1,8 +1,8 @@
 import { type ApiToken, type ApiTokenList } from "../model/types";
 
-/** `claude mcp add` command that connects Claude Code to Nexora's MCP endpoint with a token. */
+/** `claude mcp add` command that connects Claude Code to Ubuliera's MCP endpoint with a token. */
 export function mcpClientCommand(endpoint: string, secret: string): string {
-  return `claude mcp add --transport http nexora ${endpoint} --header "Authorization: Bearer ${secret}"`;
+  return `claude mcp add --transport http ubuliera ${endpoint} --header "Authorization: Bearer ${secret}"`;
 }
 
 export const SCOPE_DESCRIPTION: Record<ApiToken["scope"], string> = {

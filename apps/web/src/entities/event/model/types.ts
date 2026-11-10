@@ -1,20 +1,20 @@
 import {
   type EventType,
   type ExecutionMode,
-  type NexoraEvent,
+  type UbulieraEvent,
   type Page,
   type Severity,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 export type {
   EventSource,
   EventType,
   ExecutionMode,
-  NexoraEvent,
+  UbulieraEvent,
   Page,
   Reliability,
   Severity,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 /** GET /events filters (contracts EventQuerySchema minus paging) — also the URL search shape. */
 export type EventFilters = {
@@ -31,4 +31,4 @@ export type EventFilters = {
   q?: string;
 };
 
-export type EventPage = Page<NexoraEvent>;
+export type EventPage = Page<UbulieraEvent>;

@@ -6,7 +6,7 @@ export type GitBranchResolver = (cwd: string, projectRoot: string) => Promise<st
 
 /**
  * `git rev-parse --abbrev-ref HEAD` via the allowlisted process runner. Only runs inside the
- * registered project root (a user-trusted directory), so a hook payload cannot make Nexora run
+ * registered project root (a user-trusted directory), so a hook payload cannot make Ubuliera run
  * git in an arbitrary repository with its own config. Detached HEAD and failures → null.
  */
 export const gitBranchOf: GitBranchResolver = async (cwd, projectRoot) => {

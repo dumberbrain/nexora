@@ -15,7 +15,7 @@ const sinks: Record<Level, (...args: unknown[]) => void> = {
 
 function log(level: Level, message: string, context?: Record<string, unknown>): void {
   if (ORDER[level] < ORDER[threshold]) return;
-  sinks[level](`[nexora] ${message}`, ...(context ? [context] : []));
+  sinks[level](`[ubuliera] ${message}`, ...(context ? [context] : []));
 }
 
 /** App logger — use instead of console.* (team standard). Debug/info are dropped in production. */

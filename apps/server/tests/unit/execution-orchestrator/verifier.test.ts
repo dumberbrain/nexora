@@ -1,4 +1,4 @@
-import { type Task } from "@nexora/contracts";
+import { type Task } from "@ubuliera/contracts";
 import { describe, expect, it } from "vitest";
 
 import {

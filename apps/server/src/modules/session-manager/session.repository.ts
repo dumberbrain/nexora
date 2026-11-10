@@ -1,4 +1,4 @@
-import { type Session, type SessionListQuery, type SessionStatus } from "@nexora/contracts";
+import { type Session, type SessionListQuery, type SessionStatus } from "@ubuliera/contracts";
 import { and, desc, eq, inArray, type SQL } from "drizzle-orm";
 
 import { type Db } from "../../db/client";

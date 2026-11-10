@@ -43,7 +43,7 @@ const service = new WorktreeService();
 const diff = new DiffService();
 
 beforeEach(async () => {
-  repo = realpathSync(mkdtempSync(join(tmpdir(), "nexora-wt-")));
+  repo = realpathSync(mkdtempSync(join(tmpdir(), "ubuliera-wt-")));
   await git(repo, "init", "-q", "-b", "main");
   writeFileSync(join(repo, "README.md"), "hello\n");
   await git(repo, "add", ".");
@@ -60,15 +60,15 @@ afterEach(async () => {
 });
 
 describe("WorktreeService", () => {
-  it("creates the execution worktree on nexora/<execution> and excludes .nexora/", async () => {
+  it("creates the execution worktree on ubuliera/<execution> and excludes .ubuliera/", async () => {
     const wt = await service.createExecutionWorktree(repo, EXEC);
-    expect(wt.path).toBe(join(repo, ".nexora", "worktrees", EXEC, "main"));
-    expect(wt.branch).toBe(`nexora/${EXEC}`);
+    expect(wt.path).toBe(join(repo, ".ubuliera", "worktrees", EXEC, "main"));
+    expect(wt.branch).toBe(`ubuliera/${EXEC}`);
     expect(existsSync(join(wt.path, "README.md"))).toBe(true);
-    expect(await git(wt.path, "rev-parse", "--abbrev-ref", "HEAD")).toBe(`nexora/${EXEC}`);
+    expect(await git(wt.path, "rev-parse", "--abbrev-ref", "HEAD")).toBe(`ubuliera/${EXEC}`);
 
     const exclude = readFileSync(join(repo, ".git", "info", "exclude"), "utf8");
-    expect(exclude.split(/\r?\n/)).toContain(".nexora/");
+    expect(exclude.split(/\r?\n/)).toContain(".ubuliera/");
     // the project root stays clean: the worktree folder is not reported as untracked
     expect(await git(repo, "status", "--porcelain")).toBe("");
   });
@@ -78,7 +78,7 @@ describe("WorktreeService", () => {
     const b = await service.createExecutionWorktree(repo, EXEC);
     expect(b).toEqual(a);
     const exclude = readFileSync(join(repo, ".git", "info", "exclude"), "utf8");
-    expect(exclude.split(/\r?\n/).filter((l) => l === ".nexora/")).toHaveLength(1);
+    expect(exclude.split(/\r?\n/).filter((l) => l === ".ubuliera/")).toHaveLength(1);
   });
 
   it("creates a task worktree branched from the execution branch", async () => {
@@ -88,8 +88,8 @@ describe("WorktreeService", () => {
     await git(main.path, "commit", "-q", "-m", "plan");
 
     const task = await service.createTaskWorktree(repo, EXEC, "T-3");
-    expect(task.path).toBe(join(repo, ".nexora", "worktrees", EXEC, "T-3"));
-    expect(task.branch).toBe(`nexora/${EXEC}--T-3`);
+    expect(task.path).toBe(join(repo, ".ubuliera", "worktrees", EXEC, "T-3"));
+    expect(task.branch).toBe(`ubuliera/${EXEC}--T-3`);
     expect(existsSync(join(task.path, "plan.md"))).toBe(true);
   });
 
@@ -121,7 +121,7 @@ describe("WorktreeService", () => {
     expect(existsSync(wt.path)).toBe(false);
   });
 
-  it("refuses to remove a path that is not a Nexora worktree", async () => {
+  it("refuses to remove a path that is not a Ubuliera worktree", async () => {
     await expect(service.remove(repo, repo)).rejects.toBeInstanceOf(WorktreeError);
   });
 
@@ -129,9 +129,9 @@ describe("WorktreeService", () => {
     await service.createExecutionWorktree(repo, EXEC);
     await service.createTaskWorktree(repo, EXEC, "T-1");
     await service.cleanupExecution(repo, EXEC);
-    expect(existsSync(join(repo, ".nexora", "worktrees", EXEC))).toBe(false);
-    const branches = await git(repo, "branch", "--list", "nexora/*", "--format=%(refname:short)");
-    expect(branches.split("\n").sort()).toEqual([`nexora/${EXEC}`, `nexora/${EXEC}--T-1`]);
+    expect(existsSync(join(repo, ".ubuliera", "worktrees", EXEC))).toBe(false);
+    const branches = await git(repo, "branch", "--list", "ubuliera/*", "--format=%(refname:short)");
+    expect(branches.split("\n").sort()).toEqual([`ubuliera/${EXEC}`, `ubuliera/${EXEC}--T-1`]);
   });
 });
 

@@ -1,4 +1,4 @@
-import { type Session, type SessionStatus } from "@nexora/contracts";
+import { type Session, type SessionStatus } from "@ubuliera/contracts";
 
 import { EXTERNAL_OBSERVED_CAPABILITIES } from "./capabilities";
 import { type GitBranchResolver } from "./git-branch";

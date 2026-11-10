@@ -5,7 +5,7 @@ import {
   type Project,
   type RuntimeEnvironment,
   type TeamView,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { type Hono } from "hono";
 
 import { type AuditService } from "../../modules/permission-manager/audit.service";
@@ -43,7 +43,7 @@ const errorText = (err: unknown) => (err instanceof Error ? err.message : String
 /**
  * GET /runtime/environment (T087) — Claude Code version, login state, Agent Teams, runtimes.
  * POST /runtime/agent-teams/enable (T138) — explicit, audited opt-in per project (FR-011).
- * GET /sessions/:id/team (T138) — TeamView of a Nexora-started Agent Teams lead.
+ * GET /sessions/:id/team (T138) — TeamView of a Ubuliera-started Agent Teams lead.
  */
 export function registerRuntimeRoutes(api: Hono<AppBindings>, deps: RuntimeRouteDeps): void {
   api.get("/runtime/environment", async (c) =>
@@ -107,7 +107,7 @@ export function registerRuntimeRoutes(api: Hono<AppBindings>, deps: RuntimeRoute
       if (id.length > 128 || !teams.isLeadSession(id)) {
         throw new AppError(
           "NOT_FOUND",
-          "No running Agent Teams lead started by Nexora has this id",
+          "No running Agent Teams lead started by Ubuliera has this id",
         );
       }
       const view = await teams.refreshTeam(id);

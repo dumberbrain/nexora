@@ -1,4 +1,4 @@
-import { type WorkflowNodeRun, type WorkflowVersionList } from "@nexora/contracts";
+import { type WorkflowNodeRun, type WorkflowVersionList } from "@ubuliera/contracts";
 
 export type {
   CreateWorkflowInput,
@@ -21,7 +21,7 @@ export type {
   WorkflowSummary,
   WorkflowVersion,
   WorkflowVersionList,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 /** One row of GET /workflows/:id/versions (no graph). */
 export type WorkflowVersionMeta = WorkflowVersionList["items"][number];

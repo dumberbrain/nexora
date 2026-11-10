@@ -1,7 +1,7 @@
 import { EventEmitter } from "node:events";
 
-import { type NexoraEvent } from "@nexora/contracts";
 import { act, renderHook } from "@testing-library/react";
+import { type UbulieraEvent } from "@ubuliera/contracts";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { type LiveSocket } from "./client";
@@ -40,7 +40,7 @@ class FakeSocket {
   }
 }
 
-const ev = (id: string, sessionId = "s1"): NexoraEvent => ({
+const ev = (id: string, sessionId = "s1"): UbulieraEvent => ({
   id,
   ts: 1,
   type: "tool.invoked",
@@ -86,7 +86,7 @@ describe("useLiveSubscription", () => {
     act(() => fake.connect());
     act(() => fake.serverEmit("event", { events: [ev("01A"), ev("01B", "other"), ev("01C")] }));
     act(() => fake.serverEmit("event", { events: [ev("01C"), ev("01D")] }));
-    expect(onEvents.mock.calls.map((c) => (c[0] as NexoraEvent[]).map((e) => e.id))).toEqual([
+    expect(onEvents.mock.calls.map((c) => (c[0] as UbulieraEvent[]).map((e) => e.id))).toEqual([
       ["01A", "01C"],
       ["01D"],
     ]);

@@ -1,4 +1,4 @@
-import { type Execution, type Task } from "@nexora/contracts";
+import { type Execution, type Task } from "@ubuliera/contracts";
 
 import { type AgentDefinitionInput } from "../../runtime-manager/runtime-adapter";
 import { type DiscoveredItem } from "../../skill-registry/discovery";

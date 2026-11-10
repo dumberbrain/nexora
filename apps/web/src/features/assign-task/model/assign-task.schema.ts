@@ -1,4 +1,4 @@
-import { type AssignTaskInput, AssignTaskInputSchema, RISK_CLASSES } from "@nexora/contracts";
+import { type AssignTaskInput, AssignTaskInputSchema, RISK_CLASSES } from "@ubuliera/contracts";
 import { z } from "zod";
 
 const TASK_ID = /^T-[1-9]\d*$/;

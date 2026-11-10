@@ -1,6 +1,6 @@
 import { type InfiniteData } from "@tanstack/react-query";
 
-import { type EventPage, type NexoraEvent } from "../model/types";
+import { type EventPage, type UbulieraEvent } from "../model/types";
 
 export type EventFeedData = InfiniteData<EventPage, unknown>;
 
@@ -10,7 +10,7 @@ export type EventFeedData = InfiniteData<EventPage, unknown>;
  */
 export function prependEvents<T extends EventFeedData>(
   old: T | undefined,
-  events: NexoraEvent[],
+  events: UbulieraEvent[],
 ): T | undefined {
   const first = old?.pages[0];
   if (!old || !first) return old;
@@ -24,6 +24,6 @@ export function prependEvents<T extends EventFeedData>(
 }
 
 /** Flatten a feed to one newest-first list. */
-export function flattenFeed(data: EventFeedData | undefined): NexoraEvent[] {
+export function flattenFeed(data: EventFeedData | undefined): UbulieraEvent[] {
   return data?.pages.flatMap((p) => p.items) ?? [];
 }

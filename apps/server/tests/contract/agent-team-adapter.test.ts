@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { type Agent, TeamViewSchema } from "@nexora/contracts";
+import { type Agent, TeamViewSchema } from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { type EventInput } from "../../src/modules/event-manager";
@@ -79,7 +79,7 @@ async function startLead(): Promise<Harness> {
       executionId: "01JEXEC0000000000000000000",
       taskId: "T-1",
       projectRoot: root,
-      cwd: path.join(root, ".nexora", "worktrees", "e1"),
+      cwd: path.join(root, ".ubuliera", "worktrees", "e1"),
       prompt: "team of 2 teammates, one writes hello.txt, one bye.txt, then shut down",
       ownedPaths: [],
       permissionMode: "acceptEdits",
@@ -90,8 +90,8 @@ async function startLead(): Promise<Harness> {
 }
 
 beforeEach(() => {
-  home = mkdtempSync(path.join(tmpdir(), "nexora-teams-"));
-  root = mkdtempSync(path.join(tmpdir(), "nexora-repo-"));
+  home = mkdtempSync(path.join(tmpdir(), "ubuliera-teams-"));
+  root = mkdtempSync(path.join(tmpdir(), "ubuliera-repo-"));
 });
 
 afterEach(() => {

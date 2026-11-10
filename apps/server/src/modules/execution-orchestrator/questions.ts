@@ -7,7 +7,7 @@ import {
   type Question,
   type Strategy,
   type TaskAnalysis,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 import { clampParallel } from "./scheduler";
 import { splitSubGoals } from "./subgoals";
@@ -79,7 +79,7 @@ export function buildQuestions(input: QuestionInput): Question[] {
         key: "runTestsOnVerify",
         kind: "boolean",
         label: `Run the project's tests (${input.analysis?.stack.testRunners.join(", ") ?? ""}) during verification?`,
-        help: "Explicit opt-in. Not available yet: Nexora may only start claude, git and gh, so test results stay unavailable until a test runner is allowed.",
+        help: "Explicit opt-in. Not available yet: Ubuliera may only start claude, git and gh, so test results stay unavailable until a test runner is allowed.",
         recommendedDefault: false,
       }),
     );

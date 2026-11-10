@@ -1,6 +1,6 @@
 import { Writable } from "node:stream";
 
-import { UlidSchema } from "@nexora/contracts";
+import { UlidSchema } from "@ubuliera/contracts";
 import { describe, expect, it } from "vitest";
 
 import { createLogger } from "../../../src/lib/logger";

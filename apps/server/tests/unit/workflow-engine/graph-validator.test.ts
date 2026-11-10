@@ -1,4 +1,4 @@
-import { type GraphIssue, WORKFLOW_NODE_KINDS } from "@nexora/contracts";
+import { type GraphIssue, WORKFLOW_NODE_KINDS } from "@ubuliera/contracts";
 import { describe, expect, it } from "vitest";
 
 import { forkJoin, graph, linear, node } from "./graph-fixtures";

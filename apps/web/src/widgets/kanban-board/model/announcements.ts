@@ -1,5 +1,5 @@
 import { type Active, type Announcements, type Over } from "@dnd-kit/core";
-import { boardColumnOf } from "@nexora/contracts";
+import { boardColumnOf } from "@ubuliera/contracts";
 
 import { BOARD_COLUMN_LABEL, type BoardColumn, type Task } from "@/entities/task";
 import { decideMove } from "@/features/move-task";

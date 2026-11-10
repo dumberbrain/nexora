@@ -1,4 +1,4 @@
-import { type NexoraEvent, WorkflowNodeChangedPayloadSchema } from "@nexora/contracts";
+import { type UbulieraEvent, WorkflowNodeChangedPayloadSchema } from "@ubuliera/contracts";
 
 import {
   type NodeRunStatus,
@@ -7,7 +7,7 @@ import {
 } from "../model/types";
 
 /** `workflow.node_changed` payload, or null for any other / malformed event. */
-export function parseNodeChanged(event: NexoraEvent): WorkflowNodeChangedPayload | null {
+export function parseNodeChanged(event: UbulieraEvent): WorkflowNodeChangedPayload | null {
   if (event.type !== "workflow.node_changed") return null;
   const parsed = WorkflowNodeChangedPayloadSchema.safeParse(event.payload);
   return parsed.success ? parsed.data : null;

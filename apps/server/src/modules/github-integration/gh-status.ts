@@ -1,4 +1,4 @@
-import { GITHUB_AUTH_HINT, GITHUB_INSTALL_HINT, type GithubStatus } from "@nexora/contracts";
+import { GITHUB_AUTH_HINT, GITHUB_INSTALL_HINT, type GithubStatus } from "@ubuliera/contracts";
 
 import { type ProcessRunner } from "./runner";
 

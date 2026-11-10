@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
-import { type RuntimeCapabilityProfile, type RuntimeKind } from "@nexora/contracts";
+import { type RuntimeCapabilityProfile, type RuntimeKind } from "@ubuliera/contracts";
 
 import { FAKE_RUNTIME_CAPABILITIES } from "../../capabilities";
 import {
@@ -15,7 +15,7 @@ import {
 } from "../../runtime-adapter";
 
 /**
- * Deterministic runtime for E2E (T083). Registered only when `NEXORA_TEST_FAKE_RUNTIME=1` and
+ * Deterministic runtime for E2E (T083). Registered only when `UBULIERA_TEST_FAKE_RUNTIME=1` and
  * `NODE_ENV=test` (loadEnv refuses the flag elsewhere). No model, no network, no child process:
  * each session writes one marker file inside its own worktree `cwd`, emits the matching events
  * and completes its turn after `stepMs`.
@@ -73,7 +73,7 @@ export class ScriptedFakeAdapter implements RuntimeAdapter {
       if (input.permissionMode !== "plan" && input.taskId) {
         // write the first concrete owned path (the scope guard denies anything else)
         const owned = input.ownedPaths.find((p) => !/[*?[\]{}]/.test(p));
-        const file = path.join(input.cwd, owned ?? `nexora-e2e-${input.taskId}.md`);
+        const file = path.join(input.cwd, owned ?? `ubuliera-e2e-${input.taskId}.md`);
         mkdirSync(path.dirname(file), { recursive: true });
         const call = { file_path: file, content: `# ${input.taskId}\n` };
         const decision = deps.guard.check({
@@ -122,7 +122,7 @@ export class ScriptedFakeAdapter implements RuntimeAdapter {
           type: "session.stopped",
           reliability: "authoritative",
           severity: "info",
-          summary: "Session stopped by Nexora",
+          summary: "Session stopped by Ubuliera",
           payload: { reason: "stopped" },
         });
       }

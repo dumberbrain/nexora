@@ -2,7 +2,7 @@
 
 Guidance for Claude Code (and humans) working in this repository.
 
-Nexora is a local, single-user control center for Claude Code: a Node server (API + realtime +
+Ubuliera is a local, single-user control center for Claude Code: a Node server (API + realtime +
 MCP + orchestrator over SQLite) and a React dashboard, in an npm-workspaces monorepo. Feature
 spec, plan, research and tasks live in `specs/001-ai-orchestration-platform/`; user docs in
 `docs/`.
@@ -11,25 +11,25 @@ spec, plan, research and tasks live in `specs/001-ai-orchestration-platform/`; u
 
 Run from the repository root (Node ≥ 22.12, npm ≥ 11; `engine-strict` is on).
 
-| Command                                          | What it does                                                                  |
-| ------------------------------------------------ | ----------------------------------------------------------------------------- |
-| `npm ci`                                         | install exact versions (also generates the web route tree)                    |
-| `npm run dev`                                    | web (Rsbuild, :3022, proxy) + server (`tsx watch`, :3023)                     |
-| `npm run build`                                  | `apps/web` (Rsbuild) then `apps/server` (tsup → `dist/main.js`)               |
-| `npm start`                                      | production server on :3022, serves the built SPA                              |
-| `npm run start:e2e`                              | production build with `NODE_ENV=test` + `NEXORA_TEST_FAKE_RUNTIME=1`          |
-| `npm run lint` / `lint:fix`                      | ESLint (one root flat config), `--max-warnings 0`                             |
-| `npm run typecheck`                              | `tsc --noEmit` per workspace (web regenerates routes first)                   |
-| `npm run format` / `format:check`                | Prettier (with the Tailwind plugin)                                           |
-| `npm test`                                       | Vitest projects: `contracts`, `server`, `web`                                 |
-| `npx vitest run <paths>`                         | only the given test files; `--project server` / `web` / `contracts` to narrow |
-| `npm run test:e2e`                               | Playwright (chromium, firefox, webkit) + axe on the production build          |
-| `npm run db:generate`                            | drizzle-kit migration from `apps/server/src/db/schema.ts`                     |
-| `npm run db:migrate`                             | apply migrations to `NEXORA_DATA_DIR` (also done on every server start)       |
-| `npm run load-test -w @nexora/server -- --url …` | SC-001 load test (10 sessions, 1 000 events/min, p95 ≤ 2 s)                   |
-| `npm run check` / `check:staged`                 | run the husky pre-push / pre-commit checks by hand                            |
+| Command                                            | What it does                                                                  |
+| -------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `npm ci`                                           | install exact versions (also generates the web route tree)                    |
+| `npm run dev`                                      | web (Rsbuild, :3022, proxy) + server (`tsx watch`, :3023)                     |
+| `npm run build`                                    | `apps/web` (Rsbuild) then `apps/server` (tsup → `dist/main.js`)               |
+| `npm start`                                        | production server on :3022, serves the built SPA                              |
+| `npm run start:e2e`                                | production build with `NODE_ENV=test` + `UBULIERA_TEST_FAKE_RUNTIME=1`        |
+| `npm run lint` / `lint:fix`                        | ESLint (one root flat config), `--max-warnings 0`                             |
+| `npm run typecheck`                                | `tsc --noEmit` per workspace (web regenerates routes first)                   |
+| `npm run format` / `format:check`                  | Prettier (with the Tailwind plugin)                                           |
+| `npm test`                                         | Vitest projects: `contracts`, `server`, `web`                                 |
+| `npx vitest run <paths>`                           | only the given test files; `--project server` / `web` / `contracts` to narrow |
+| `npm run test:e2e`                                 | Playwright (chromium, firefox, webkit) + axe on the production build          |
+| `npm run db:generate`                              | drizzle-kit migration from `apps/server/src/db/schema.ts`                     |
+| `npm run db:migrate`                               | apply migrations to `UBULIERA_DATA_DIR` (also done on every server start)     |
+| `npm run load-test -w @ubuliera/server -- --url …` | SC-001 load test (10 sessions, 1 000 events/min, p95 ≤ 2 s)                   |
+| `npm run check` / `check:staged`                   | run the husky pre-push / pre-commit checks by hand                            |
 
-E2E uses port 3022 (`NEXORA_E2E_PORT` to change) and reuses a running server outside CI.
+E2E uses port 3022 (`UBULIERA_E2E_PORT` to change) and reuses a running server outside CI.
 
 ## Repository layout
 
@@ -37,7 +37,7 @@ E2E uses port 3022 (`NEXORA_E2E_PORT` to change) and reuses a running server out
 packages/contracts/   zod schemas + types shared by server, web and MCP (entities, REST DTOs,
                       socket events, MCP tools). Change additively; both sides depend on it.
 apps/server/
-  src/main.ts         entry: loadEnv → createNexoraServer
+  src/main.ts         entry: loadEnv → createUbulieraServer
   src/server.ts       wiring: DB → services → Hono app → Socket.IO → listen
   src/services.ts     US1 services (projects, hooks, sessions, agents, stats, integrations, github)
   src/orchestration.ts runtimes + orchestrator + controls + workflows (US2–US6)
@@ -71,7 +71,7 @@ docs/                 user documentation
 | `workflow-engine`        | versioned graphs, graph validator, condition evaluator, executor, templates                                                  |
 | `permission-manager`     | approvals, scope guard, audit log, API tokens, settings                                                                      |
 | `communication-manager`  | messages to sessions/agents (capability-gated)                                                                               |
-| `git-workspace`          | execution/task worktrees under `<repo>/.nexora/worktrees`, diffs                                                             |
+| `git-workspace`          | execution/task worktrees under `<repo>/.ubuliera/worktrees`, diffs                                                           |
 | `skill-registry`         | skills, commands, agents discovery; integrations service                                                                     |
 | `mcp-registry`           | external MCP server discovery, permission status, health probe                                                               |
 | `github-integration`     | `gh` status and read-only `gh api` data                                                                                      |
@@ -98,7 +98,7 @@ docs/                 user documentation
 
 - One process serves API, realtime, MCP and (production) the SPA — no logic duplicated between
   REST and MCP; both call the same services.
-- Loopback bind by default; non-loopback needs `NEXORA_REMOTE=1` + `NEXORA_TOKEN` (≥ 32 chars).
+- Loopback bind by default; non-loopback needs `UBULIERA_REMOTE=1` + `UBULIERA_TOKEN` (≥ 32 chars).
   Host/Origin guard on HTTP and the WebSocket handshake; cookie + CSRF double-submit for the SPA.
 - Secrets go through `lib/redactor` before persisting, logging, socket emit, export and MCP output.
 - Only `claude`, `git`, `gh` are spawned, with argument arrays and no shell (`lib/process`).
@@ -120,5 +120,5 @@ docs/                 user documentation
   decodes UTF-8 as cp1252 and corrupts characters like `≥` and `—`. Use the Edit/Write tools or
   `node` scripts.
 - A dev server that already owns 3022 blocks `npm run test:e2e` — stop it or set
-  `NEXORA_E2E_PORT`.
+  `UBULIERA_E2E_PORT`.
 - On Windows, the Agent Teams PTY needs a console: start the server from a real terminal.

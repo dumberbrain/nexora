@@ -1,5 +1,5 @@
-import { type EntityChanged, type Stats } from "@nexora/contracts";
 import { type QueryClient } from "@tanstack/react-query";
+import { type EntityChanged, type Stats } from "@ubuliera/contracts";
 
 import { entityDetailKey, entityListKey, statsKey } from "@/shared/api";
 import { type LiveSocket } from "@/shared/socket/client";

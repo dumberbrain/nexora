@@ -1,5 +1,5 @@
-import { type ApiErrorBody } from "@nexora/contracts";
 import { act, screen, waitFor, within } from "@testing-library/react";
+import { type ApiErrorBody } from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 

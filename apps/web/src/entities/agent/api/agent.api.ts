@@ -1,4 +1,4 @@
-import { type Message, type SendMessageInput } from "@nexora/contracts";
+import { type Message, type SendMessageInput } from "@ubuliera/contracts";
 
 import { http } from "@/shared/api";
 

@@ -38,9 +38,9 @@ const audits = () => audit.list({ limit: 50 }).items;
 beforeEach(() => {
   db = openDb({ dataDir: ":memory:" });
   audit = new AuditService(db);
-  tmp = realpathSync(mkdtempSync(join(tmpdir(), "nexora-scope-")));
+  tmp = realpathSync(mkdtempSync(join(tmpdir(), "ubuliera-scope-")));
   projectRoot = join(tmp, "repo");
-  cwd = join(projectRoot, ".nexora", "worktrees", "01EXEC", "main");
+  cwd = join(projectRoot, ".ubuliera", "worktrees", "01EXEC", "main");
   outside = join(tmp, "elsewhere");
   mkdirSync(join(cwd, "src", "api"), { recursive: true });
   mkdirSync(outside, { recursive: true });

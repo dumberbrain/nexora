@@ -1,4 +1,4 @@
-import { type ExecutionTasks } from "@nexora/contracts";
+import { type ExecutionTasks } from "@ubuliera/contracts";
 
 import { http } from "@/shared/api";
 

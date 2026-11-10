@@ -11,7 +11,7 @@ import {
   type GithubRepoList,
   type GithubRepoRef,
   type GithubStatus,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { z } from "zod";
 
 import { detectGithubStatus } from "./gh-status";

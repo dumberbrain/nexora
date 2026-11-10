@@ -1,5 +1,5 @@
-import { SendMessageInputSchema } from "@nexora/contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { SendMessageInputSchema } from "@ubuliera/contracts";
 import { z } from "zod";
 
 import { agentApi } from "@/entities/agent";

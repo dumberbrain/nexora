@@ -1,4 +1,4 @@
-import { RuntimeEnvironmentSchema, type RuntimeEnvironment } from "@nexora/contracts";
+import { RuntimeEnvironmentSchema, type RuntimeEnvironment } from "@ubuliera/contracts";
 import { Hono } from "hono";
 import { describe, expect, it } from "vitest";
 

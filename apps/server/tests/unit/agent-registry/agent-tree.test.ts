@@ -1,4 +1,4 @@
-import { type EntityChanged } from "@nexora/contracts";
+import { type EntityChanged } from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { type AgentObservation } from "../../../src/modules/agent-registry";

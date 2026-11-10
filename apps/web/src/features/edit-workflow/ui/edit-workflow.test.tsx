@@ -71,7 +71,7 @@ describe("RunWorkflowDialog", () => {
     await user.click(screen.getByRole("button", { name: "Start run" }));
     expect(await screen.findByText("Choose a project")).toBeInTheDocument();
 
-    await screen.findByRole("option", { name: /nexora/ });
+    await screen.findByRole("option", { name: /ubuliera/ });
     await user.selectOptions(
       screen.getByRole("combobox", { name: "Project" }),
       projectFixtures[0]!.id,

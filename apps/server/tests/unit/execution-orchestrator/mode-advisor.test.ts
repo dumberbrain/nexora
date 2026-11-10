@@ -1,4 +1,4 @@
-import { ExecutionConfigSchema, ModeOptionSchema, type TaskAnalysis } from "@nexora/contracts";
+import { ExecutionConfigSchema, ModeOptionSchema, type TaskAnalysis } from "@ubuliera/contracts";
 import { describe, expect, it } from "vitest";
 
 import { adviseModes } from "../../../src/modules/execution-orchestrator/mode-advisor";

@@ -3,7 +3,7 @@ import {
   type ApiTokenList,
   type CreateApiTokenResult,
   CreateApiTokenInputSchema,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 import { type Hono } from "hono";
 
 import { type AuditService } from "../../modules/permission-manager/audit.service";

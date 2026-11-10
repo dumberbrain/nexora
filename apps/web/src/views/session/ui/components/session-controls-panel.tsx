@@ -14,8 +14,8 @@ export function SessionControlsPanel({ session }: { session: Session }) {
       </h2>
       {session.observeOnly ? (
         <p className="font-mono text-xs text-muted-foreground">
-          Started outside Nexora — controls stay visible but disabled; use the terminal running this
-          session.
+          Started outside Ubuliera — controls stay visible but disabled; use the terminal running
+          this session.
         </p>
       ) : null}
       <SessionControls session={session} />

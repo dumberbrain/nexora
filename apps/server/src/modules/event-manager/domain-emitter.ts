@@ -1,4 +1,4 @@
-import { type EntityChanged, type NexoraEvent } from "@nexora/contracts";
+import { type EntityChanged, type UbulieraEvent } from "@ubuliera/contracts";
 
 import { type EventBus } from "./event-bus";
 import { type EventInput, type EventStore } from "./event-store";
@@ -16,7 +16,7 @@ export class DomainEmitter {
     private readonly bus: EventBus,
   ) {}
 
-  event(input: DomainEventInput): NexoraEvent {
+  event(input: DomainEventInput): UbulieraEvent {
     return this.store.append({
       source: "orchestrator",
       reliability: "authoritative",

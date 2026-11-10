@@ -1,14 +1,14 @@
 {
-  "name": "@nexora/server",
+  "name": "@ubuliera/server",
   "version": "0.1.0",
   "private": true,
-  "description": "Nexora orchestrator: Hono API, Socket.IO realtime, MCP endpoint, runtime adapters",
+  "description": "Ubuliera orchestrator: Hono API, Socket.IO realtime, MCP endpoint, runtime adapters",
   "type": "module",
   "scripts": {
     "dev": "cross-env NODE_ENV=development tsx watch --clear-screen=false src/main.ts",
     "build": "tsup",
     "start": "cross-env NODE_ENV=production node dist/main.js",
-    "start:e2e": "cross-env NODE_ENV=test NEXORA_TEST_FAKE_RUNTIME=1 node dist/main.js",
+    "start:e2e": "cross-env NODE_ENV=test UBULIERA_TEST_FAKE_RUNTIME=1 node dist/main.js",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit -p tsconfig.json",

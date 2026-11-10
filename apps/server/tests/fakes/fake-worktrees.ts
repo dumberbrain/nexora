@@ -9,13 +9,13 @@ export class FakeWorktrees implements WorktreeProvider {
   readonly changes = new Map<string, string[]>();
 
   executionWorktree(repoRoot: string, executionId: string): Promise<string> {
-    const path = join(repoRoot, ".nexora", "worktrees", executionId, "main");
+    const path = join(repoRoot, ".ubuliera", "worktrees", executionId, "main");
     this.created.push(path);
     return Promise.resolve(path);
   }
 
   taskWorktree(repoRoot: string, executionId: string, taskId: string): Promise<string> {
-    const path = join(repoRoot, ".nexora", "worktrees", executionId, taskId);
+    const path = join(repoRoot, ".ubuliera", "worktrees", executionId, taskId);
     this.created.push(path);
     return Promise.resolve(path);
   }

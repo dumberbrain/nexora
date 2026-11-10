@@ -1,4 +1,4 @@
-import { type IntegrationItem, type IntegrationList } from "@nexora/contracts";
+import { type IntegrationItem, type IntegrationList } from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 
 const NOW = Date.UTC(2026, 10, 10, 9, 0, 0);

@@ -1,4 +1,4 @@
-import { TaskAnalysisSchema } from "@nexora/contracts";
+import { TaskAnalysisSchema } from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createUs2Harness, type Us2Harness } from "../../helpers/us2";

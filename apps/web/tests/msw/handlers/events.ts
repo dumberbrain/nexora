@@ -1,13 +1,13 @@
-import { type NexoraEvent, type Page } from "@nexora/contracts";
+import { type UbulieraEvent, type Page } from "@ubuliera/contracts";
 import { http, HttpResponse } from "msw";
 
 const NOW = Date.UTC(2026, 10, 8, 12, 0, 0);
 const S1 = "6f1c2a9e-1b7d-4a53-9f0e-2c4d8b7a1e01";
 
-type EventFixtureInput = Pick<NexoraEvent, "id" | "type" | "summary"> & Partial<NexoraEvent>;
+type EventFixtureInput = Pick<UbulieraEvent, "id" | "type" | "summary"> & Partial<UbulieraEvent>;
 
 /** Event fixture with hook-sourced defaults. */
-export function makeEvent(p: EventFixtureInput): NexoraEvent {
+export function makeEvent(p: EventFixtureInput): UbulieraEvent {
   return {
     ts: NOW,
     source: "hook",
@@ -24,12 +24,12 @@ export function makeEvent(p: EventFixtureInput): NexoraEvent {
 }
 
 /** Ids are ULIDs, so lexical order == time order. Stored oldest first. */
-export const eventFixtures: NexoraEvent[] = [
+export const eventFixtures: UbulieraEvent[] = [
   makeEvent({
     id: "01JCXK00000000000000000E01",
     ts: NOW - 60_000,
     type: "session.started",
-    summary: "Session started in C:/work/nexora",
+    summary: "Session started in C:/work/ubuliera",
   }),
   makeEvent({
     id: "01JCXK00000000000000000E02",
@@ -88,6 +88,6 @@ export const eventHandlers = [
       .sort((a, b) => (a.id < b.id ? 1 : -1));
     const items = matching.slice(0, limit);
     const nextCursor = matching.length > limit ? (items.at(-1)?.id ?? null) : null;
-    return HttpResponse.json<Page<NexoraEvent>>({ items, nextCursor });
+    return HttpResponse.json<Page<UbulieraEvent>>({ items, nextCursor });
   }),
 ];

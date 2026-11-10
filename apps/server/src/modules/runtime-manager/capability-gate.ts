@@ -2,7 +2,7 @@ import {
   type ControlKind,
   PAUSE_CONTROL_LABEL,
   type RuntimeCapabilityProfile,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 import { CapabilityUnsupportedError } from "./runtime-adapter";
 import { AppError } from "../../http/errors";
@@ -25,7 +25,7 @@ const no = (reason: string): ControlSupport => ({ supported: false, reason });
  * Capability gate (T109, FR-016/FR-031): whether a control is available on a runtime, derived
  * only from its {@link RuntimeCapabilityProfile}. `pause` is "Interrupt & hold" — a native pause
  * or interrupt + resume. Task controls are executed by the orchestrator, so they only need a
- * runtime Nexora can start.
+ * runtime Ubuliera can start.
  */
 export function controlSupport(
   p: RuntimeCapabilityProfile,
@@ -35,7 +35,7 @@ export function controlSupport(
   const r = p.runtime;
   switch (control) {
     case "stop":
-      return p.canStop ? yes : no(`${r} sessions cannot be stopped by Nexora`);
+      return p.canStop ? yes : no(`${r} sessions cannot be stopped by Ubuliera`);
     case "interrupt":
       return p.canInterrupt ? yes : no(`${r} does not support interrupting a turn`);
     case "pause":
@@ -56,7 +56,7 @@ export function controlSupport(
     case "retry_task":
     case "request_review":
     case "assign_task":
-      return p.canStart ? yes : no(`${r} is not run by Nexora; its tasks cannot be controlled`);
+      return p.canStart ? yes : no(`${r} is not run by Ubuliera; its tasks cannot be controlled`);
   }
 }
 
@@ -72,7 +72,7 @@ export function assertControl(
   if (subject.observeOnly) {
     throw new AppError(
       "CONFLICT",
-      "This session was started outside Nexora and is observe-only; control it from its terminal",
+      "This session was started outside Ubuliera and is observe-only; control it from its terminal",
     );
   }
   if (!controlSupport(subject.capabilities, control, opts).supported) {

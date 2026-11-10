@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { IntegrationListSchema } from "@nexora/contracts";
+import { IntegrationListSchema } from "@ubuliera/contracts";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { closeDb, openDb, type Db } from "../../src/db/client";
@@ -32,8 +32,8 @@ function write(path: string, value: unknown) {
 const SECRET = "ghp_abcdefghijklmnopqrstuvwxyz0123456789AB";
 
 beforeEach(async () => {
-  root = realpathSync(mkdtempSync(join(tmpdir(), "nexora-int-")));
-  home = realpathSync(mkdtempSync(join(tmpdir(), "nexora-int-home-")));
+  root = realpathSync(mkdtempSync(join(tmpdir(), "ubuliera-int-")));
+  home = realpathSync(mkdtempSync(join(tmpdir(), "ubuliera-int-home-")));
   db = openDb({ dataDir: ":memory:" });
   const audit = new AuditService(db);
   const projects = new ProjectService(new ProjectRepository(db), audit);

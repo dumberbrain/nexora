@@ -1,4 +1,4 @@
-import { type InstallHooksInput } from "@nexora/contracts";
+import { type InstallHooksInput } from "@ubuliera/contracts";
 
 import { http } from "@/shared/api";
 
@@ -34,7 +34,7 @@ export const projectApi = {
       } satisfies InstallHooksInput)
       .then((r) => r.data),
 
-  /** Removes only Nexora's hook entries. Returns the updated project. */
+  /** Removes only Ubuliera's hook entries. Returns the updated project. */
   uninstallHooks: (id: string) =>
     http.delete<Project>(`/projects/${encodeURIComponent(id)}/hooks`).then((r) => r.data),
 

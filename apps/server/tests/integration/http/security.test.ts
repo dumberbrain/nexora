@@ -1,12 +1,12 @@
-import { HealthSchema } from "@nexora/contracts";
+import { HealthSchema } from "@ubuliera/contracts";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { type NexoraEnv } from "../../../src/config/env";
+import { type UbulieraEnv } from "../../../src/config/env";
 import { closeDb, openDb, type Db } from "../../../src/db/client";
 import { createApp } from "../../../src/http/app";
 
 const TOKEN = "r".repeat(40);
-const baseEnv: NexoraEnv = {
+const baseEnv: UbulieraEnv = {
   nodeEnv: "test",
   host: "127.0.0.1",
   port: 3022,
@@ -24,7 +24,7 @@ afterEach(() => {
   db = undefined;
 });
 
-function setup(env: Partial<NexoraEnv> = {}) {
+function setup(env: Partial<UbulieraEnv> = {}) {
   db = openDb({ dataDir: ":memory:" });
   return createApp({ env: { ...baseEnv, ...env }, db, startedAt: Date.now() });
 }
@@ -37,7 +37,7 @@ async function login(app: ReturnType<typeof setup>) {
   expect(res.status).toBe(200);
   const setCookies = res.headers.getSetCookie();
   const cookie = setCookies.map((c) => c.split(";")[0]).join("; ");
-  const csrf = /nexora_csrf=([^;]+)/.exec(cookie)?.[1];
+  const csrf = /ubuliera_csrf=([^;]+)/.exec(cookie)?.[1];
   expect(csrf).toBeTruthy();
   return { cookie, csrf: csrf! };
 }
@@ -89,7 +89,7 @@ describe("security middleware", () => {
 
   it("issues HttpOnly SameSite=Strict session cookie on loopback", async () => {
     const res = await setup().request("/api/v1/auth/session", { headers: HOST });
-    const session = res.headers.getSetCookie().find((c) => c.startsWith("nexora_session="));
+    const session = res.headers.getSetCookie().find((c) => c.startsWith("ubuliera_session="));
     expect(session).toMatch(/HttpOnly/i);
     expect(session).toMatch(/SameSite=Strict/i);
   });
@@ -116,7 +116,7 @@ describe("security middleware", () => {
     const { cookie } = await login(app);
     const res = await app.request("/api/v1/auth/logout", {
       method: "POST",
-      headers: { ...HOST, cookie, "x-nexora-csrf": "wrong" },
+      headers: { ...HOST, cookie, "x-ubuliera-csrf": "wrong" },
     });
     expect(res.status).toBe(403);
   });
@@ -126,7 +126,7 @@ describe("security middleware", () => {
     const { cookie, csrf } = await login(app);
     const res = await app.request("/api/v1/auth/logout", {
       method: "POST",
-      headers: { ...HOST, cookie, "x-nexora-csrf": csrf },
+      headers: { ...HOST, cookie, "x-ubuliera-csrf": csrf },
     });
     expect(res.status).toBe(204);
   });
@@ -136,21 +136,21 @@ describe("security middleware", () => {
 
     it("does not auto-issue sessions without a bearer token", async () => {
       const res = await setup(remote).request("/api/v1/auth/session", {
-        headers: { host: "nexora.lan:3022" },
+        headers: { host: "ubuliera.lan:3022" },
       });
       expect(res.status).toBe(401);
     });
 
     it("rejects a wrong bearer token", async () => {
       const res = await setup(remote).request("/api/v1/auth/whoami", {
-        headers: { host: "nexora.lan:3022", authorization: "Bearer nope" },
+        headers: { host: "ubuliera.lan:3022", authorization: "Bearer nope" },
       });
       expect(res.status).toBe(401);
     });
 
     it("accepts the configured bearer token, without CSRF, from any Host", async () => {
       const app = setup(remote);
-      const headers = { host: "nexora.lan:3022", authorization: `Bearer ${TOKEN}` };
+      const headers = { host: "ubuliera.lan:3022", authorization: `Bearer ${TOKEN}` };
       expect((await app.request("/api/v1/auth/whoami", { headers })).status).toBe(200);
       expect((await app.request("/api/v1/auth/logout", { method: "POST", headers })).status).toBe(
         204,

@@ -110,7 +110,7 @@ async function phase1(): Promise<string> {
     } else if (turn === 1 && m.type === "assistant" && !interrupted) {
       interrupted = true;
       const r = await run.interrupt();
-      log("phase1.jsonl", { nexora: "interrupt() returned", r });
+      log("phase1.jsonl", { ubuliera: "interrupt() returned", r });
       say("interrupt() sent");
     }
   }

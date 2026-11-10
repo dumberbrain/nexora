@@ -1,7 +1,7 @@
 # Contract: HTTP API (Hono, `/api/v1`)
 
 Base: `http://127.0.0.1:3022/api/v1`. All bodies JSON, validated by zod schemas exported from
-`packages/contracts` (`@nexora/contracts`). Errors use one shape:
+`packages/contracts` (`@ubuliera/contracts`). Errors use one shape:
 
 ```json
 { "error": { "code": "VALIDATION_FAILED", "message": "…", "details": [] } }
@@ -12,7 +12,7 @@ Codes: `VALIDATION_FAILED 400`, `UNAUTHENTICATED 401`, `FORBIDDEN 403`, `NOT_FOU
 `INTERNAL 500`.
 
 **Auth**: loopback requests from the served web app carry a per-install session cookie
-(`HttpOnly; SameSite=Strict`) plus `X-Nexora-CSRF` header. Remote mode (opt-in) and MCP require
+(`HttpOnly; SameSite=Strict`) plus `X-Ubuliera-CSRF` header. Remote mode (opt-in) and MCP require
 `Authorization: Bearer <token>`. Every mutating route records an `AuditEntry`.
 
 Pagination: cursor-based `?cursor=<ULID>&limit=1..200` → `{ items, nextCursor }`.
@@ -24,9 +24,9 @@ Pagination: cursor-based `?cursor=<ULID>&limit=1..200` → `{ items, nextCursor 
 | GET | `/projects` | list projects |
 | POST | `/projects` | `{ rootPath }` → register (path validated, must exist) |
 | POST | `/projects/:id/analyze` | refresh stack/instructions/integrations detection |
-| POST | `/projects/:id/hooks/install` | install Nexora hooks into project settings (requires explicit confirm flag; diff shown first via `GET .../hooks/preview`) |
+| POST | `/projects/:id/hooks/install` | install Ubuliera hooks into project settings (requires explicit confirm flag; diff shown first via `GET .../hooks/preview`) |
 | GET | `/projects/:id/hooks/preview` | proposed settings diff |
-| DELETE | `/projects/:id/hooks` | remove Nexora hooks |
+| DELETE | `/projects/:id/hooks` | remove Ubuliera hooks |
 
 ## Executions
 
@@ -101,9 +101,9 @@ Node `config` is validated per kind (`NODE_CONFIG_SCHEMAS` in contracts/api/work
 | GET | `/integrations?projectId=&kind=&refresh=` | skills, commands, agents, MCP servers with tools, health, permission status (secrets stripped) → `IntegrationList` |
 | GET | `/runtime/environment` | Claude Code version, auth status, Agent Teams support, gh status |
 | POST | `/runtime/agent-teams/enable` | `{ projectId, confirmation: "enable agent teams" }` → writes the flag to the project's `.claude/settings.local.json` (audited) |
-| GET | `/sessions/:id/team` | `TeamView` of a Nexora-started Agent Teams lead (members, tasks, messages — `best_effort`) |
+| GET | `/sessions/:id/team` | `TeamView` of a Ubuliera-started Agent Teams lead (members, tasks, messages — `best_effort`) |
 
-Terminal: Socket.IO namespace `/terminal` (auth required, Nexora-spawned lead sessions only): `terminal:attach` → ack with backlog, `terminal:input`, `terminal:resize`, server `terminal:output`, `terminal:exit` (contracts/api/teams.ts).
+Terminal: Socket.IO namespace `/terminal` (auth required, Ubuliera-spawned lead sessions only): `terminal:attach` → ack with backlog, `terminal:input`, `terminal:resize`, server `terminal:output`, `terminal:exit` (contracts/api/teams.ts).
 | GET | `/github/repos` | owner/repo of registered projects' remotes (repo picker) |
 | GET | `/github/status` | `connected \| not_installed \| not_authenticated` + setup hint |
 | GET | `/github/repos/:owner/:repo/{branches,commits,pulls}` | via `gh api` (read-only); branches/commits fall back to local `git` (`source: local_git`) |
@@ -111,7 +111,7 @@ Terminal: Socket.IO namespace `/terminal` (auth required, Nexora-spawned lead se
 
 ## Hook ingestion (internal, loopback only)
 
-| POST | `/hooks/ingest` | body = raw Claude Code hook JSON; header `X-Nexora-Hook-Token` (per-project secret written into hook config). Returns hook decision JSON for `PreToolUse`/`PermissionRequest` when the event belongs to a Nexora-managed execution with an approval policy; otherwise `{}` (no effect). |
+| POST | `/hooks/ingest` | body = raw Claude Code hook JSON; header `X-Ubuliera-Hook-Token` (per-project secret written into hook config). Returns hook decision JSON for `PreToolUse`/`PermissionRequest` when the event belongs to a Ubuliera-managed execution with an approval policy; otherwise `{}` (no effect). |
 
 ## Health
 

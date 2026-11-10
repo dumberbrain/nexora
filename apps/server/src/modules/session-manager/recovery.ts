@@ -1,4 +1,4 @@
-import { type SessionStatus } from "@nexora/contracts";
+import { type SessionStatus } from "@ubuliera/contracts";
 
 import { type SessionRepository } from "./session.repository";
 import { type Logger } from "../../lib/logger";

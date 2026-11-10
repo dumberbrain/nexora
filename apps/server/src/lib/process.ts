@@ -4,7 +4,7 @@ import { homedir } from "node:os";
 import path from "node:path";
 import { createInterface } from "node:readline";
 
-/** The only executables Nexora may start (FR-051). Exact names — no paths, no shells. */
+/** The only executables Ubuliera may start (FR-051). Exact names — no paths, no shells. */
 export const ALLOWED_COMMANDS = new Set(["claude", "git", "gh"] as const);
 export type AllowedCommand = "claude" | "git" | "gh";
 

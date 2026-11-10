@@ -1,4 +1,8 @@
-import { CONTROL_KINDS, type ControlKind, type RuntimeCapabilityProfile } from "@nexora/contracts";
+import {
+  CONTROL_KINDS,
+  type ControlKind,
+  type RuntimeCapabilityProfile,
+} from "@ubuliera/contracts";
 import { describe, expect, it } from "vitest";
 
 import { AppError } from "../../../src/http/errors";
@@ -33,7 +37,7 @@ const AGENT_TEAM_PTY: RuntimeCapabilityProfile = {
 /**
  * The capability matrix (contracts/runtime-adapter.md) applied to every control. `pause` is
  * "Interrupt & hold": interrupt + resume (no runtime pauses natively). Task controls are run by
- * the orchestrator, so they need a runtime Nexora can start.
+ * the orchestrator, so they need a runtime Ubuliera can start.
  */
 const MATRIX: Record<string, { profile: RuntimeCapabilityProfile; yes: ControlKind[] }> = {
   agent_sdk: { profile: AGENT_SDK_CAPABILITIES, yes: [...CONTROL_KINDS] },

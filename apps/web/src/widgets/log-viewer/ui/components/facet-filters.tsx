@@ -1,4 +1,4 @@
-import { EVENT_TYPES, EXECUTION_MODES, SEVERITIES } from "@nexora/contracts";
+import { EVENT_TYPES, EXECUTION_MODES, SEVERITIES } from "@ubuliera/contracts";
 import { ChevronDownIcon } from "lucide-react";
 
 import {

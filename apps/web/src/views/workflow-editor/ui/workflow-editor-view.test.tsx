@@ -74,7 +74,7 @@ describe("WorkflowEditorView", () => {
     const { user } = renderWithProviders(<Page onRunStarted={onRunStarted} />);
     await user.click(await screen.findByRole("button", { name: "Run version 1" }));
     const dialog = screen.getByRole("dialog", { name: "Run Feature pipeline v1" });
-    await within(dialog).findByRole("option", { name: /nexora/ });
+    await within(dialog).findByRole("option", { name: /ubuliera/ });
     await user.selectOptions(
       within(dialog).getByRole("combobox", { name: "Project" }),
       "01JCXK0000000000000000P001",

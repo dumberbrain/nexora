@@ -10,7 +10,7 @@ import {
   type WorkflowSummary,
   type WorkflowVersion,
   type WorkflowVersionList,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 import { type ValidationCatalog, validateGraph } from "./graph-validator";
 import { BUILT_IN_TEMPLATES } from "./templates";

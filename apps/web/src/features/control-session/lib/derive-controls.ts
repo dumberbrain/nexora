@@ -5,7 +5,7 @@ import {
   type RuntimeCapabilityProfile,
   type RuntimeKind,
   type SessionStatus,
-} from "@nexora/contracts";
+} from "@ubuliera/contracts";
 
 import { type Session } from "@/entities/session";
 import { humanize } from "@/shared/lib/humanize";
@@ -34,7 +34,7 @@ export const CONTROL_LABEL = {
 } as const;
 
 export const OBSERVE_ONLY_REASON =
-  "Observe-only session — Nexora did not start it, so it cannot be controlled here";
+  "Observe-only session — Ubuliera did not start it, so it cannot be controlled here";
 
 type Cap = keyof Pick<
   RuntimeCapabilityProfile,
