@@ -25,4 +25,5 @@ export * from "./api/board";
 export * from "./api/workflows";
 export * from "./api/teams";
 export * from "./api/integrations";
+export * from "./api/settings";
 export * from "./socket";

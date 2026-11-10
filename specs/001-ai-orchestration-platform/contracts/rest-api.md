@@ -116,3 +116,15 @@ Terminal: Socket.IO namespace `/terminal` (auth required, Nexora-spawned lead se
 ## Health
 
 | GET | `/health` | `{ status, version, db, uptimeMs }` — no auth, loopback only |
+
+## Settings & API tokens (US8)
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/settings` | MCP enabled + endpoint; remote access status (read-only) |
+| PUT | `/settings/mcp` | `{ enabled }` (audited; disabled ⇒ `/mcp` 404) |
+| GET | `/tokens` | API tokens (no secrets) |
+| POST | `/tokens` | `{ name, scope: read|control }` → 201 `{ token, secret }` — secret shown once, stored as sha-256 |
+| DELETE | `/tokens/:id` | revoke (idempotent) |
+
+Session-cookie only: bearer tokens can never create or revoke tokens or change settings. MCP tool names, scopes and input schemas: contracts/api/settings.ts (`MCP_TOOLS`, `MCP_TOOL_INPUTS`).
