@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll } from "vitest";
 
-import { resetTaskBoard, resetWorkflows } from "./msw/handlers";
+import { resetSettings, resetTaskBoard, resetWorkflows } from "./msw/handlers";
 import { server } from "./msw/server";
 
 // jsdom has no ResizeObserver; Radix form controls (Switch/Checkbox inside a <form>) measure
@@ -19,6 +19,7 @@ afterEach(() => {
   server.resetHandlers();
   resetTaskBoard();
   resetWorkflows();
+  resetSettings();
   cleanup();
 });
 afterAll(() => server.close());

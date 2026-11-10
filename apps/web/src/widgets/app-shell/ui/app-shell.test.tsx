@@ -55,6 +55,14 @@ describe("AppShell", () => {
     expect(nav.querySelector('a[href="/"]')).toHaveTextContent("/overview");
   });
 
+  it("puts /settings at the bottom of the navigation", async () => {
+    renderShell();
+    const nav = (await screen.findAllByRole("navigation", { name: "Main" }))[0]!;
+    const links = nav.querySelectorAll("a");
+    expect(links[links.length - 1]).toHaveAttribute("href", "/settings");
+    expect(links[links.length - 1]).toHaveTextContent("/settings");
+  });
+
   it("shows the realtime state, including stale states", async () => {
     useConnectionStore.setState({ state: "reconnecting" });
     renderShell();
